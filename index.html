@@ -141,7 +141,7 @@ h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 .sport small{color:var(--muted);font-size:.82rem;line-height:1.3}
 .sport.main{grid-column:1/-1;min-height:150px;border-color:var(--fg)}
 .sport.main h2{font-size:1.9rem}
-.sport.main .go{position:absolute;right:14px;top:14px;background:var(--fg);color:var(--bg);border-radius:999px;padding:5px 12px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.95rem}
+.sport .go{position:absolute;right:10px;top:11px;font-size:.85rem!important;padding:3px 10px!important;background:var(--fg);color:var(--bg);border-radius:999px;padding:5px 12px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.95rem}
 .sport.soon{opacity:.6}
 .sport.soon .badge{position:absolute;right:10px;top:12px;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
 .stat-row{display:flex;gap:10px;margin-top:18px}
@@ -158,7 +158,7 @@ h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 <div class="wrap" id="gym" hidden>
   <a class="back" href="#home">‹ Home</a>
   <div class="top">
-    <div><p class="kicker">Palestra · Scheda Ipertrofia</p><h1>GymDay</h1></div>
+    <div><p class="kicker">Scheda Ipertrofia</p><h1>Palestra</h1></div>
     <div class="sync on" id="sync"><i></i><span>Dati salvati sul telefono</span></div>
   </div>
   <nav class="nav" id="nav" aria-label="Allenamenti"></nav>
@@ -487,7 +487,7 @@ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==
 
 /* ---------- home & sections ---------- */
 const SPORTS = [
-  {id:"gym", name:"Palestra", sub:"GymDay", ico:"🏋️", pc:"--p-blue", active:true},
+  {id:"gym", name:"Palestra", sub:"Scheda, serie e carichi", ico:"🏋️", pc:"--p-blue", active:true},
   {id:"run", name:"Corsa", sub:"Uscite, distanze e ritmi", ico:"🏃", pc:"--p-red"},
   {id:"bike", name:"Bici", sub:"Giri e chilometri", ico:"🚴", pc:"--p-yellow"},
   {id:"swim", name:"Nuoto", sub:"Vasche e tempi", ico:"🏊", pc:"--p-green"},
@@ -504,12 +504,12 @@ function renderHome(){
   const planned = plan.workouts.filter(w=>w.day>=0).length;
   const last = sessions[0];
   const lastStr = last ? new Date(last.date).toLocaleDateString("it-IT",{day:"numeric",month:"short"}) : "–";
-  const gymSub = todayW ? `Oggi: <b>${esc(todayW.name)}</b> · ${todayW.exercises.length} esercizi` : "Oggi recupero · scegli un allenamento se vuoi";
+  const gymSub = todayW ? `Oggi: <b>${esc(todayW.name)}</b>` : "Oggi recupero";
   $("#home").innerHTML = `
-    <header class="home-head"><p class="kicker">${esc(dateStr)}</p><h1>MyPersonal&shy;Training</h1><p>Scegli lo sport di oggi.</p></header>
+    <header class="home-head"><p class="kicker">MyPersonalTraining · ${esc(dateStr)}</p><h1>My Body</h1><p>Scegli lo sport di oggi.</p></header>
     <div class="sports">
       ${SPORTS.map(s=> s.active
-        ? `<a class="sport main" href="#${s.id}" style="--pc:var(${s.pc})"><span class="ico" aria-hidden="true">${s.ico}</span><span class="go">Apri ›</span><h2>${esc(s.sub)}</h2><small>${esc(s.name)} · ${gymSub}</small></a>`
+        ? `<a class="sport" href="#${s.id}" style="--pc:var(${s.pc})"><span class="ico" aria-hidden="true">${s.ico}</span><span class="go">Apri ›</span><h2>${esc(s.name)}</h2><small>${gymSub}</small></a>`
         : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true"><span class="ico" aria-hidden="true">${s.ico}</span><span class="badge">In arrivo</span><h2>${esc(s.name)}</h2><small>${esc(s.sub)}</small></div>`
       ).join("")}
     </div>
