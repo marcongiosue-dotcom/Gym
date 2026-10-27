@@ -1,7 +1,7 @@
 {
-  "name": "Scheda Ipertrofia",
-  "short_name": "Scheda",
-  "description": "Allenamenti, serie, carichi e timer di recupero",
+  "name": "MyPersonalTraining",
+  "short_name": "MyPT",
+  "description": "Il tuo allenamento: palestra (GymDay) e altri sport",
   "lang": "it",
   "start_url": "./",
   "scope": "./",
