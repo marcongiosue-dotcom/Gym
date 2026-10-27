@@ -1450,7 +1450,10 @@ new MutationObserver(()=>document.body.classList.toggle("timing", $("#timer").cl
 window.addEventListener("hashchange", route);
 route();
 if(!user.name) askName(false);
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{ r.update().catch(()=>{}); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") r.update().catch(()=>{}); }); }).catch(()=>{});
+  let reloaded=false; const hadSW=!!navigator.serviceWorker.controller; navigator.serviceWorker.addEventListener("controllerchange",()=>{ if(!reloaded && hadSW){ reloaded=true; location.reload(); } });
+}
 try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
 </script>
 
