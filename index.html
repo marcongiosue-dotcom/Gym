@@ -127,27 +127,51 @@ h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 .timer .bar{position:absolute;left:0;top:0;height:4px;background:var(--p-yellow);width:0}
 .timer.over{background:var(--p-red);color:#fff}
 .toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
-/* Home: one tile per sport; only active sections are tappable */
+/* Home: My Body card on top, then filter/sort bar and a grid of sport tiles */
 .back{display:inline-flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:6px;padding:4px 0}
 .kicker{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;color:var(--muted);margin:0 0 4px}
-.home-head{margin:8px 0 18px}
-.home-head h1{font-size:2.3rem}
-.home-head p{margin:6px 0 0;color:var(--muted);font-size:.95rem}
+.home-head{margin:8px 0 14px}
+.home-head h1{font-size:1.5rem}
+.body-card{display:block;position:relative;padding:16px;border-radius:var(--r);background:var(--fg);color:var(--bg);text-decoration:none}
+.body-card h2{margin:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:2.4rem;line-height:1}
+.body-card .go{position:absolute;right:14px;top:16px;border:1px solid currentColor;border-radius:999px;padding:4px 12px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.9rem;opacity:.9}
+.body-card .mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.body-card .mini div{border-top:1px solid color-mix(in srgb,currentColor 25%,transparent);padding-top:8px}
+.body-card .mini b{display:block;font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.body-card .mini span{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;opacity:.7}
+.sec-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:24px 0 8px}
+.sec-title h2{margin:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.4rem}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar select{flex:1;min-width:0}
+.filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px}
+.filters::-webkit-scrollbar{display:none}
+.filters .chip{font-size:.92rem;padding:6px 12px}
 .sports{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sport{position:relative;display:flex;flex-direction:column;gap:6px;min-height:132px;padding:14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;overflow:hidden}
 .sport::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--pc,var(--line))}
 .sport .ico{font-size:1.7rem;line-height:1}
 .sport h2{margin:auto 0 0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.45rem;line-height:1}
 .sport small{color:var(--muted);font-size:.82rem;line-height:1.3}
-.sport.main{grid-column:1/-1;min-height:150px;border-color:var(--fg)}
-.sport.main h2{font-size:1.9rem}
-.sport .go{position:absolute;right:10px;top:11px;font-size:.85rem!important;padding:3px 10px!important;background:var(--fg);color:var(--bg);border-radius:999px;padding:5px 12px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.95rem}
+.sport .go{position:absolute;right:10px;top:11px;background:var(--fg);color:var(--bg);border-radius:999px;padding:3px 10px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.85rem}
 .sport.soon{opacity:.6}
-.sport.soon .badge{position:absolute;right:10px;top:12px;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
-.stat-row{display:flex;gap:10px;margin-top:18px}
-.stat{flex:1;background:var(--sunk);border-radius:var(--r);padding:10px 12px}
-.stat b{display:block;font-family:var(--mono);font-size:1.3rem;font-variant-numeric:tabular-nums}
-.stat span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.sport .badge{position:absolute;right:10px;top:12px;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.sport.off{border-style:dashed}
+.sport.off>:not(.ctl){opacity:.4}
+.sport .ctl{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.sport .ctl .btn{padding:6px 0;min-width:0}
+.sport .ctl [data-shide]{grid-column:1/-1}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;min-width:0}
+.stat b{display:block;font-family:var(--mono);font-size:1.25rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat span{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat em{display:block;font-style:normal;font-family:var(--mono);font-size:.75rem;color:var(--muted);margin-top:2px}
+.stat em.dn{color:var(--done)} .stat em.upc{color:var(--warn)}
+.btable{width:100%;border-collapse:collapse;font-size:.88rem}
+.btable th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:0 6px 6px 0}
+.btable td{padding:8px 6px 8px 0;border-top:1px solid var(--line);font-family:var(--mono);font-variant-numeric:tabular-nums}
+.btable td:first-child{font-family:var(--body)}
+.btable .x{border:0;background:none;color:var(--muted);padding:2px 6px}
+.tscroll{overflow-x:auto}
 @media (prefers-reduced-motion: reduce){.timer{transition:none}}
 @media (max-width:380px){.timer .clock{font-size:1.7rem}.timer .lbl{display:none}}
 </style>
@@ -155,6 +179,7 @@ h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 </head>
 <body>
 <div class="wrap" id="home" hidden></div>
+<div class="wrap" id="body" hidden></div>
 <div class="wrap" id="gym" hidden>
   <a class="back" href="#home">‹ Home</a>
   <div class="top">
@@ -406,7 +431,7 @@ document.addEventListener("click", ev=>{
   }
   if(b.hasAttribute("data-reset")){ armButton(b,()=>{ delete drafts[w.id]; saveDrafts(); render(); }); return; }
   if(b.hasAttribute("data-finish")){ finish(w); return; }
-  if(b.hasAttribute("data-export")){ const blob=new Blob([JSON.stringify({app:"mypersonaltraining",exportedAt:Date.now(),plan,sessions},null,1)],{type:"application/json"});
+  if(b.hasAttribute("data-export")){ const blob=new Blob([JSON.stringify({app:"mypersonaltraining",exportedAt:Date.now(),plan,sessions,body:LS.get("mypt.body"),home:LS.get("mypt.home")},null,1)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="backup-mypt-gymday-"+new Date().toISOString().slice(0,10)+".json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); return; }
   if(b.dataset.delsess){ armButton(b,async()=>{ const id=b.dataset.delsess; sessions=sessions.filter(s=>s.id!==id); LS.set("gym.sessions",sessions); render(); }); return; }
 });
@@ -433,7 +458,7 @@ document.addEventListener("change", ev=>{
 document.addEventListener("change", async ev=>{
   if(ev.target.id!=="imp" || !ev.target.files[0]) return;
   try{ const d=JSON.parse(await ev.target.files[0].text()); if(!d.plan||!Array.isArray(d.plan.workouts)) throw 0;
-    plan=d.plan; sessions=Array.isArray(d.sessions)?d.sessions:[]; LS.set("gym.plan",plan); LS.set("gym.sessions",sessions);
+    plan=d.plan; sessions=Array.isArray(d.sessions)?d.sessions:[]; LS.set("gym.plan",plan); LS.set("gym.sessions",sessions); if(d.body){ LS.set("mypt.body",d.body); body=Object.assign({height:null,entries:[]},d.body); } if(d.home){ LS.set("mypt.home",d.home); }
     current=plan.workouts[0]?.id; render(); toast("Backup importato"); }
   catch(e){ toast("File non valido: scegli un backup esportato da questa app"); }
   ev.target.value="";
@@ -487,42 +512,158 @@ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==
 
 /* ---------- home & sections ---------- */
 const SPORTS = [
-  {id:"gym", name:"Palestra", sub:"Scheda, serie e carichi", ico:"🏋️", pc:"--p-blue", active:true},
-  {id:"run", name:"Corsa", sub:"Uscite, distanze e ritmi", ico:"🏃", pc:"--p-red"},
-  {id:"bike", name:"Bici", sub:"Giri e chilometri", ico:"🚴", pc:"--p-yellow"},
-  {id:"swim", name:"Nuoto", sub:"Vasche e tempi", ico:"🏊", pc:"--p-green"},
-  {id:"padel", name:"Padel / Tennis", sub:"Partite e risultati", ico:"🎾", pc:"--p-yellow"},
-  {id:"football", name:"Calcio", sub:"Partite e allenamenti", ico:"⚽", pc:"--p-green"},
-  {id:"mobility", name:"Mobilità", sub:"Stretching e yoga", ico:"🧘", pc:"--p-red"}
+  {id:"gym", name:"Palestra", sub:"Scheda, serie e carichi", ico:"🏋️", pc:"--p-blue", cat:"Forza", active:true},
+  {id:"run", name:"Corsa", sub:"Uscite, distanze e ritmi", ico:"🏃", pc:"--p-red", cat:"Cardio"},
+  {id:"bike", name:"Bici", sub:"Giri e chilometri", ico:"🚴", pc:"--p-yellow", cat:"Cardio"},
+  {id:"swim", name:"Nuoto", sub:"Vasche e tempi", ico:"🏊", pc:"--p-green", cat:"Cardio"},
+  {id:"padel", name:"Padel / Tennis", sub:"Partite e risultati", ico:"🎾", pc:"--p-yellow", cat:"Racchetta"},
+  {id:"football", name:"Calcio", sub:"Partite e allenamenti", ico:"⚽", pc:"--p-green", cat:"Squadra"},
+  {id:"mobility", name:"Mobilità", sub:"Stretching e yoga", ico:"🧘", pc:"--p-red", cat:"Benessere"}
 ];
-function renderHome(){
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
-  const todayW = plan.workouts.find(w=>w.day===todayIdx);
-  const weekStart = new Date(now); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate()-todayIdx);
-  const thisWeek = sessions.filter(s=>s.date>=weekStart.getTime()).length;
-  const planned = plan.workouts.filter(w=>w.day>=0).length;
-  const last = sessions[0];
-  const lastStr = last ? new Date(last.date).toLocaleDateString("it-IT",{day:"numeric",month:"short"}) : "–";
-  const gymSub = todayW ? `Oggi: <b>${esc(todayW.name)}</b>` : "Oggi recupero";
-  $("#home").innerHTML = `
-    <header class="home-head"><p class="kicker">MyPersonalTraining · ${esc(dateStr)}</p><h1>My Body</h1><p>Scegli lo sport di oggi.</p></header>
-    <div class="sports">
-      ${SPORTS.map(s=> s.active
-        ? `<a class="sport" href="#${s.id}" style="--pc:var(${s.pc})"><span class="ico" aria-hidden="true">${s.ico}</span><span class="go">Apri ›</span><h2>${esc(s.name)}</h2><small>${gymSub}</small></a>`
-        : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true"><span class="ico" aria-hidden="true">${s.ico}</span><span class="badge">In arrivo</span><h2>${esc(s.name)}</h2><small>${esc(s.sub)}</small></div>`
-      ).join("")}
-    </div>
-    <div class="stat-row">
-      <div class="stat"><b>${thisWeek}/${planned||"–"}</b><span>Palestra settimana</span></div>
-      <div class="stat"><b>${sessions.length}</b><span>Allenamenti totali</span></div>
-      <div class="stat"><b>${esc(lastStr)}</b><span>Ultimo</span></div>
-    </div>`;
+const CATS = ["Tutti","Disponibili",...new Set(SPORTS.map(s=>s.cat))];
+let homePrefs = Object.assign({order:SPORTS.map(s=>s.id), hidden:[], filter:"Tutti", sort:"custom"}, LS.get("mypt.home")||{});
+SPORTS.forEach(s=>{ if(!homePrefs.order.includes(s.id)) homePrefs.order.push(s.id); });
+let homeEdit = false;
+const saveHome = ()=>LS.set("mypt.home", homePrefs);
+
+/* body data: {height, entries:[{id,date:"YYYY-MM-DD",weight,fat,waist,chest,hips,arm,thigh}]} newest first */
+let body = Object.assign({height:null, entries:[]}, LS.get("mypt.body")||{});
+const saveBody = ()=>LS.set("mypt.body", body);
+const METRICS = [
+  {k:"weight", l:"Peso", u:"kg", good:-1},
+  {k:"fat", l:"Grasso", u:"%", good:-1},
+  {k:"waist", l:"Vita", u:"cm", good:-1},
+  {k:"chest", l:"Petto", u:"cm", good:1},
+  {k:"hips", l:"Fianchi", u:"cm", good:0},
+  {k:"arm", l:"Braccio", u:"cm", good:1},
+  {k:"thigh", l:"Coscia", u:"cm", good:0}
+];
+const latest = k => { const i=body.entries.findIndex(e=>e[k]!=null); return i<0?null:{v:body.entries[i][k], i}; };
+const prevOf = (k,i) => { for(let j=i+1;j<body.entries.length;j++) if(body.entries[j][k]!=null) return body.entries[j][k]; return null; };
+const num1 = n => n==null?"–":(Math.round(n*10)/10).toLocaleString("it-IT");
+function bmi(){ const w=latest("weight"); if(!w||!body.height) return null; const h=body.height/100; return w.v/(h*h); }
+function delta(m){
+  const L=latest(m.k); if(!L) return ""; const p=prevOf(m.k,L.i); if(p==null) return "";
+  const d=L.v-p; if(Math.abs(d)<0.05) return `<em>= stabile</em>`;
+  const cls = m.good===0?"":(Math.sign(d)===m.good?"dn":"upc");
+  return `<em class="${cls}">${d>0?"+":"−"}${num1(Math.abs(d))} ${m.u}</em>`;
 }
+function weekGym(){
+  const now=new Date(), ws=new Date(now); ws.setHours(0,0,0,0); ws.setDate(ws.getDate()-todayIdx);
+  return sessions.filter(s=>s.date>=ws.getTime()).length;
+}
+
+function renderHome(){
+  const dateStr = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
+  const todayW = plan.workouts.find(w=>w.day===todayIdx);
+  const b = bmi(), w = latest("weight"), f = latest("fat");
+  let list = homePrefs.order.map(id=>SPORTS.find(s=>s.id===id)).filter(Boolean);
+  if(homePrefs.sort==="az") list = [...list].sort((a,b)=>a.name.localeCompare(b.name,"it"));
+  if(homePrefs.sort==="avail") list = [...list].sort((a,b)=>(b.active?1:0)-(a.active?1:0));
+  if(!homeEdit){
+    list = list.filter(s=>!homePrefs.hidden.includes(s.id));
+    if(homePrefs.filter==="Disponibili") list = list.filter(s=>s.active);
+    else if(homePrefs.filter!=="Tutti") list = list.filter(s=>s.cat===homePrefs.filter);
+  }
+  const tile = (s,i)=>{
+    const sub = s.id==="gym" ? (todayW?`Oggi: <b>${esc(todayW.name)}</b>`:"Oggi recupero") : esc(s.sub);
+    const inner = `<span class="ico" aria-hidden="true">${s.ico}</span>${homeEdit?"":(s.active?`<span class="go">Apri ›</span>`:`<span class="badge">In arrivo</span>`)}<h2>${esc(s.name)}</h2><small>${sub}</small>`;
+    if(homeEdit){
+      const hid = homePrefs.hidden.includes(s.id);
+      return `<div class="sport ${hid?"off":""}" style="--pc:var(${s.pc})">${inner}<div class="ctl">
+        <button class="btn" data-smv="-1" data-sid="${s.id}" ${i===0?"disabled":""} aria-label="Sposta prima">←</button>
+        <button class="btn" data-smv="1" data-sid="${s.id}" ${i===list.length-1?"disabled":""} aria-label="Sposta dopo">→</button>
+        <button class="btn" data-shide="${s.id}" aria-pressed="${!hid}">${hid?"Mostra":"Nascondi"}</button></div></div>`;
+    }
+    return s.active ? `<a class="sport" href="#${s.id}" style="--pc:var(${s.pc})">${inner}</a>`
+                    : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true">${inner}</div>`;
+  };
+  $("#home").innerHTML = `
+    <header class="home-head"><p class="kicker">${esc(dateStr)}</p><h1>MyPersonalTraining</h1></header>
+    <a class="body-card" href="#body"><span class="go">Riepilogo ›</span><p class="kicker" style="color:inherit;opacity:.7">Il tuo corpo</p><h2>My Body</h2>
+      <div class="mini"><div><b>${w?num1(w.v):"–"}</b><span>Peso kg</span></div><div><b>${b?num1(b):"–"}</b><span>BMI</span></div><div><b>${f?num1(f.v):"–"}</b><span>Grasso %</span></div></div></a>
+    <div class="sec-title"><h2>Sport</h2><button class="btn ${homeEdit?"primary":""}" data-hedit>${homeEdit?"Fatto":"Personalizza"}</button></div>
+    ${homeEdit ? `<p style="margin:0 0 10px;color:var(--muted);font-size:.88rem">Sposta gli sport con le frecce e nascondi quelli che non pratichi.</p>` : `
+    <div class="toolbar"><select class="tin" id="sport-sort" aria-label="Ordina sport">
+      <option value="custom" ${homePrefs.sort==="custom"?"selected":""}>Ordine personale</option>
+      <option value="az" ${homePrefs.sort==="az"?"selected":""}>Alfabetico A → Z</option>
+      <option value="avail" ${homePrefs.sort==="avail"?"selected":""}>Disponibili prima</option></select></div>
+    <div class="filters" role="group" aria-label="Filtra sport">${CATS.map(c=>`<button class="chip ghost" data-hf="${esc(c)}" aria-pressed="${homePrefs.filter===c}">${esc(c)}</button>`).join("")}</div>`}
+    <div class="sports">${list.length?list.map(tile).join(""):`<div class="empty" style="grid-column:1/-1">Nessuno sport con questo filtro.</div>`}</div>`;
+}
+
+function renderBody(){
+  const b = bmi();
+  const bmiLbl = b==null?"":b<18.5?"sottopeso":b<25?"normopeso":b<30?"sovrappeso":"obesità";
+  const today = new Date().toISOString().slice(0,10);
+  const cols = METRICS.filter(m=>body.entries.some(e=>e[m.k]!=null));
+  const total = sessions.length, wk = weekGym(), planned = plan.workouts.filter(w=>w.day>=0).length;
+  const mins = sessions.slice(0,10);
+  const vol30 = sessions.filter(s=>s.date>Date.now()-30*864e5).reduce((a,s)=>a+s.exercises.reduce((b,x)=>b+x.sets.reduce((c,y)=>c+(y.kg||0)*(x.unit==="s"?0:(y.reps||0)),0),0),0);
+  const L = (k)=>{ const x=latest(k); return x?num1(x.v):"–"; };
+  $("#body").innerHTML = `
+    <a class="back" href="#home">‹ Home</a>
+    <p class="kicker">Riepilogo</p><h1>My Body</h1>
+    <p style="margin:6px 0 0;color:var(--muted);font-size:.9rem">${body.entries.length?`Ultima misurazione: ${new Date(body.entries[0].date).toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric"})}`:"Nessuna misurazione ancora: aggiungi la prima qui sotto."}</p>
+
+    <div class="sec-title"><h2>Composizione</h2></div>
+    <div class="stat-row">
+      <div class="stat"><span>Peso</span><b>${L("weight")}<small style="font-size:.7rem"> kg</small></b>${delta(METRICS[0])}</div>
+      <div class="stat"><span>BMI</span><b>${b?num1(b):"–"}</b><em>${b?bmiLbl:(body.height?"":"serve l'altezza")}</em></div>
+      <div class="stat"><span>Grasso</span><b>${L("fat")}<small style="font-size:.7rem"> %</small></b>${delta(METRICS[1])}</div>
+      <div class="stat"><span>Massa magra</span><b>${(latest("weight")&&latest("fat"))?num1(latest("weight").v*(1-latest("fat").v/100)):"–"}<small style="font-size:.7rem"> kg</small></b></div>
+      <div class="stat"><span>Altezza</span><b>${body.height?num1(body.height):"–"}<small style="font-size:.7rem"> cm</small></b></div>
+      <div class="stat"><span>Misurazioni</span><b>${body.entries.length}</b></div>
+    </div>
+
+    <div class="sec-title"><h2>Circonferenze</h2></div>
+    <div class="stat-row">${METRICS.slice(2).map(m=>`<div class="stat"><span>${m.l}</span><b>${L(m.k)}<small style="font-size:.7rem"> cm</small></b>${delta(m)}</div>`).join("")}</div>
+
+    <div class="sec-title"><h2>Attività</h2></div>
+    <div class="stat-row">
+      <div class="stat"><span>Palestra sett.</span><b>${wk}/${planned||"–"}</b></div>
+      <div class="stat"><span>Allenamenti</span><b>${total}</b></div>
+      <div class="stat"><span>Volume 30 gg</span><b>${Math.round(vol30/1000*10)/10>0?num1(vol30/1000)+"t":"–"}</b></div>
+    </div>
+
+    <div class="sec-title"><h2>Nuova misurazione</h2></div>
+    <div class="card"><div class="edit-grid">
+      <label>Data<input class="tin" type="date" id="b-date" value="${today}" max="${today}"></label>
+      <label>Altezza (cm)<input class="tin" id="b-height" inputmode="decimal" value="${body.height??""}" placeholder="es. 178"></label>
+      ${METRICS.map(m=>`<label>${m.l} (${m.u})<input class="tin" id="b-${m.k}" inputmode="decimal" placeholder="${(latest(m.k)?num1(latest(m.k).v):"")}"></label>`).join("")}
+    </div><div class="edit-actions"><span class="sp"></span><button class="btn primary" data-bsave>Salva misurazione</button></div>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.8rem">Compila solo i campi che hai misurato. Meglio pesarsi sempre alla stessa ora, a digiuno.</p></div>
+
+    <div class="sec-title"><h2>Storico</h2></div>
+    ${body.entries.length?`<div class="card tscroll"><table class="btable"><thead><tr><th>Data</th>${cols.map(m=>`<th>${m.l}</th>`).join("")}<th></th></tr></thead><tbody>
+      ${body.entries.map(e=>`<tr><td>${new Date(e.date).toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"2-digit"})}</td>${cols.map(m=>`<td>${e[m.k]!=null?num1(e[m.k]):"–"}</td>`).join("")}<td><button class="x" data-bdel="${e.id}" aria-label="Elimina misurazione">✕</button></td></tr>`).join("")}
+    </tbody></table></div>`:`<div class="empty">Le misurazioni salvate compaiono qui.</div>`}`;
+}
+
+document.addEventListener("click", ev=>{
+  const b = ev.target.closest("button"); if(!b) return;
+  if(b.dataset.hf){ homePrefs.filter=b.dataset.hf; saveHome(); renderHome(); return; }
+  if(b.hasAttribute("data-hedit")){ homeEdit=!homeEdit; if(homeEdit){ homePrefs.sort="custom"; homePrefs.filter="Tutti"; saveHome(); } renderHome(); return; }
+  if(b.dataset.smv){ const o=homePrefs.order, i=o.indexOf(b.dataset.sid), j=i+Number(b.dataset.smv); if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; saveHome(); renderHome(); return; }
+  if(b.dataset.shide){ const id=b.dataset.shide, h=homePrefs.hidden; homePrefs.hidden = h.includes(id)?h.filter(x=>x!==id):[...h,id]; saveHome(); renderHome(); return; }
+  if(b.hasAttribute("data-bsave")){
+    const h=parseNum($("#b-height").value); body.height = h&&h>50&&h<260 ? h : body.height;
+    const e={id:uid(), date:$("#b-date").value||new Date().toISOString().slice(0,10)}; let any=false;
+    METRICS.forEach(m=>{ const v=parseNum($("#b-"+m.k).value); if(v!=null&&v>0){ e[m.k]=v; any=true; } });
+    if(!any){ saveBody(); renderBody(); toast(h?"Altezza salvata":"Inserisci almeno un valore"); return; }
+    body.entries.push(e); body.entries.sort((a,b)=>b.date.localeCompare(a.date)); saveBody(); renderBody(); scrollTo(0,0); toast("Misurazione salvata"); return;
+  }
+  if(b.dataset.bdel){ armButton(b,()=>{ body.entries=body.entries.filter(e=>e.id!==b.dataset.bdel); saveBody(); renderBody(); }); return; }
+});
+document.addEventListener("change", ev=>{
+  if(ev.target.id==="sport-sort"){ homePrefs.sort=ev.target.value; saveHome(); renderHome(); }
+});
+
 function route(){
-  const sec = location.hash==="#gym" ? "gym" : "home";
-  $("#home").hidden = sec!=="home"; $("#gym").hidden = sec!=="gym";
-  if(sec==="gym") render(); else renderHome();
+  const h = location.hash.slice(1);
+  const sec = h==="gym"||h==="body" ? h : "home";
+  ["home","gym","body"].forEach(id=>$("#"+id).hidden = id!==sec);
+  if(sec==="gym") render(); else if(sec==="body") renderBody(); else renderHome();
   scrollTo(0,0);
 }
 window.addEventListener("hashchange", route);
