@@ -299,7 +299,7 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   <a href="#home" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>Home</a>
   <a href="#cal" data-tab="cal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendario</a>
   <a href="#food" data-tab="food"><svg viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2 1-3 4-3 7s1 4 3 4"/></svg>Cibo</a>
-  <button type="button" data-settings aria-label="Impostazioni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Impostaz.</button>
+  <a href="#set" data-tab="set"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Impostaz.</a>
 </nav>
 <div class="wrap" id="gym" hidden>
   <a class="back" href="#home">‹ Home</a>
@@ -327,9 +327,9 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   <button class="btn primary" type="submit" id="onb-ok">Inizia</button>
   <button class="btn" type="button" id="onb-cancel" hidden>Annulla</button>
 </form></div>
-<div class="sheet" id="settings" hidden role="dialog" aria-modal="true" aria-labelledby="set-title"><div class="panel">
-  <div class="grab"></div>
-  <div class="sh-top"><h2 id="set-title">Impostazioni</h2><button class="btn" type="button" data-setclose>Chiudi</button></div>
+<div class="wrap" id="set" hidden>
+  <div id="set-hello"></div>
+  <h1 style="font-size:1.9rem;margin:4px 0 0">Impostazioni</h1>
   <div class="set-group"><p class="kicker">Profilo</p>
     <div class="set-row"><input class="tin" id="set-name" maxlength="30" placeholder="Il tuo nome" aria-label="Nome"><button class="btn primary" type="button" data-setname>Salva</button></div></div>
   <div class="set-group"><p class="kicker">Colore sfondo</p>
@@ -354,7 +354,7 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
     <p class="set-note">I dati restano solo su questo telefono. Esporta un backup ogni tanto: ti serve se cambi telefono o cancelli i dati del browser.</p>
     <div class="edit-actions"><button class="btn danger" type="button" data-wipe>Cancella tutti i dati</button></div></div>
   <p class="set-note" style="margin-top:22px;text-align:center">MyPT · versione 1.0</p>
-</div></div>
+</div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
   <div class="in-t">
@@ -1000,17 +1000,18 @@ function markTheme(){ const t=currentTheme(); document.querySelectorAll("[data-t
 document.addEventListener("click", ev=>{ const b=ev.target.closest("[data-theme-pick]"); if(b) applyTheme(b.dataset.themePick); });
 if(document.documentElement.dataset.theme) document.querySelector('meta[name="theme-color"]').setAttribute("content",THEME_BG[currentTheme()]||"#15191b");
 $("#onb-cancel").addEventListener("click", ()=>{ $("#onb").hidden=true; });
-function openSettings(){
+function fillSettings(){
+  $("#set-hello").innerHTML = hello();
   $("#set-name").value = user.name||"";
   const T=food.targets; [["kcal","#s-kcal"],["p","#s-p"],["c","#s-c"],["f","#s-f"],["water","#s-water"]].forEach(([k,id])=>$(id).value=T[k]??"");
-  markTheme(); $("#settings").hidden=false;
+  markTheme();
 }
-function closeSettings(){ $("#settings").hidden=true; }
+function openSettings(){ location.hash="#set"; }
+function closeSettings(){}
 function refresh(){ route(); }
 document.addEventListener("click", ev=>{
-  if(ev.target.closest("[data-rename],[data-settings]")){ openSettings(); return; }
-  if(ev.target.id==="settings" || ev.target.closest("[data-setclose]")){ closeSettings(); return; }
-  const b=ev.target.closest("#settings button"); if(!b) return;
+  if(ev.target.closest("[data-rename]")){ openSettings(); return; }
+  const b=ev.target.closest("#set button"); if(!b) return;
   if(b.hasAttribute("data-setname")){ const n=$("#set-name").value.trim().replace(/\s+/g," "); if(!n){ $("#set-name").focus(); return; }
     user.name=n.charAt(0).toUpperCase()+n.slice(1); LS.set("mypt.user",user); $("#set-name").value=user.name; refresh(); toast("Nome salvato"); return; }
   if(b.hasAttribute("data-settgt")){ const T=food.targets; [["kcal","#s-kcal"],["p","#s-p"],["c","#s-c"],["f","#s-f"],["water","#s-water"]].forEach(([k,id])=>{ const v=parseNum($(id).value); if(v!=null&&v>=0) T[k]=Math.round(v); }); saveFood(); refresh(); toast("Obiettivi salvati"); return; }
@@ -1018,16 +1019,16 @@ document.addEventListener("click", ev=>{
   if(b.hasAttribute("data-wipe")){ armButton(b,()=>{ try{ Object.keys(localStorage).filter(k=>/^(gym|mypt)\./.test(k)).forEach(k=>localStorage.removeItem(k)); }catch(e){} location.hash=""; location.reload(); }); return; }
 });
 $("#set-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("[data-setname]").click(); } });
-document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#settings").hidden) closeSettings(); });
+
 
 /* ---------- navigation: tabs + swipe ---------- */
-const TABS = ["home","cal","food"];
+const TABS = ["home","cal","food","set"];
 let lastSec = null;
 function route(){
   const h = location.hash.slice(1);
-  const sec = ["gym","body","cal","food"].includes(h) ? h : "home";
-  ["home","gym","body","cal","food"].forEach(id=>$("#"+id).hidden = id!==sec);
-  if(sec==="gym") render(); else if(sec==="body") renderBody(); else if(sec==="cal") renderCal(); else if(sec==="food") renderFood(); else renderHome();
+  const sec = ["gym","body","cal","food","set"].includes(h) ? h : "home";
+  ["home","gym","body","cal","food","set"].forEach(id=>$("#"+id).hidden = id!==sec);
+  if(sec==="gym") render(); else if(sec==="body") renderBody(); else if(sec==="cal") renderCal(); else if(sec==="food") renderFood(); else if(sec==="set") fillSettings(); else renderHome();
   const isTab = TABS.includes(sec);
   $("#tabbar").hidden = !isTab;
   document.querySelectorAll("#tabbar a").forEach(a=>{ if(a.dataset.tab===sec) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
@@ -1039,7 +1040,7 @@ function route(){
 let sx=null, sy=0, sEl=null;
 document.addEventListener("touchstart", e=>{ if(e.touches.length!==1){ sx=null; return; } sx=e.touches[0].clientX; sy=e.touches[0].clientY; sEl=e.target; }, {passive:true});
 document.addEventListener("touchend", e=>{
-  if(sx==null || !$("#onb").hidden || !$("#settings").hidden) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
+  if(sx==null || !$("#onb").hidden) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
   if(Math.abs(dx)<70 || Math.abs(dx)<Math.abs(dy)*1.8) return;
   if(sEl && sEl.closest("input,select,textarea,.filters,.tscroll,.nav,.timer")) return;
   const cur = location.hash.slice(1)||"home", i = TABS.indexOf(cur==="" ? "home" : cur); if(i<0) return;
