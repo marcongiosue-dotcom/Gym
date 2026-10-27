@@ -296,6 +296,58 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .meals{display:flex;flex-direction:column;gap:10px}
 @media (prefers-reduced-motion: reduce){.timer{transition:none}}
 @media (max-width:380px){.timer .clock{font-size:1.7rem}.timer .lbl{display:none}}
+/* Costruttore scheda: corpo interattivo, libreria, salvataggio */
+.steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:0 0 14px;padding:0}
+.steps button{width:100%;border:0;background:var(--sunk);color:var(--muted);border-radius:6px;padding:7px 4px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:.82rem}
+.steps .ok button{color:var(--fg)}
+.steps .on button{background:var(--fg);color:var(--bg)}
+.steps button:disabled{opacity:.55;cursor:default}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.presets .chip,.mchips .chip{font-size:.9rem;padding:6px 12px}
+.bodywrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 8px;text-align:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--bg)}
+.seg button{border:0;background:none;border-radius:999px;padding:6px 18px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.bodies{display:flex;justify-content:center;gap:4%;max-width:290px;margin:0 auto}
+.bfig{flex:1;margin:0;min-width:0}
+.bfig figcaption{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;color:var(--muted)}
+.bodymap{display:block;width:100%;height:auto;margin:6px auto 0;-webkit-tap-highlight-color:transparent}
+.bodymap .bs{fill:var(--sunk);stroke:var(--line);stroke-width:.8}
+.bodymap .mz{fill:color-mix(in srgb,var(--muted) 30%,var(--surface));stroke:var(--surface);stroke-width:1.2;cursor:pointer;transition:fill .15s}
+.bodymap .mz:hover{fill:color-mix(in srgb,var(--accent) 35%,var(--surface))}
+.bodymap .mz[aria-pressed="true"]{fill:var(--accent)}
+.bodymap .mz:focus-visible{outline:none;stroke:var(--fg);stroke-width:2}
+.hint{margin:6px 0 0;font-size:.8rem;color:var(--muted)}
+.mchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.mchips .chip,.presets .chip,#bonly .chip{font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:600}
+.small-link{margin-top:10px;border:0;background:none;color:var(--muted);text-decoration:underline;padding:4px 0}
+.eqf .chip{font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:500;font-size:.85rem;padding:5px 11px}
+.lgrp{display:flex;align-items:baseline;gap:8px;margin:16px 0 6px;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.1rem}
+.lgrp span{font-family:var(--mono);font-size:.75rem;color:var(--muted);font-weight:500}
+.llist{display:flex;flex-direction:column;gap:6px}
+.lrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:10px 12px}
+.lrow .nm{flex:1;min-width:0;font-weight:600;line-height:1.25}
+.lrow small,.prow small{display:block;color:var(--muted);font-weight:400;font-size:.8rem;margin-top:2px}
+.lrow .add{flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:1.1rem;color:var(--muted)}
+.lrow[aria-pressed="true"]{border-color:var(--accent)}
+.lrow[aria-pressed="true"] .add{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.lbl2{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;margin:14px 0 6px}
+.days{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.days button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 4px;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:1rem;min-width:0}
+.days button small{display:block;font-family:var(--body);text-transform:none;font-weight:500;font-size:.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.days button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.days .nod{grid-column:span 1;font-size:.8rem}
+.plist{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 8px 8px 10px}
+.prow .nm{flex:1;min-width:0;font-weight:600;font-size:.92rem;line-height:1.25}
+.prow .btn{padding:6px 9px}
+.bbar{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.bbar .in-b{max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bbar span{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.bbar .btn{padding:11px 18px;font-size:1rem}
+.btn:disabled{opacity:.45;cursor:default}
+@media (prefers-reduced-motion: reduce){.bodymap .mz{transition:none}}
 </style>
 
 </head>
@@ -420,6 +472,337 @@ function defaultPlan(){
   ]};
 }
 
+/* ---------- libreria esercizi ---------- */
+const MUSCLES = {petto:"Petto",spalle:"Spalle",trapezio:"Trapezio",dorsali:"Dorsali",lombari:"Lombari",bicipiti:"Bicipiti",tricipiti:"Tricipiti",avambracci:"Avambracci",addome:"Addome",obliqui:"Obliqui",glutei:"Glutei",quadricipiti:"Quadricipiti",femorali:"Femorali",adduttori:"Adduttori",polpacci:"Polpacci"};
+const MKEYS = Object.keys(MUSCLES);
+const EQUIP = {M:"Macchina",C:"Cavi",D:"Manubri",B:"Bilanciere",L:"Corpo libero"};
+const PRESETS = [
+  {l:"Parte alta", m:["petto","spalle","trapezio","dorsali","bicipiti","tricipiti"]},
+  {l:"Parte bassa", m:["glutei","quadricipiti","femorali","adduttori","polpacci"]},
+  {l:"Push", m:["petto","spalle","tricipiti"]},
+  {l:"Pull", m:["dorsali","trapezio","bicipiti","avambracci"]},
+  {l:"Braccia", m:["bicipiti","tricipiti","avambracci"]},
+  {l:"Core", m:["addome","obliqui","lombari"]},
+  {l:"Total body", m:MKEYS}
+];
+// id|nome|muscolo principale|secondari|attrezzo|m=multiarticolare i=isolamento|serie|rip min|rip max|recupero s|unità
+const LIB = `
+panca_bil|Panca piana con bilanciere|petto|spalle tricipiti|B|m|4|6|8|150
+panca_man|Panca piana con manubri|petto|spalle tricipiti|D|m|4|8|10|120
+panca_incl_bil|Panca inclinata con bilanciere|petto|spalle tricipiti|B|m|4|6|8|150
+panca_incl_man|Panca inclinata 30° con manubri|petto|spalle tricipiti|D|m|4|8|10|120
+panca_decl|Panca declinata con bilanciere|petto|tricipiti|B|m|3|8|10|120
+chest_press|Chest press alla macchina|petto|spalle tricipiti|M|m|4|8|10|120
+chest_press_incl|Chest press inclinata alla macchina|petto|spalle tricipiti|M|m|4|8|10|120
+panca_multi|Panca piana al multipower|petto|spalle tricipiti|M|m|4|8|10|120
+croci_man|Croci con manubri su panca piana|petto|spalle|D|i|3|10|12|90
+croci_cavi|Croci ai cavi in piedi|petto|spalle|C|i|3|12|15|90
+croci_cavi_bassi|Croci ai cavi dal basso|petto|spalle|C|i|3|12|15|75
+pectoral|Pectoral machine|petto||M|i|3|12|15|90
+dip_petto|Dip alle parallele (busto inclinato)|petto|tricipiti spalle|L|m|3|8|12|120
+piegamenti|Piegamenti sulle braccia|petto|tricipiti spalle|L|m|3|10|20|75
+pullover|Pullover con manubrio|petto|dorsali|D|i|3|10|12|90
+military|Military press con bilanciere|spalle|tricipiti trapezio|B|m|4|6|8|150
+lento_man|Lento avanti con manubri seduto|spalle|tricipiti|D|m|4|8|10|120
+shoulder_press|Shoulder press alla macchina|spalle|tricipiti|M|m|3|8|10|120
+arnold|Arnold press|spalle|tricipiti|D|m|3|8|12|90
+alzate_lat|Alzate laterali con manubri|spalle||D|i|4|12|15|75
+alzate_lat_cavo|Alzate laterali al cavo|spalle||C|i|4|12|15|75
+alzate_lat_macc|Alzate laterali alla macchina|spalle||M|i|3|12|15|75
+alzate_front|Alzate frontali con manubri|spalle|petto|D|i|3|10|12|75
+alzate_post|Alzate posteriori a busto flesso|spalle|trapezio|D|i|3|12|15|75
+reverse_fly|Reverse fly alla pectoral machine|spalle|trapezio|M|i|3|12|15|75
+face_pull|Face pull ai cavi con corda|spalle|trapezio|C|i|4|12|15|75
+tirata_mento|Tirate al mento al cavo|spalle|trapezio bicipiti|C|m|3|10|12|90
+pike_push|Pike push-up|spalle|tricipiti|L|m|3|8|12|90
+scrollate_man|Scrollate con manubri|trapezio|avambracci|D|i|4|10|15|75
+scrollate_bil|Scrollate con bilanciere|trapezio|avambracci|B|i|4|10|12|90
+scrollate_macc|Scrollate alla macchina|trapezio||M|i|3|12|15|75
+farmer|Camminata del contadino con manubri|trapezio|avambracci addome|D|m|3|30|45|90|s
+y_raise|Y-raise su panca inclinata|trapezio|spalle|D|i|3|12|15|60
+trazioni|Trazioni alla sbarra presa prona|dorsali|bicipiti trapezio|L|m|4|6|10|150
+trazioni_sup|Trazioni presa supina|dorsali|bicipiti|L|m|3|6|10|150
+trazioni_ass|Trazioni assistite alla macchina|dorsali|bicipiti|M|m|3|8|12|120
+lat_larga|Lat machine presa larga|dorsali|bicipiti trapezio|C|m|4|8|10|120
+lat_neutra|Lat machine presa stretta neutra|dorsali|bicipiti|C|m|4|8|10|120
+lat_supina|Lat machine presa supina|dorsali|bicipiti|C|m|3|10|12|90
+pulley|Pulley basso presa stretta|dorsali|trapezio bicipiti|C|m|4|8|12|120
+pulley_larga|Pulley basso presa larga|trapezio|dorsali spalle|C|m|3|10|12|90
+rematore_bil|Rematore con bilanciere|dorsali|trapezio bicipiti lombari|B|m|4|6|10|150
+rematore_man|Rematore con manubrio a un braccio|dorsali|trapezio bicipiti|D|m|3|8|12|90
+rematore_panca|Rematore con manubri su panca inclinata|dorsali|trapezio spalle|D|m|4|8|10|120
+tbar|T-bar row con petto in appoggio|dorsali|trapezio bicipiti|M|m|4|8|10|120
+row_macc|Rematore alla macchina|dorsali|trapezio bicipiti|M|m|3|8|12|120
+pulldown_tese|Pulldown a braccia tese al cavo|dorsali||C|i|3|12|15|75
+rematore_cavo|Rematore al cavo a un braccio|dorsali|bicipiti|C|m|3|10|12|75
+pullover_macc|Pullover alla macchina|dorsali|petto|M|i|3|10|12|90
+rematore_inv|Rematore inverso a corpo libero|dorsali|trapezio bicipiti|L|m|3|8|15|90
+stacco|Stacco da terra con bilanciere|lombari|glutei femorali trapezio avambracci|B|m|4|4|6|180
+iperestensioni|Iperestensioni a 45°|lombari|glutei femorali|L|i|3|12|15|90
+good_morning|Good morning con bilanciere|lombari|femorali glutei|B|m|3|8|10|120
+lombari_macc|Lombari alla macchina|lombari||M|i|3|12|15|75
+superman|Superman a terra|lombari|glutei|L|i|3|12|15|60
+curl_bil|Curl con bilanciere|bicipiti|avambracci|B|i|3|8|12|90
+curl_ez|Curl con bilanciere EZ|bicipiti|avambracci|B|i|3|8|12|90
+curl_man|Curl con manubri alternato|bicipiti|avambracci|D|i|3|10|12|90
+curl_incl|Curl con manubri su panca inclinata|bicipiti||D|i|3|10|12|90
+hammer|Curl a martello con manubri|bicipiti|avambracci|D|i|3|10|12|90
+hammer_cavo|Curl a martello al cavo con corda|bicipiti|avambracci|C|i|3|10|12|75
+curl_scott|Curl alla panca Scott|bicipiti||B|i|3|10|12|90
+curl_scott_macc|Curl alla macchina Scott|bicipiti||M|i|3|10|12|75
+curl_cavo|Curl al cavo basso|bicipiti|avambracci|C|i|3|10|12|75
+curl_conc|Curl di concentrazione|bicipiti||D|i|3|10|12|60
+curl_spider|Spider curl|bicipiti||D|i|3|10|12|75
+curl_cavo_alto|Curl ai cavi alti|bicipiti||C|i|3|12|15|60
+pushdown|Pushdown ai cavi con barra|tricipiti||C|i|3|10|12|90
+pushdown_corda|Pushdown ai cavi con corda|tricipiti||C|i|3|12|15|75
+french|French press con bilanciere EZ|tricipiti||B|i|3|8|12|90
+french_man|French press con manubri|tricipiti||D|i|3|10|12|90
+overhead_cavo|Estensioni sopra la testa al cavo|tricipiti||C|i|3|10|12|90
+overhead_man|Estensioni sopra la testa con manubrio|tricipiti||D|i|3|10|12|90
+panca_stretta|Panca piana presa stretta|tricipiti|petto spalle|B|m|4|6|10|120
+dip|Dip alle parallele (busto dritto)|tricipiti|petto spalle|L|m|3|8|12|120
+dip_panca|Dip tra due panche|tricipiti|spalle|L|m|3|10|15|75
+kickback|Kickback con manubrio|tricipiti||D|i|3|12|15|60
+dip_macc|Dip alla macchina|tricipiti|petto|M|m|3|10|12|90
+piegamenti_stretti|Piegamenti presa stretta|tricipiti|petto|L|m|3|10|15|75
+curl_polso|Curl di polso con bilanciere|avambracci||B|i|3|12|20|60
+curl_polso_inv|Curl di polso inverso con manubri|avambracci||D|i|3|12|20|60
+curl_inverso|Curl inverso con bilanciere EZ|avambracci|bicipiti|B|i|3|10|12|75
+sospensione|Sospensione alla sbarra|avambracci|dorsali|L|i|3|30|60|90|s
+pinza|Presa a pinza con dischi|avambracci||B|i|3|20|30|60|s
+crunch|Crunch a terra|addome||L|i|3|15|20|60
+crunch_cavo|Crunch ai cavi in ginocchio|addome||C|i|3|12|15|60
+crunch_macc|Crunch alla macchina|addome||M|i|3|12|15|60
+plank|Plank|addome|obliqui lombari|L|i|3|30|60|60|s
+knee_raise|Sollevamento ginocchia alla sedia romana|addome||L|i|3|12|15|60
+leg_raise|Sollevamento gambe alla sbarra|addome|obliqui|L|i|3|8|12|75
+crunch_inv|Crunch inverso|addome||L|i|3|12|15|60
+ab_wheel|Ruota per addominali|addome|lombari spalle|L|i|3|8|12|75
+hollow|Hollow hold|addome||L|i|3|20|40|60|s
+dead_bug|Dead bug|addome|obliqui|L|i|3|10|12|60
+russian|Russian twist|obliqui|addome|L|i|3|15|20|60
+plank_lat|Plank laterale|obliqui|addome|L|i|3|30|45|45|s
+woodchop|Woodchopper al cavo|obliqui|addome|C|i|3|12|15|60
+pallof|Pallof press al cavo|obliqui|addome|C|i|3|10|12|60
+crunch_obl|Crunch obliqui|obliqui|addome|L|i|3|15|20|60
+pieg_lat|Piegamenti laterali con manubrio|obliqui||D|i|3|12|15|60
+hip_thrust|Hip thrust con bilanciere|glutei|femorali|B|m|4|8|10|120
+hip_thrust_macc|Hip thrust alla macchina|glutei|femorali|M|m|4|8|12|120
+ponte|Ponte glutei a terra|glutei|femorali|L|i|3|12|20|60
+kickback_cavo|Slanci posteriori al cavo|glutei|femorali|C|i|3|12|15|60
+glute_macc|Slanci posteriori alla macchina glutei|glutei||M|i|3|12|15|60
+abductor|Abductor machine|glutei||M|i|3|15|20|60
+abd_cavo|Abduzioni dell'anca al cavo|glutei||C|i|3|12|15|60
+step_up|Step-up su panca con manubri|glutei|quadricipiti|D|m|3|10|12|90
+stacco_sumo|Stacco sumo con bilanciere|glutei|adduttori femorali lombari quadricipiti|B|m|4|5|8|150
+squat|Squat con bilanciere|quadricipiti|glutei adduttori lombari|B|m|4|6|8|180
+front_squat|Front squat con bilanciere|quadricipiti|glutei addome|B|m|4|6|8|150
+squat_multi|Squat al multipower|quadricipiti|glutei|M|m|4|8|10|150
+goblet|Goblet squat con manubrio|quadricipiti|glutei|D|m|3|10|12|90
+leg_press|Pressa 45° (leg press)|quadricipiti|glutei adduttori|M|m|4|8|12|150
+hack|Hack squat alla macchina|quadricipiti|glutei|M|m|4|8|10|120
+pendulum|Pendulum squat / V-squat|quadricipiti|glutei|M|m|3|8|12|120
+leg_ext|Leg extension|quadricipiti||M|i|3|12|15|90
+affondi|Affondi con manubri|quadricipiti|glutei|D|m|3|10|12|90
+affondi_cam|Affondi in camminata|quadricipiti|glutei|D|m|3|10|12|90
+bulgari|Affondi bulgari con manubri|quadricipiti|glutei|D|m|3|8|12|90
+sissy|Sissy squat|quadricipiti||L|i|3|10|15|75
+squat_libero|Squat a corpo libero|quadricipiti|glutei|L|m|3|15|20|60
+sedia|Sedia al muro|quadricipiti||L|i|3|30|60|60|s
+curl_seduto|Leg curl da seduto|femorali||M|i|4|10|12|90
+curl_sdraiato|Leg curl da sdraiato|femorali||M|i|3|10|12|90
+curl_piedi|Leg curl in piedi a una gamba|femorali||M|i|3|10|12|75
+rumeno|Stacco rumeno con bilanciere|femorali|glutei lombari|B|m|4|8|10|120
+rumeno_man|Stacco rumeno con manubri|femorali|glutei lombari|D|m|3|8|12|120
+gambe_tese|Stacco a gambe tese|femorali|glutei lombari|B|m|3|8|10|120
+nordic|Nordic curl|femorali||L|i|3|5|8|120
+adductor|Adductor machine|adduttori||M|i|3|12|15|60
+adduz_cavo|Adduzioni dell'anca al cavo|adduttori||C|i|3|12|15|60
+squat_sumo|Squat sumo con manubrio|adduttori|glutei quadricipiti|D|m|3|10|12|90
+copenhagen|Copenhagen plank|adduttori|obliqui|L|i|3|20|30|60|s
+calf_piedi|Calf in piedi alla macchina|polpacci||M|i|4|10|15|60
+calf_seduto|Calf da seduto alla macchina|polpacci||M|i|4|15|20|60
+calf_pressa|Calf alla pressa|polpacci||M|i|4|12|15|60
+calf_multi|Calf al multipower|polpacci||M|i|4|10|15|60
+calf_man|Calf a una gamba con manubrio|polpacci||D|i|3|12|15|60
+calf_gradino|Calf sul gradino a corpo libero|polpacci||L|i|3|15|25|45
+`.trim().split("\n").map(r=>{ const [id,name,m,sec,eq,type,sets,a,b,rest,unit]=r.split("|");
+  return {id,name,m,sec:sec?sec.split(" "):[],eq,type,sets:+sets,repMin:+a,repMax:+b,rest:+rest,unit:unit||"reps"}; });
+const LIBX = Object.fromEntries(LIB.map(x=>[x.id,x]));
+// esercizi della scheda iniziale → voce della libreria (per collegare lo storico)
+const NAME2LIB = {"Chest Press guidata / Macchina convergente":"chest_press","Chest-Supported T-Bar Row (o panca 45° manubri)":"tbar","Shoulder Press seduto, schienale 80°":"shoulder_press","Alzate laterali al cavo o manubri seduto":"alzate_lat_cavo","Curl manubri su panca inclinata 60°":"curl_incl","Hammer curl cavo basso o manubri":"hammer_cavo","Pushdown ai cavi (barra o corda)":"pushdown","Cable Crunch in ginocchio / Crunch macchina":"crunch_cavo","Leg Press 45° (piedi al centro)":"leg_press","Leg Curl seduto":"curl_seduto","Leg Extension":"leg_ext","Glute Kickback al cavo (o macchina glutei)":"kickback_cavo","Calf Raise alla Leg Press":"calf_pressa","Knee Raise su Captain's Chair":"knee_raise","Lat Machine presa neutra o larga":"lat_neutra","Incline Chest Press o manubri panca 30°":"chest_press_incl","Pulley basso / Row guidato presa larga":"pulley_larga","Croci ai cavi o Pectoral Machine":"croci_cavi","Face Pull ai cavi alti con corda":"face_pull","Preacher Curl alla panca Scott":"curl_scott","Curl ai cavi bassi (barra o corda)":"curl_cavo","Overhead Triceps Extension al cavo alto":"overhead_cavo","Hip Thrust alla macchina o bilanciere":"hip_thrust_macc","Hack Squat guidato / V-Squat":"hack","Leg Curl sdraiato":"curl_sdraiato","Iperestensioni a 45°":"iperestensioni","Calf Raise da seduto (ginocchia 90°)":"calf_seduto","Plank isometrico / Pallof Press":"plank"};
+const libOf = x => x?.lib || NAME2LIB[x?.name] || null;
+const libTarget = l => [MUSCLES[l.m],...l.sec.map(k=>MUSCLES[k])].join(", ");
+
+/* ---------- corpo interattivo (metà sinistra, specchiata) ---------- */
+const BODY = {
+  front:{
+    base:[
+      "M93,46 L107,46 L109,60 L91,60 Z",
+      "M49,218 C45,228 45,240 51,247 C57,248 61,240 61,228 L60,218 Z",
+      "M70,198 C78,203 90,206 100,207 L100,224 C96,222 92,222 90,224 C86,214 79,207 70,204 Z",
+      "M74,300 C78,304 86,304 90,300 L90,314 C86,317 78,317 74,314 Z",
+      "M79,318 C82,340 82,362 81,382 L90,382 C92,360 92,338 90,318 Z",
+      "M74,386 L91,386 L93,395 L68,395 Z"
+    ],
+    m:{
+      trapezio:["M92,58 C87,62 81,64 75,66 L92,66 Z"],
+      spalle:["M74,66 C62,64 52,72 50,86 C49,96 51,104 54,110 C58,104 62,96 64,88 C66,80 70,72 77,68 Z"],
+      petto:["M98,70 L80,68 C72,72 67,82 67,94 C67,104 73,112 84,114 C90,114 96,112 98,110 Z"],
+      bicipiti:["M53,114 C49,124 48,138 50,150 C54,154 60,154 64,150 C66,138 66,124 64,112 C60,108 56,110 53,114 Z"],
+      avambracci:["M49,158 C45,174 45,196 48,214 L60,214 C64,196 66,176 64,158 C60,155 52,155 49,158 Z"],
+      addome:["M98,117 L87,117 C85,140 86,166 88,186 C90,193 94,197 98,199 Z"],
+      obliqui:["M84,117 C78,117 73,117 68,115 C68,134 70,156 73,176 C77,186 83,192 87,196 C84,172 82,142 84,117 Z"],
+      quadricipiti:["M71,207 C65,232 65,266 71,294 C77,299 85,299 89,294 C91,270 91,244 89,227 C85,217 79,209 71,207 Z"],
+      adduttori:["M91,227 C93,246 93,268 91,286 C96,276 99,256 99,227 C97,223 94,223 91,227 Z"],
+      polpacci:["M72,318 C68,336 69,356 73,376 L78,376 C78,356 78,336 77,318 Z"]
+    }
+  },
+  back:{
+    base:[
+      "M93,46 L107,46 L109,58 L91,58 Z",
+      "M49,218 C45,228 45,240 51,247 C57,248 61,240 61,228 L60,218 Z",
+      "M74,302 C78,305 88,305 94,302 L92,312 C86,314 78,314 74,311 Z",
+      "M76,368 C80,371 84,371 86,368 L88,384 L78,384 Z",
+      "M74,386 L91,386 L93,395 L68,395 Z"
+    ],
+    m:{
+      dorsali:["M98,114 C94,100 86,86 74,74 C68,84 66,98 68,112 C70,130 76,150 84,164 C90,170 96,172 98,172 Z"],
+      trapezio:["M100,48 L92,50 C88,58 80,64 70,68 C80,72 90,86 100,114 Z"],
+      spalle:["M74,66 C62,64 52,72 50,86 C49,96 51,104 54,110 C58,104 62,96 64,88 C66,80 70,72 69,69 Z"],
+      tricipiti:["M53,114 C49,124 48,138 50,150 C54,154 60,154 64,150 C66,138 66,124 64,112 C60,108 56,110 53,114 Z"],
+      avambracci:["M49,158 C45,174 45,196 48,214 L60,214 C64,196 66,176 64,158 C60,155 52,155 49,158 Z"],
+      lombari:["M98,175 C92,175 86,172 82,168 C82,180 84,190 87,198 L98,200 Z"],
+      glutei:["M98,204 C88,202 78,202 72,208 C66,220 68,236 76,244 C84,250 94,248 98,242 Z"],
+      femorali:["M72,249 C68,266 68,284 73,298 C80,302 88,302 94,298 C96,282 96,264 96,251 C88,255 79,255 72,249 Z"],
+      polpacci:["M72,316 C66,330 66,348 72,362 C76,366 82,366 86,362 C90,348 90,330 86,316 C82,312 76,312 72,316 Z"]
+    }
+  }
+};
+function bodySvg(side, sel){
+  const B = BODY[side], mir = p=>`<path d="${p}"/><path d="${p}" transform="matrix(-1 0 0 1 200 0)"/>`;
+  const muscles = Object.entries(B.m).map(([k,ps])=>`<g class="mz" data-m="${k}" role="button" tabindex="0" aria-pressed="${sel.includes(k)}" aria-label="${MUSCLES[k]}">${ps.map(mir).join("")}</g>`).join("");
+  return `<figure class="bfig"><figcaption>${side==="front"?"Fronte":"Retro"}</figcaption><svg class="bodymap" viewBox="42 6 116 394" aria-label="Corpo ${side==="front"?"fronte":"retro"}: tocca i muscoli da allenare">
+    <g class="bs"><ellipse cx="100" cy="28" rx="14" ry="18"/>${B.base.map(mir).join("")}</g>${muscles}</svg></figure>`;
+}
+
+/* ---------- costruttore scheda ---------- */
+let bld = null;
+function openBuilder(targetId){
+  const t = targetId && plan.workouts.find(w=>w.id===targetId);
+  bld = {step:1, side:"front", muscles:[], only:null, eq:"", q:"", picked:[], name:"", day:-1, target:t?t.id:null};
+  if(t){ const ms=new Set(); t.exercises.forEach(e=>{ const l=LIBX[libOf(e)]; if(l) ms.add(l.m); }); bld.muscles=[...ms]; }
+  view="builder"; editing=false; render(); scrollTo(0,0);
+}
+function bldList(){
+  const q = bld.q.trim().toLowerCase(), ms = bld.only ? [bld.only] : bld.muscles;
+  return LIB.filter(l=>(q ? l.name.toLowerCase().includes(q) : ms.includes(l.m)) && (!bld.eq || l.eq===bld.eq));
+}
+function bldSetsByMuscle(ids){
+  const c={}; ids.forEach(id=>{ const l=LIBX[id]; if(l) c[l.m]=(c[l.m]||0)+l.sets; });
+  return MKEYS.filter(k=>c[k]).map(k=>`<span class="tag">${MUSCLES[k]} ${c[k]}</span>`).join("");
+}
+function renderBuilder(){
+  const tgt = bld.target && plan.workouts.find(w=>w.id===bld.target);
+  const steps = ["Muscoli","Esercizi","Salva"];
+  let h = `<div class="head"><div><h2>${tgt?"Aggiungi a "+esc(tgt.name):"Nuova scheda"}</h2><p>${bld.step===1?"Tocca le zone che vuoi allenare":bld.step===2?"Scegli gli esercizi":"Dai un nome e scegli il giorno"}</p></div>
+    <button class="btn" data-bx>Annulla</button></div>
+    <ol class="steps">${steps.map((s,i)=>`<li class="${i+1===bld.step?"on":i+1<bld.step?"ok":""}"><button data-bstep="${i+1}" ${i+1>bld.step&&!(i===1&&bld.muscles.length)&&!(i===2&&bld.picked.length)?"disabled":""}>${i+1}. ${s}</button></li>`).join("")}</ol>`;
+  if(bld.step===1){
+    h += `<div class="presets">${PRESETS.map(p=>`<button class="chip" data-preset="${esc(p.l)}" aria-pressed="${p.m.length===bld.muscles.length&&p.m.every(k=>bld.muscles.includes(k))}">${p.l}</button>`).join("")}</div>
+    <div class="bodywrap">
+      <div class="bodies">${bodySvg("front", bld.muscles)}${bodySvg("back", bld.muscles)}</div>
+      <p class="hint">Tocca un muscolo per selezionarlo, toccalo di nuovo per toglierlo</p>
+    </div>
+    <div class="mchips">${MKEYS.map(k=>`<button class="chip" data-mk="${k}" aria-pressed="${bld.muscles.includes(k)}">${MUSCLES[k]}</button>`).join("")}</div>
+    ${bld.muscles.length?`<button class="btn small-link" data-bclear>Deseleziona tutto</button>`:""}`;
+  } else if(bld.step===2){
+    const list = bldList(), byM = {};
+    list.forEach(l=>(byM[l.m] ??= []).push(l));
+    h += `<input class="tin" id="bq" type="search" placeholder="Cerca un esercizio (in tutta la libreria)" value="${esc(bld.q)}" aria-label="Cerca esercizio">
+    <div class="filters" id="bonly" style="margin:10px 0 6px" ${bld.q?"hidden":""}><button class="chip" data-only="" aria-pressed="${!bld.only}">Tutti</button>${bld.muscles.map(k=>`<button class="chip" data-only="${k}" aria-pressed="${bld.only===k}">${MUSCLES[k]}</button>`).join("")}</div>
+    <div class="filters eqf"><button class="chip ghost" data-eq="" aria-pressed="${!bld.eq}">Ogni attrezzo</button>${Object.entries(EQUIP).map(([k,v])=>`<button class="chip ghost" data-eq="${k}" aria-pressed="${bld.eq===k}">${v}</button>`).join("")}</div>
+    <div id="blist">${renderLibList(byM)}</div>`;
+  } else {
+    const occ = i=>plan.workouts.find(w=>w.day===i && w.id!==bld.target);
+    if(!tgt) h += `<div class="card"><div class="edit-grid">
+      <label class="full">Nome scheda<input class="tin" id="bname" maxlength="40" placeholder="es. Petto e tricipiti" value="${esc(bld.name)}"></label></div>
+      <p class="lbl2">Giorno</p>
+      <div class="days">${DAYS.map((d,i)=>`<button data-bday="${i}" aria-pressed="${bld.day===i}">${d}${occ(i)?`<small>${esc(occ(i).name)}</small>`:"<small>libero</small>"}</button>`).join("")}
+        <button data-bday="-1" aria-pressed="${bld.day===-1}" class="nod">Nessun giorno</button></div>
+      ${bld.day>=0&&occ(bld.day)?`<p class="set-note">${esc(occ(bld.day).name)} verrà spostata su "nessun giorno".</p>`:""}</div>`;
+    h += `<div class="sec-title"><h2 style="font-size:1.15rem">Esercizi (${bld.picked.length})</h2></div>
+      <div class="meta" style="margin:0 0 10px">${bldSetsByMuscle(bld.picked)}</div>
+      <div class="plist">${bld.picked.map((id,i)=>{ const l=LIBX[id]; return `<div class="prow"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="nm">${esc(l.name)}<small>${l.sets} × ${l.unit==="s"?l.repMin+"–"+l.repMax+'"':l.repMin+"–"+l.repMax} · ${MUSCLES[l.m]}</small></div>
+        <button class="btn" data-pmv="-1" data-pid="${id}" ${i===0?"disabled":""} aria-label="Sposta su">↑</button><button class="btn" data-pmv="1" data-pid="${id}" ${i===bld.picked.length-1?"disabled":""} aria-label="Sposta giù">↓</button><button class="btn danger" data-pick="${id}" aria-label="Togli">✕</button></div>`; }).join("")}</div>
+      <p class="set-note">Serie, ripetizioni e recupero li puoi cambiare dopo con <b>Modifica</b>.</p>`;
+  }
+  const n = bld.picked.length;
+  const next = bld.step===1 ? `<button class="btn primary" data-bstep="2" ${bld.muscles.length?"":"disabled"}>Vedi esercizi ›</button>`
+    : bld.step===2 ? `<button class="btn primary" data-bstep="3" ${n?"":"disabled"}>Avanti ›</button>`
+    : `<button class="btn primary" data-ksave ${n?"":"disabled"}>${tgt?"Aggiungi alla scheda":"Salva scheda"}</button>`;
+  h += `<div class="bbar"><div class="in-b"><span>${bld.step===1?`${bld.muscles.length} ${bld.muscles.length===1?"muscolo":"muscoli"}`:`${n} ${n===1?"esercizio":"esercizi"}`}</span>${next}</div></div>`;
+  return h;
+}
+function renderLibList(byM){
+  const keys = MKEYS.filter(k=>byM[k]);
+  if(!keys.length) return `<div class="empty">Nessun esercizio con questi filtri.</div>`;
+  return keys.map(k=>`<h3 class="lgrp">${MUSCLES[k]} <span>${byM[k].length}</span></h3><div class="llist">${byM[k].map(l=>{
+    const on = bld.picked.includes(l.id), sec = l.sec.map(s=>MUSCLES[s]).join(", ");
+    return `<button class="lrow" data-pick="${l.id}" aria-pressed="${on}"><span class="nm">${esc(l.name)}<small>${EQUIP[l.eq]} · ${l.sets}×${l.unit==="s"?l.repMin+"–"+l.repMax+'"':l.repMin+"–"+l.repMax}${sec?" · anche "+sec:""}</small></span><span class="add" aria-hidden="true">${on?"✓":"+"}</span></button>`; }).join("")}</div>`).join("");
+}
+function lastByLib(lib){ for(const s of sessions){ const x=s.exercises?.find(x=>libOf(x)===lib); if(x && x.sets?.length) return x; } return null; }
+function exFromLib(id){
+  const l = LIBX[id], e = ex(l.name, libTarget(l), l.sets, l.repMin, l.repMax, l.rest, l.unit); e.lib = id;
+  const last = lastByLib(id); if(last){ const kgs=last.sets.map(s=>s.kg).filter(v=>v!=null); if(kgs.length) e.weights=Array.from({length:e.sets},(_,k)=>last.sets[k]?.kg ?? kgs[kgs.length-1]); }
+  return e;
+}
+function saveBuilder(){
+  const tgt = bld.target && plan.workouts.find(w=>w.id===bld.target);
+  const exs = bld.picked.map(exFromLib);
+  if(tgt){ tgt.exercises.push(...exs); current=tgt.id; toast(exs.length===1?"Esercizio aggiunto":exs.length+" esercizi aggiunti"); }
+  else {
+    const name = bld.name.trim() || bld.muscles.map(k=>MUSCLES[k]).slice(0,3).join(" e ") || "Nuova scheda";
+    if(bld.day>=0) plan.workouts.forEach(x=>{ if(x.day===bld.day) x.day=-1; });
+    const ms = [...new Set(bld.picked.map(id=>LIBX[id].m))].map(k=>MUSCLES[k]).join(", ");
+    const nw = {id:uid(), name, subtitle:ms, day:bld.day, color:plan.workouts.length%4, exercises:exs};
+    plan.workouts.push(nw); current=nw.id; toast("Scheda salvata");
+  }
+  savePlan(); bld=null; view="workout"; render(); scrollTo(0,0);
+}
+function bldToggleMuscle(k){
+  const i = bld.muscles.indexOf(k); if(i<0) bld.muscles.push(k); else bld.muscles.splice(i,1);
+  bld.muscles.sort((a,b)=>MKEYS.indexOf(a)-MKEYS.indexOf(b));
+  if(bld.only && !bld.muscles.includes(bld.only)) bld.only=null;
+}
+document.addEventListener("click", ev=>{
+  if(view!=="builder" || !bld) return;
+  const z = ev.target.closest(".mz");
+  if(z){ bldToggleMuscle(z.dataset.m); render(); return; }
+  const b = ev.target.closest("button"); if(!b) return;
+  if(b.hasAttribute("data-bx")){ bld=null; view="workout"; render(); return; }
+  if(b.dataset.side){ bld.side=b.dataset.side; render(); return; }
+  if(b.dataset.mk){ bldToggleMuscle(b.dataset.mk); render(); return; }
+  if(b.hasAttribute("data-bclear")){ bld.muscles=[]; bld.only=null; render(); return; }
+  if(b.dataset.preset){ const p=PRESETS.find(p=>p.l===b.dataset.preset); bld.muscles=[...p.m]; bld.only=null; render(); return; }
+  if(b.dataset.bstep){ bld.step=Number(b.dataset.bstep); if(bld.step===2) bld.q=""; render(); scrollTo(0,0); return; }
+  if(b.dataset.only!=null){ bld.only=b.dataset.only||null; render(); return; }
+  if(b.dataset.eq!=null){ bld.eq=b.dataset.eq; render(); return; }
+  if(b.dataset.pick){ const id=b.dataset.pick, i=bld.picked.indexOf(id); if(i<0) bld.picked.push(id); else bld.picked.splice(i,1);
+    if(bld.step===2){ b.setAttribute("aria-pressed", i<0); b.querySelector(".add").textContent = i<0?"✓":"+"; const n=bld.picked.length;
+      $(".bbar span").textContent = `${n} ${n===1?"esercizio":"esercizi"}`; $(".bbar [data-bstep]").disabled=!n; } else render(); return; }
+  if(b.dataset.pmv){ const i=bld.picked.indexOf(b.dataset.pid), j=i+Number(b.dataset.pmv); [bld.picked[i],bld.picked[j]]=[bld.picked[j],bld.picked[i]]; render(); return; }
+  if(b.dataset.bday!=null){ bld.day=Number(b.dataset.bday); render(); return; }
+  if(b.hasAttribute("data-ksave")){ saveBuilder(); return; }
+});
+document.addEventListener("keydown", ev=>{ if(view==="builder" && bld && (ev.key==="Enter"||ev.key===" ") && ev.target.classList?.contains("mz")){ ev.preventDefault(); bldToggleMuscle(ev.target.dataset.m); render(); document.querySelector(`.mz[data-m="${ev.target.dataset.m}"]`)?.focus(); } });
+document.addEventListener("input", ev=>{
+  if(view!=="builder" || !bld) return;
+  if(ev.target.id==="bname"){ bld.name=ev.target.value; return; }
+  if(ev.target.id==="bq"){ bld.q=ev.target.value; const byM={}; bldList().forEach(l=>(byM[l.m] ??= []).push(l)); $("#blist").innerHTML=renderLibList(byM); $("#bonly").hidden=!!bld.q; }
+});
+
 /* ---------- state ---------- */
 let plan = null, sessions = [], current = null, editing = false, view = "workout";
 let drafts = {}; // workoutId -> exId -> [{kg,reps,done}]
@@ -431,6 +814,7 @@ const LS = {
 plan = LS.get("gym.plan") || defaultPlan();
 sessions = LS.get("gym.sessions") || [];
 drafts = LS.get("gym.drafts") || {};
+plan.workouts.forEach(w=>w.exercises.forEach(e=>{ if(!e.lib && NAME2LIB[e.name]) e.lib=NAME2LIB[e.name]; }));
 const todayIdx = (new Date().getDay()+6)%7;
 current = (plan.workouts.find(w=>w.day===todayIdx) || plan.workouts[0] || {}).id;
 
@@ -458,12 +842,13 @@ function draftFor(w,e){
   if(d.length>e.sets) d.length = e.sets;
   return d;
 }
-function lastFor(exId){
-  for(const s of sessions){ const x=s.exercises?.find(x=>x.id===exId); if(x && x.sets?.length) return {s,x}; }
+function lastFor(e){
+  const L = libOf(e);
+  for(const s of sessions){ const x=s.exercises?.find(x=>x.id===e.id) || (L && s.exercises?.find(x=>libOf(x)===L)); if(x && x.sets?.length) return {s,x}; }
   return null;
 }
 function readyToProgress(e){
-  const l = lastFor(e.id); if(!l) return false;
+  const l = lastFor(e); if(!l) return false;
   const done = l.x.sets.filter(s=>s.reps!=null);
   return done.length>=e.sets && done.every(s=>s.reps>=e.repMax);
 }
@@ -479,7 +864,7 @@ function armButton(btn, fn){
 function renderNav(){
   const nav = $("#nav");
   nav.innerHTML = plan.workouts.map(w=>`<button class="chip" style="--pc:var(${PLATES[w.color%4]})" data-w="${w.id}" aria-pressed="${view==='workout'&&w.id===current}"><span class="plate"></span>${esc(w.name)}</button>`).join("")
-   + `<button class="chip ghost" data-add aria-label="Nuovo allenamento">+ Nuovo</button>`
+   + `<button class="chip ghost" data-add aria-label="Nuova scheda" aria-pressed="${view==='builder'}">+ Nuova scheda</button>`
    + `<button class="chip ghost" data-hist aria-pressed="${view==='history'}">Storico</button>`;
   const week = $("#week");
   week.innerHTML = DAYS.map((d,i)=>{ const w=plan.workouts.find(w=>w.day===i);
@@ -489,8 +874,9 @@ function render(){
   renderNav();
   const main = $("#main");
   if(view==="history"){ main.innerHTML = renderHistory(); return; }
+  if(view==="builder" && bld){ main.innerHTML = renderBuilder(); return; }
   const w = W();
-  if(!w){ main.innerHTML = `<div class="empty" style="margin-top:22px">Nessun allenamento. Tocca <b>+ Nuovo</b> per crearne uno.</div>`; return; }
+  if(!w){ main.innerHTML = `<div class="empty" style="margin-top:22px">Nessuna scheda. Tocca <b>+ Nuova scheda</b> per crearne una.</div>`; return; }
   const dayName = w.day!=null && w.day>=0 ? ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"][w.day] : "Giorno libero";
   let h = `<div class="head"><div><h2>${esc(w.name)}</h2><p>${esc(dayName)} · ${esc(w.subtitle||"")}</p></div>
     <button class="btn ${editing?'primary':''}" data-edit>${editing?"Fatto":"Modifica"}</button></div>`;
@@ -505,14 +891,14 @@ function render(){
   if(!w.exercises.length) h += `<div class="empty">Nessun esercizio. ${editing?"Aggiungine uno qui sotto.":"Tocca <b>Modifica</b> per aggiungerne."}</div>`;
   w.exercises.forEach((e,i)=>{ h += editing ? renderEditCard(w,e,i) : renderCard(w,e,i); });
   h += `</div>`;
-  if(editing) h += `<div class="footer-actions"><button class="btn" data-addex>+ Aggiungi esercizio</button></div>`;
+  if(editing) h += `<div class="footer-actions"><button class="btn primary" data-addlib>+ Dalla libreria</button><button class="btn" data-addex>+ Esercizio personalizzato</button></div>`;
   else if(w.exercises.length) h += `<div class="footer-actions"><button class="btn" data-reset>Azzera serie</button><button class="btn primary" data-finish>Termina allenamento</button></div>
     <div class="notes"><div><b>RIR 1–2:</b> chiudi ogni serie con 1–2 ripetizioni di margine.</div><div><b>Tempo:</b> discesa 2–3 s, 1 s di pausa in allungamento, spinta decisa.</div><div><b>Progressione:</b> quando arrivi al tetto delle ripetizioni in tutte le serie, aggiungi 1–2,5 kg la volta dopo.</div></div>`;
   main.innerHTML = h;
 }
 function renderCard(w,e,i){
   const d = draftFor(w,e);
-  const last = lastFor(e.id);
+  const last = lastFor(e);
   const allDone = d.length && d.every(s=>s.done);
   const unit = e.unit==="s" ? "Sec" : "Rip";
   let rows = `<div class="h"></div><div class="h">Kg</div><div class="h">${unit}</div><div class="h"></div>`;
@@ -573,12 +959,10 @@ function renderHistoryList(){
 document.addEventListener("click", ev=>{
   const b = ev.target.closest("button"); if(!b) return;
   const w = W();
-  if(b.dataset.w){ current=b.dataset.w; view="workout"; editing=false; render(); scrollTo(0,0); return; }
-  if(b.hasAttribute("data-hist")){ view="history"; editing=false; render(); return; }
-  if(b.hasAttribute("data-add")){
-    const nw={id:uid(),name:"Nuovo allenamento",subtitle:"",day:-1,color:plan.workouts.length%4,exercises:[]};
-    plan.workouts.push(nw); current=nw.id; view="workout"; editing=true; savePlan(); render(); return;
-  }
+  if(b.dataset.w){ current=b.dataset.w; view="workout"; editing=false; bld=null; render(); scrollTo(0,0); return; }
+  if(b.hasAttribute("data-hist")){ view="history"; editing=false; bld=null; render(); return; }
+  if(b.hasAttribute("data-add")){ openBuilder(); return; }
+  if(b.hasAttribute("data-addlib")){ openBuilder(w.id); return; }
   if(b.hasAttribute("data-edit")){ editing=!editing; render(); return; }
   if(b.hasAttribute("data-delw")){ armButton(b,()=>{ plan.workouts=plan.workouts.filter(x=>x!==w); delete drafts[w.id]; saveDrafts(); current=plan.workouts[0]?.id; editing=false; savePlan(); render(); toast("Allenamento eliminato"); }); return; }
   if(b.hasAttribute("data-addex")){ const e=ex("Nuovo esercizio","",3,8,12,90); w.exercises.push(e); savePlan(); render(); document.getElementById("n-"+e.id)?.select(); return; }
@@ -591,7 +975,7 @@ document.addEventListener("click", ev=>{
     s.done=!s.done;
     if(s.done){
       if(s.kg==null){ const p=e.weights?.[k] ?? e.weights?.[e.weights.length-1]; if(p!=null) s.kg=p; }
-      if(s.reps==null){ s.reps = lastFor(e.id)?.x.sets[k]?.reps ?? e.repMin; }
+      if(s.reps==null){ s.reps = lastFor(e)?.x.sets[k]?.reps ?? e.repMin; }
       const card=b.closest(".card");
       card.querySelector(`[data-kg="${k}"]`).value=fmtKg(s.kg);
       card.querySelector(`[data-reps="${k}"]`).value=s.reps??"";
@@ -639,7 +1023,7 @@ document.addEventListener("change", async ev=>{
 async function finish(w){
   const exercises = w.exercises.map(e=>{
     const d=draftFor(w,e);
-    return {id:e.id,name:e.name,unit:e.unit,sets:d.filter(s=>s.done).map(s=>({kg:s.kg,reps:s.reps}))};
+    return {id:e.id,lib:libOf(e),name:e.name,unit:e.unit,sets:d.filter(s=>s.done).map(s=>({kg:s.kg,reps:s.reps}))};
   }).filter(x=>x.sets.length);
   if(!exercises.length){ toast("Spunta almeno una serie prima di terminare"); return; }
   const s = {id:uid()+Date.now().toString(36), workoutId:w.id, workoutName:w.name, date:Date.now(), exercises};
