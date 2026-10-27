@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#15191b">
+<script>try{var t=JSON.parse(localStorage.getItem("mypt.theme"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,7 +29,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0;padding-top:env(safe-area-inset
   --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
   --r:10px;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root:not([data-theme]){
   --bg:#101315; --surface:#1a1f22; --sunk:#232a2e; --line:#2f383d;
   --fg:#eef1f1; --muted:#9aa5a9; --accent:#6f95ff; --accent-ink:#0b1020;
   --done:#4fd08a; --done-bg:#16332a; --warn:#f0a94a; --danger:#ff6b61;
@@ -40,6 +41,19 @@ html{-webkit-text-size-adjust:100%}body{margin:0;padding-top:env(safe-area-inset
   --done:#4fd08a; --done-bg:#16332a; --warn:#f0a94a; --danger:#ff6b61;
   --p-red:#ff6a5c; --p-blue:#6f95ff; --p-yellow:#f2c935; --p-green:#4fd08a;
   color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="blue"]{
+  --bg:#0d1b33; --surface:#14264a; --sunk:#1b3060; --line:#2a4479;
+  --fg:#eef3ff; --muted:#9fb2d6; --accent:#7fb0ff; --accent-ink:#0b1630;
+  --done:#4fd08a; --done-bg:#163a3a; --warn:#f0a94a; --danger:#ff6b61;
+  --p-red:#ff6a5c; --p-blue:#7fb0ff; --p-yellow:#f2c935; --p-green:#4fd08a;
+  color-scheme:dark}
+:root[data-theme="pink"]{
+  --bg:#fbe8ef; --surface:#fff7fa; --sunk:#f5d9e3; --line:#ebc1d0;
+  --fg:#3a1424; --muted:#87586a; --accent:#c2185b; --accent-ink:#ffffff;
+  --done:#16804a; --done-bg:#dff1e6; --warn:#a15c00; --danger:#c42a22;
+  --p-red:#d23a2f; --p-blue:#2457d6; --p-yellow:#d9a400; --p-green:#2d8f4e;
+  color-scheme:light}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4}
 .wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:14px 150px}
@@ -142,6 +156,11 @@ a.btn{color:var(--fg)}
 .onb p{color:var(--muted);margin:0 0 18px}
 .onb input{text-align:center;font-size:1.15rem;padding:13px}
 .onb .btn{width:100%;margin-top:10px;padding:13px;font-size:1rem}
+.themes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 8px}
+.themes button{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.8rem;font-weight:600}
+.themes i{width:30px;height:30px;border-radius:50%;background:var(--sw);box-shadow:inset 0 0 0 1px rgba(127,127,127,.4)}
+.themes button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.onb .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;margin:18px 0 0;text-align:left}
 .home-head h1{font-size:1.5rem}
 .body-card{display:block;position:relative;padding:16px;border-radius:var(--r);background:var(--fg);color:var(--bg);text-decoration:none}
 .body-card h2{margin:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:2.4rem;line-height:1}
@@ -281,7 +300,14 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   <h1 id="onb-title">Benvenuto in MyPT</h1>
   <p id="onb-sub">Come ti chiami?</p>
   <input class="tin" id="onb-name" autocomplete="given-name" maxlength="30" placeholder="Il tuo nome" aria-label="Il tuo nome">
-  <button class="btn primary" type="submit">Inizia</button>
+  <p class="lbl">Colore sfondo</p>
+  <div class="themes" role="group" aria-label="Colore sfondo">
+    <button type="button" data-theme-pick="dark" style="--sw:#101315"><i></i>Nero</button>
+    <button type="button" data-theme-pick="light" style="--sw:#eceeed"><i></i>Bianco</button>
+    <button type="button" data-theme-pick="blue" style="--sw:#0d1b33"><i></i>Blu</button>
+    <button type="button" data-theme-pick="pink" style="--sw:#fbe8ef"><i></i>Rosa</button>
+  </div>
+  <button class="btn primary" type="submit" id="onb-ok">Inizia</button>
   <button class="btn" type="button" id="onb-cancel" hidden>Annulla</button>
 </form></div>
 <div class="timer" id="timer" role="timer" aria-live="off">
@@ -524,7 +550,7 @@ document.addEventListener("click", ev=>{
   }
   if(b.hasAttribute("data-reset")){ armButton(b,()=>{ delete drafts[w.id]; saveDrafts(); render(); }); return; }
   if(b.hasAttribute("data-finish")){ finish(w); return; }
-  if(b.hasAttribute("data-export")){ const blob=new Blob([JSON.stringify({app:"mypersonaltraining",exportedAt:Date.now(),plan,sessions,body:LS.get("mypt.body"),home:LS.get("mypt.home"),food:LS.get("mypt.food"),user:LS.get("mypt.user")},null,1)],{type:"application/json"});
+  if(b.hasAttribute("data-export")){ const blob=new Blob([JSON.stringify({app:"mypersonaltraining",exportedAt:Date.now(),plan,sessions,body:LS.get("mypt.body"),home:LS.get("mypt.home"),food:LS.get("mypt.food"),user:LS.get("mypt.user"),theme:LS.get("mypt.theme")},null,1)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="backup-mypt-gymday-"+new Date().toISOString().slice(0,10)+".json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); return; }
   if(b.dataset.delsess){ armButton(b,async()=>{ const id=b.dataset.delsess; sessions=sessions.filter(s=>s.id!==id); LS.set("gym.sessions",sessions); render(); }); return; }
 });
@@ -551,7 +577,7 @@ document.addEventListener("change", ev=>{
 document.addEventListener("change", async ev=>{
   if(ev.target.id!=="imp" || !ev.target.files[0]) return;
   try{ const d=JSON.parse(await ev.target.files[0].text()); if(!d.plan||!Array.isArray(d.plan.workouts)) throw 0;
-    plan=d.plan; sessions=Array.isArray(d.sessions)?d.sessions:[]; LS.set("gym.plan",plan); LS.set("gym.sessions",sessions); if(d.body){ LS.set("mypt.body",d.body); body=Object.assign({height:null,entries:[]},d.body); } if(d.home){ LS.set("mypt.home",d.home); } if(d.user){ LS.set("mypt.user",d.user); user=d.user; } if(d.food){ LS.set("mypt.food",d.food); food=Object.assign({targets:{kcal:2200,p:150,c:250,f:70,water:8},days:{}},d.food); }
+    plan=d.plan; sessions=Array.isArray(d.sessions)?d.sessions:[]; LS.set("gym.plan",plan); LS.set("gym.sessions",sessions); if(d.body){ LS.set("mypt.body",d.body); body=Object.assign({height:null,entries:[]},d.body); } if(d.home){ LS.set("mypt.home",d.home); } if(d.theme){ applyTheme(d.theme); } if(d.user){ LS.set("mypt.user",d.user); user=d.user; } if(d.food){ LS.set("mypt.food",d.food); food=Object.assign({targets:{kcal:2200,p:150,c:250,f:70,water:8},days:{}},d.food); }
     current=plan.workouts[0]?.id; render(); toast("Backup importato"); }
   catch(e){ toast("File non valido: scegli un backup esportato da questa app"); }
   ev.target.value="";
@@ -906,11 +932,12 @@ document.addEventListener("click", ev=>{
 let user = LS.get("mypt.user") || {};
 function hello(){
   const dateStr = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
-  return `<div class="hello"><div><p class="kicker">${esc(dateStr)}</p><button class="who" data-rename aria-label="Cambia nome">${user.name?"Ciao, "+esc(user.name):"MyPT"}</button></div><span class="brand">MyPT</span></div>`;
+  return `<div class="hello"><div><p class="kicker">${esc(dateStr)}</p><button class="who" data-rename aria-label="Profilo: nome e colore">${user.name?"Ciao, "+esc(user.name):"MyPT"}</button></div><span class="brand">MyPT</span></div>`;
 }
 function askName(edit){
   $("#onb").hidden=false; $("#onb-cancel").hidden=!edit;
-  $("#onb-title").textContent = edit ? "Cambia nome" : "Benvenuto in MyPT";
+  $("#onb-title").textContent = edit ? "Profilo" : "Benvenuto in MyPT";
+  $("#onb-ok").textContent = edit ? "Salva" : "Inizia"; markTheme();
   $("#onb-name").value = user.name||""; setTimeout(()=>$("#onb-name").focus(),50);
 }
 $("#onb-form").addEventListener("submit", e=>{ e.preventDefault();
@@ -918,6 +945,15 @@ $("#onb-form").addEventListener("submit", e=>{ e.preventDefault();
   if(!n){ $("#onb-name").focus(); return; }
   user.name = n.charAt(0).toUpperCase()+n.slice(1); LS.set("mypt.user", user); $("#onb").hidden=true; route();
 });
+const THEME_BG = {dark:"#101315", light:"#eceeed", blue:"#0d1b33", pink:"#fbe8ef"};
+function currentTheme(){ return document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); }
+function applyTheme(t){
+  document.documentElement.dataset.theme=t; LS.set("mypt.theme",t);
+  document.querySelector('meta[name="theme-color"]').setAttribute("content",THEME_BG[t]); markTheme();
+}
+function markTheme(){ const t=currentTheme(); document.querySelectorAll("[data-theme-pick]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.themePick===t)); }
+document.addEventListener("click", ev=>{ const b=ev.target.closest("[data-theme-pick]"); if(b) applyTheme(b.dataset.themePick); });
+if(document.documentElement.dataset.theme) document.querySelector('meta[name="theme-color"]').setAttribute("content",THEME_BG[currentTheme()]||"#15191b");
 $("#onb-cancel").addEventListener("click", ()=>{ $("#onb").hidden=true; });
 document.addEventListener("click", ev=>{ if(ev.target.closest("[data-rename]")) askName(true); });
 
