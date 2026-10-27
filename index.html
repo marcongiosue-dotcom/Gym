@@ -149,7 +149,11 @@ a.btn{color:var(--fg)}
 .home-head{margin:8px 0 14px}
 .hello{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin:8px 0 14px}
 .hello .who{border:0;background:none;padding:0;text-align:left;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.6rem;line-height:1.05;color:var(--fg)}
-.hello .brand{font-family:var(--display);font-weight:800;font-size:.95rem;letter-spacing:.04em;border:1.5px solid var(--fg);border-radius:6px;padding:2px 7px;margin-top:2px}
+.hello{display:block!important}
+.hello .hl-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hello .hl-top .kicker{margin:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.05em}
+.hello .who{overflow-wrap:anywhere;margin-top:4px}
+.hello .brand{white-space:nowrap;flex:none;font-family:var(--display);font-weight:800;font-size:.78rem;letter-spacing:.04em;border:1.5px solid var(--fg);border-radius:6px;padding:2px 7px}
 .onb{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px 16px}
 .onb .box{width:100%;max-width:420px;text-align:center}
 .onb img{width:96px;height:96px;border-radius:22px}
@@ -977,7 +981,7 @@ document.addEventListener("click", ev=>{
 let user = LS.get("mypt.user") || {};
 function hello(){
   const dateStr = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
-  return `<div class="hello"><div><p class="kicker">${esc(dateStr)}</p><button class="who" data-rename aria-label="Profilo: nome e colore">${user.name?"Ciao, "+esc(user.name):"MyPT"}</button></div><span class="brand">MyPT</span></div>`;
+  return `<div class="hello"><div class="hl-top"><p class="kicker">${esc(dateStr)}</p><span class="brand">MyPersonalTraining</span></div><button class="who" data-rename aria-label="Profilo: nome e colore">${user.name?"Ciao, "+esc(user.name):"MyPT"}</button></div>`;
 }
 function askName(edit){
   $("#onb").hidden=false; $("#onb-cancel").hidden=!edit;
