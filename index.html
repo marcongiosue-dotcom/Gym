@@ -188,6 +188,11 @@ a.btn{color:var(--fg)}
 .sport h2{margin:auto 0 0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.45rem;line-height:1}
 .sport small{color:var(--muted);font-size:.82rem;line-height:1.3}
 .sport .go{position:absolute;right:10px;top:11px;background:var(--fg);color:var(--bg);border-radius:999px;padding:3px 10px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.85rem}
+.sport-wrap{position:relative;display:flex}
+.sport-wrap>.sport{flex:1}
+.star{position:absolute;right:6px;bottom:6px;width:36px;height:36px;border:0;background:none;font-size:1.35rem;line-height:1;color:var(--muted);border-radius:50%;display:grid;place-items:center}
+.star[aria-pressed="true"]{color:var(--p-yellow)}
+.sport small{padding-right:30px}
 .sport.soon{opacity:.6}
 .sport .badge{position:absolute;right:10px;top:12px;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
 .sport.off{border-style:dashed}
@@ -688,8 +693,8 @@ const SPORTS = [
   {id:"football", name:"Calcio", sub:"Partite e allenamenti", ico:"⚽", pc:"--p-green", cat:"Squadra"},
   {id:"mobility", name:"Mobilità", sub:"Stretching e yoga", ico:"🧘", pc:"--p-red", cat:"Benessere"}
 ];
-const CATS = ["Tutti","Disponibili",...new Set(SPORTS.map(s=>s.cat))];
-let homePrefs = Object.assign({order:SPORTS.map(s=>s.id), hidden:[], filter:"Tutti", sort:"custom"}, LS.get("mypt.home")||{});
+const CATS = ["Tutti","Preferiti","Disponibili",...new Set(SPORTS.map(s=>s.cat))];
+let homePrefs = Object.assign({order:SPORTS.map(s=>s.id), hidden:[], fav:[], filter:"Tutti", sort:"custom"}, LS.get("mypt.home")||{});
 SPORTS.forEach(s=>{ if(!homePrefs.order.includes(s.id)) homePrefs.order.push(s.id); });
 let homeEdit = false;
 const saveHome = ()=>LS.set("mypt.home", homePrefs);
@@ -732,6 +737,7 @@ function renderHome(){
   if(!homeEdit){
     list = list.filter(s=>!homePrefs.hidden.includes(s.id));
     if(homePrefs.filter==="Disponibili") list = list.filter(s=>s.active);
+    else if(homePrefs.filter==="Preferiti") list = list.filter(s=>homePrefs.fav.includes(s.id));
     else if(homePrefs.filter!=="Tutti") list = list.filter(s=>s.cat===homePrefs.filter);
   }
   const tile = (s,i)=>{
@@ -744,8 +750,10 @@ function renderHome(){
         <button class="btn" data-smv="1" data-sid="${s.id}" ${i===list.length-1?"disabled":""} aria-label="Sposta dopo">→</button>
         <button class="btn" data-shide="${s.id}" aria-pressed="${!hid}">${hid?"Mostra":"Nascondi"}</button></div></div>`;
     }
-    return s.active ? `<a class="sport" href="#${s.id}" style="--pc:var(${s.pc})">${inner}</a>`
-                    : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true">${inner}</div>`;
+    const fav = homePrefs.fav.includes(s.id);
+    const star = `<button class="star" data-fav="${s.id}" aria-pressed="${fav}" aria-label="${fav?"Togli dai preferiti":"Aggiungi ai preferiti"}: ${esc(s.name)}">${fav?"★":"☆"}</button>`;
+    return `<div class="sport-wrap">` + (s.active ? `<a class="sport" href="#${s.id}" style="--pc:var(${s.pc})">${inner}</a>`
+                    : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true">${inner}</div>`) + star + `</div>`;
   };
   $("#home").innerHTML = `
     ${hello()}
@@ -758,7 +766,7 @@ function renderHome(){
       <option value="az" ${homePrefs.sort==="az"?"selected":""}>Alfabetico A → Z</option>
       <option value="avail" ${homePrefs.sort==="avail"?"selected":""}>Disponibili prima</option></select></div>
     <div class="filters" role="group" aria-label="Filtra sport">${CATS.map(c=>`<button class="chip ghost" data-hf="${esc(c)}" aria-pressed="${homePrefs.filter===c}">${esc(c)}</button>`).join("")}</div>`}
-    <div class="sports">${list.length?list.map(tile).join(""):`<div class="empty" style="grid-column:1/-1">Nessuno sport con questo filtro.</div>`}</div>`;
+    <div class="sports">${list.length?list.map(tile).join(""):`<div class="empty" style="grid-column:1/-1">${homePrefs.filter==="Preferiti"?"Nessun preferito: tocca la ☆ su uno sport per aggiungerlo.":"Nessuno sport con questo filtro."}</div>`}</div>`;
 }
 
 function renderBody(){
@@ -812,6 +820,7 @@ function renderBody(){
 
 document.addEventListener("click", ev=>{
   const b = ev.target.closest("button"); if(!b) return;
+  if(b.dataset.fav){ const id=b.dataset.fav, f=homePrefs.fav; homePrefs.fav = f.includes(id)?f.filter(x=>x!==id):[...f,id]; saveHome(); renderHome(); return; }
   if(b.dataset.hf){ homePrefs.filter=b.dataset.hf; saveHome(); renderHome(); return; }
   if(b.hasAttribute("data-hedit")){ homeEdit=!homeEdit; if(homeEdit){ homePrefs.sort="custom"; homePrefs.filter="Tutti"; saveHome(); } renderHome(); return; }
   if(b.dataset.smv){ const o=homePrefs.order, i=o.indexOf(b.dataset.sid), j=i+Number(b.dataset.smv); if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; saveHome(); renderHome(); return; }
