@@ -171,6 +171,11 @@ h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 .btable td{padding:8px 6px 8px 0;border-top:1px solid var(--line);font-family:var(--mono);font-variant-numeric:tabular-nums}
 .btable td:first-child{font-family:var(--body)}
 .btable .x{border:0;background:none;color:var(--muted);padding:2px 6px}
+.more{margin-top:12px}
+.more>summary{list-style:none;cursor:pointer;display:block;text-align:center;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-weight:600;font-size:.9rem;color:var(--accent)}
+.more>summary::-webkit-details-marker{display:none}
+.more[open] .when-closed,.more:not([open]) .when-open{display:none}
+.btn.big{display:block;width:100%;padding:13px;font-size:1rem}
 .tscroll{overflow-x:auto}
 @media (prefers-reduced-motion: reduce){.timer{transition:none}}
 @media (max-width:380px){.timer .clock{font-size:1.7rem}.timer .lbl{display:none}}
@@ -529,6 +534,7 @@ const saveHome = ()=>LS.set("mypt.home", homePrefs);
 /* body data: {height, entries:[{id,date:"YYYY-MM-DD",weight,fat,waist,chest,hips,arm,thigh}]} newest first */
 let body = Object.assign({height:null, entries:[]}, LS.get("mypt.body")||{});
 const saveBody = ()=>LS.set("mypt.body", body);
+let bodyForm = false, bodyMore = false;
 const METRICS = [
   {k:"weight", l:"Peso", u:"kg", good:-1},
   {k:"fat", l:"Grasso", u:"%", good:-1},
@@ -616,28 +622,29 @@ function renderBody(){
       <div class="stat"><span>Misurazioni</span><b>${body.entries.length}</b></div>
     </div>
 
-    <div class="sec-title"><h2>Circonferenze</h2></div>
-    <div class="stat-row">${METRICS.slice(2).map(m=>`<div class="stat"><span>${m.l}</span><b>${L(m.k)}<small style="font-size:.7rem"> cm</small></b>${delta(m)}</div>`).join("")}</div>
+    <details class="more" ${bodyMore?"open":""}><summary><span class="when-closed">Vedi altro ▾</span><span class="when-open">Vedi meno ▴</span></summary>
+      <div class="sec-title"><h2>Circonferenze</h2></div>
+      <div class="stat-row">${METRICS.slice(2).map(m=>`<div class="stat"><span>${m.l}</span><b>${L(m.k)}<small style="font-size:.7rem"> cm</small></b>${delta(m)}</div>`).join("")}</div>
+      <div class="sec-title"><h2>Storico misure</h2></div>
+      ${body.entries.length?`<div class="card tscroll"><table class="btable"><thead><tr><th>Data</th>${cols.map(m=>`<th>${m.l}</th>`).join("")}<th></th></tr></thead><tbody>
+        ${body.entries.map(e=>`<tr><td>${new Date(e.date).toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"2-digit"})}</td>${cols.map(m=>`<td>${e[m.k]!=null?num1(e[m.k]):"–"}</td>`).join("")}<td><button class="x" data-bdel="${e.id}" aria-label="Elimina misurazione">✕</button></td></tr>`).join("")}
+      </tbody></table></div>`:`<div class="empty">Le misurazioni salvate compaiono qui.</div>`}
+    </details>
 
-    <div class="sec-title"><h2>Attività</h2></div>
-    <div class="stat-row">
-      <div class="stat"><span>Palestra sett.</span><b>${wk}/${planned||"–"}</b></div>
-      <div class="stat"><span>Allenamenti</span><b>${total}</b></div>
-      <div class="stat"><span>Volume 30 gg</span><b>${Math.round(vol30/1000*10)/10>0?num1(vol30/1000)+"t":"–"}</b></div>
-    </div>
-
-    <div class="sec-title"><h2>Nuova misurazione</h2></div>
-    <div class="card"><div class="edit-grid">
+    <button class="btn ${bodyForm?"":"primary"} big" data-bform aria-expanded="${bodyForm}" style="margin-top:18px">${bodyForm?"Chiudi":"+ Nuova misurazione"}</button>
+    ${bodyForm?`<div class="card" style="margin-top:10px"><div class="edit-grid" style="margin-top:0">
       <label>Data<input class="tin" type="date" id="b-date" value="${today}" max="${today}"></label>
       <label>Altezza (cm)<input class="tin" id="b-height" inputmode="decimal" value="${body.height??""}" placeholder="es. 178"></label>
       ${METRICS.map(m=>`<label>${m.l} (${m.u})<input class="tin" id="b-${m.k}" inputmode="decimal" placeholder="${(latest(m.k)?num1(latest(m.k).v):"")}"></label>`).join("")}
     </div><div class="edit-actions"><span class="sp"></span><button class="btn primary" data-bsave>Salva misurazione</button></div>
-    <p style="margin:8px 0 0;color:var(--muted);font-size:.8rem">Compila solo i campi che hai misurato. Meglio pesarsi sempre alla stessa ora, a digiuno.</p></div>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.8rem">Compila solo i campi che hai misurato. Meglio pesarsi sempre alla stessa ora, a digiuno.</p></div>`:""}
 
-    <div class="sec-title"><h2>Storico</h2></div>
-    ${body.entries.length?`<div class="card tscroll"><table class="btable"><thead><tr><th>Data</th>${cols.map(m=>`<th>${m.l}</th>`).join("")}<th></th></tr></thead><tbody>
-      ${body.entries.map(e=>`<tr><td>${new Date(e.date).toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"2-digit"})}</td>${cols.map(m=>`<td>${e[m.k]!=null?num1(e[m.k]):"–"}</td>`).join("")}<td><button class="x" data-bdel="${e.id}" aria-label="Elimina misurazione">✕</button></td></tr>`).join("")}
-    </tbody></table></div>`:`<div class="empty">Le misurazioni salvate compaiono qui.</div>`}`;
+    <div class="sec-title"><h2>Riepilogo attività</h2></div>
+    <div class="stat-row">
+      <div class="stat"><span>Palestra sett.</span><b>${wk}/${planned||"–"}</b></div>
+      <div class="stat"><span>Allenamenti</span><b>${total}</b></div>
+      <div class="stat"><span>Volume 30 gg</span><b>${vol30>=100?num1(vol30/1000)+"t":"–"}</b></div>
+    </div>`;
 }
 
 document.addEventListener("click", ev=>{
@@ -646,14 +653,15 @@ document.addEventListener("click", ev=>{
   if(b.hasAttribute("data-hedit")){ homeEdit=!homeEdit; if(homeEdit){ homePrefs.sort="custom"; homePrefs.filter="Tutti"; saveHome(); } renderHome(); return; }
   if(b.dataset.smv){ const o=homePrefs.order, i=o.indexOf(b.dataset.sid), j=i+Number(b.dataset.smv); if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; saveHome(); renderHome(); return; }
   if(b.dataset.shide){ const id=b.dataset.shide, h=homePrefs.hidden; homePrefs.hidden = h.includes(id)?h.filter(x=>x!==id):[...h,id]; saveHome(); renderHome(); return; }
-  if(b.hasAttribute("data-bsave")){
+  if(b.hasAttribute("data-bform")){ bodyMore=!!$("#body details.more")?.open; bodyForm=!bodyForm; renderBody(); if(bodyForm) $("#b-weight")?.focus(); return; }
+  if(b.hasAttribute("data-bsave")){ bodyMore=!!$("#body details.more")?.open;
     const h=parseNum($("#b-height").value); body.height = h&&h>50&&h<260 ? h : body.height;
     const e={id:uid(), date:$("#b-date").value||new Date().toISOString().slice(0,10)}; let any=false;
     METRICS.forEach(m=>{ const v=parseNum($("#b-"+m.k).value); if(v!=null&&v>0){ e[m.k]=v; any=true; } });
     if(!any){ saveBody(); renderBody(); toast(h?"Altezza salvata":"Inserisci almeno un valore"); return; }
-    body.entries.push(e); body.entries.sort((a,b)=>b.date.localeCompare(a.date)); saveBody(); renderBody(); scrollTo(0,0); toast("Misurazione salvata"); return;
+    body.entries.push(e); body.entries.sort((a,b)=>b.date.localeCompare(a.date)); saveBody(); bodyForm=false; renderBody(); scrollTo(0,0); toast("Misurazione salvata"); return;
   }
-  if(b.dataset.bdel){ armButton(b,()=>{ body.entries=body.entries.filter(e=>e.id!==b.dataset.bdel); saveBody(); renderBody(); }); return; }
+  if(b.dataset.bdel){ armButton(b,()=>{ bodyMore=true; body.entries=body.entries.filter(e=>e.id!==b.dataset.bdel); saveBody(); renderBody(); }); return; }
 });
 document.addEventListener("change", ev=>{
   if(ev.target.id==="sport-sort"){ homePrefs.sort=ev.target.value; saveHome(); renderHome(); }
