@@ -132,6 +132,16 @@ a.btn{color:var(--fg)}
 .back{display:inline-flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:6px;padding:4px 0}
 .kicker{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;color:var(--muted);margin:0 0 4px}
 .home-head{margin:8px 0 14px}
+.hello{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin:8px 0 14px}
+.hello .who{border:0;background:none;padding:0;text-align:left;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.6rem;line-height:1.05;color:var(--fg)}
+.hello .brand{font-family:var(--display);font-weight:800;font-size:.95rem;letter-spacing:.04em;border:1.5px solid var(--fg);border-radius:6px;padding:2px 7px;margin-top:2px}
+.onb{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.onb .box{width:100%;max-width:420px;text-align:center}
+.onb img{width:96px;height:96px;border-radius:22px}
+.onb h1{font-size:2.2rem;margin:16px 0 6px}
+.onb p{color:var(--muted);margin:0 0 18px}
+.onb input{text-align:center;font-size:1.15rem;padding:13px}
+.onb .btn{width:100%;margin-top:10px;padding:13px;font-size:1rem}
 .home-head h1{font-size:1.5rem}
 .body-card{display:block;position:relative;padding:16px;border-radius:var(--r);background:var(--fg);color:var(--bg);text-decoration:none}
 .body-card h2{margin:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:2.4rem;line-height:1}
@@ -266,6 +276,14 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   <main id="main"></main>
 </div>
 
+<div class="onb" id="onb" hidden><form class="box" id="onb-form">
+  <img src="icon-192.png" alt="">
+  <h1 id="onb-title">Benvenuto in MyPT</h1>
+  <p id="onb-sub">Come ti chiami?</p>
+  <input class="tin" id="onb-name" autocomplete="given-name" maxlength="30" placeholder="Il tuo nome" aria-label="Il tuo nome">
+  <button class="btn primary" type="submit">Inizia</button>
+  <button class="btn" type="button" id="onb-cancel" hidden>Annulla</button>
+</form></div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
   <div class="in-t">
@@ -506,7 +524,7 @@ document.addEventListener("click", ev=>{
   }
   if(b.hasAttribute("data-reset")){ armButton(b,()=>{ delete drafts[w.id]; saveDrafts(); render(); }); return; }
   if(b.hasAttribute("data-finish")){ finish(w); return; }
-  if(b.hasAttribute("data-export")){ const blob=new Blob([JSON.stringify({app:"mypersonaltraining",exportedAt:Date.now(),plan,sessions,body:LS.get("mypt.body"),home:LS.get("mypt.home"),food:LS.get("mypt.food")},null,1)],{type:"application/json"});
+  if(b.hasAttribute("data-export")){ const blob=new Blob([JSON.stringify({app:"mypersonaltraining",exportedAt:Date.now(),plan,sessions,body:LS.get("mypt.body"),home:LS.get("mypt.home"),food:LS.get("mypt.food"),user:LS.get("mypt.user")},null,1)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="backup-mypt-gymday-"+new Date().toISOString().slice(0,10)+".json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); return; }
   if(b.dataset.delsess){ armButton(b,async()=>{ const id=b.dataset.delsess; sessions=sessions.filter(s=>s.id!==id); LS.set("gym.sessions",sessions); render(); }); return; }
 });
@@ -533,7 +551,7 @@ document.addEventListener("change", ev=>{
 document.addEventListener("change", async ev=>{
   if(ev.target.id!=="imp" || !ev.target.files[0]) return;
   try{ const d=JSON.parse(await ev.target.files[0].text()); if(!d.plan||!Array.isArray(d.plan.workouts)) throw 0;
-    plan=d.plan; sessions=Array.isArray(d.sessions)?d.sessions:[]; LS.set("gym.plan",plan); LS.set("gym.sessions",sessions); if(d.body){ LS.set("mypt.body",d.body); body=Object.assign({height:null,entries:[]},d.body); } if(d.home){ LS.set("mypt.home",d.home); } if(d.food){ LS.set("mypt.food",d.food); food=Object.assign({targets:{kcal:2200,p:150,c:250,f:70,water:8},days:{}},d.food); }
+    plan=d.plan; sessions=Array.isArray(d.sessions)?d.sessions:[]; LS.set("gym.plan",plan); LS.set("gym.sessions",sessions); if(d.body){ LS.set("mypt.body",d.body); body=Object.assign({height:null,entries:[]},d.body); } if(d.home){ LS.set("mypt.home",d.home); } if(d.user){ LS.set("mypt.user",d.user); user=d.user; } if(d.food){ LS.set("mypt.food",d.food); food=Object.assign({targets:{kcal:2200,p:150,c:250,f:70,water:8},days:{}},d.food); }
     current=plan.workouts[0]?.id; render(); toast("Backup importato"); }
   catch(e){ toast("File non valido: scegli un backup esportato da questa app"); }
   ev.target.value="";
@@ -655,7 +673,7 @@ function renderHome(){
                     : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true">${inner}</div>`;
   };
   $("#home").innerHTML = `
-    <header class="home-head"><p class="kicker">${esc(dateStr)}</p><h1>MyPT</h1></header>
+    ${hello()}
     <a class="body-card" href="#body"><span class="go">Riepilogo ›</span><p class="kicker" style="color:inherit;opacity:.7">Il tuo corpo</p><h2>My Body</h2>
       <div class="mini"><div><b>${w?num1(w.v):"–"}</b><span>Peso kg</span></div><div><b>${b?num1(b):"–"}</b><span>BMI</span></div><div><b>${f?num1(f.v):"–"}</b><span>Grasso %</span></div></div></a>
     <div class="sec-title"><h2>Sport</h2><button class="btn ${homeEdit?"primary":""}" data-hedit>${homeEdit?"Fatto":"Personalizza"}</button></div>
@@ -786,6 +804,7 @@ function renderFood(){
     </article>`;
   };
   $("#food").innerHTML = `
+    ${hello()}
     <p class="kicker">Alimentazione</p>
     <div class="day-nav"><button class="btn" data-fday="-1" aria-label="Giorno precedente">‹</button><h1>${esc(dayLabel(foodDay))}</h1><button class="btn" data-fday="1" aria-label="Giorno successivo">›</button></div>
     <div class="card">
@@ -848,6 +867,7 @@ function renderCal(){
   if(ev.fd){ const S=sumItems(ev.fd.items); items.push(`<div class="day-item"><span class="ic">🥗</span><div class="tx"><b>${r0(S.kcal)} kcal · ${ev.fd.items.length} alimenti</b><small>P ${r0(S.p)} g · C ${r0(S.c)} g · G ${r0(S.f)} g · 💧 ${ev.fd.water}</small></div><button class="btn" data-gofood="${calSel}">Apri</button></div>`); }
   const selLbl = fromIso(calSel).toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
   $("#cal").innerHTML = `
+    ${hello()}
     <p class="kicker">Calendario</p>
     <div class="cal-head"><h1>${MONTHS[m]} ${y}</h1><div class="nv"><button class="btn" data-cnav="-1" aria-label="Mese precedente">‹</button><button class="btn" data-ctoday>Oggi</button><button class="btn" data-cnav="1" aria-label="Mese successivo">›</button></div></div>
     <div class="cal-wd">${DAYS.map(d=>`<div>${d}</div>`).join("")}</div>
@@ -882,6 +902,25 @@ document.addEventListener("click", ev=>{
   if(b.hasAttribute("data-ftgtsave")){ const T=food.targets; [["kcal","#t-kcal"],["p","#t-p"],["c","#t-c"],["f","#t-f"],["water","#t-water"]].forEach(([k,id])=>{ const v=parseNum($(id).value); if(v!=null&&v>=0) T[k]=Math.round(v); }); saveFood(); foodTgt=false; renderFood(); toast("Obiettivi salvati"); return; }
 });
 
+/* ---------- user name (asked on first launch) ---------- */
+let user = LS.get("mypt.user") || {};
+function hello(){
+  const dateStr = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
+  return `<div class="hello"><div><p class="kicker">${esc(dateStr)}</p><button class="who" data-rename aria-label="Cambia nome">${user.name?"Ciao, "+esc(user.name):"MyPT"}</button></div><span class="brand">MyPT</span></div>`;
+}
+function askName(edit){
+  $("#onb").hidden=false; $("#onb-cancel").hidden=!edit;
+  $("#onb-title").textContent = edit ? "Cambia nome" : "Benvenuto in MyPT";
+  $("#onb-name").value = user.name||""; setTimeout(()=>$("#onb-name").focus(),50);
+}
+$("#onb-form").addEventListener("submit", e=>{ e.preventDefault();
+  const n=$("#onb-name").value.trim().replace(/\s+/g," ");
+  if(!n){ $("#onb-name").focus(); return; }
+  user.name = n.charAt(0).toUpperCase()+n.slice(1); LS.set("mypt.user", user); $("#onb").hidden=true; route();
+});
+$("#onb-cancel").addEventListener("click", ()=>{ $("#onb").hidden=true; });
+document.addEventListener("click", ev=>{ if(ev.target.closest("[data-rename]")) askName(true); });
+
 /* ---------- navigation: tabs + swipe ---------- */
 const TABS = ["home","cal","food"];
 let lastSec = null;
@@ -901,7 +940,7 @@ function route(){
 let sx=null, sy=0, sEl=null;
 document.addEventListener("touchstart", e=>{ if(e.touches.length!==1){ sx=null; return; } sx=e.touches[0].clientX; sy=e.touches[0].clientY; sEl=e.target; }, {passive:true});
 document.addEventListener("touchend", e=>{
-  if(sx==null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
+  if(sx==null || !$("#onb").hidden) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
   if(Math.abs(dx)<70 || Math.abs(dx)<Math.abs(dy)*1.8) return;
   if(sEl && sEl.closest("input,select,textarea,.filters,.tscroll,.nav,.timer")) return;
   const cur = location.hash.slice(1)||"home", i = TABS.indexOf(cur==="" ? "home" : cur); if(i<0) return;
@@ -912,6 +951,7 @@ new MutationObserver(()=>document.body.classList.toggle("timing", $("#timer").cl
 
 window.addEventListener("hashchange", route);
 route();
+if(!user.name) askName(false);
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
 try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
 </script>
