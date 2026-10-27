@@ -49,10 +49,10 @@ html{-webkit-text-size-adjust:100%}body{margin:0;padding-top:env(safe-area-inset
   --p-red:#ff6a5c; --p-blue:#7fb0ff; --p-yellow:#f2c935; --p-green:#4fd08a;
   color-scheme:dark}
 :root[data-theme="pink"]{
-  --bg:#fbe8ef; --surface:#fff7fa; --sunk:#f5d9e3; --line:#ebc1d0;
-  --fg:#3a1424; --muted:#87586a; --accent:#c2185b; --accent-ink:#ffffff;
-  --done:#16804a; --done-bg:#dff1e6; --warn:#a15c00; --danger:#c42a22;
-  --p-red:#d23a2f; --p-blue:#2457d6; --p-yellow:#d9a400; --p-green:#2d8f4e;
+  --bg:#ff94c4; --surface:#ffd3e7; --sunk:#ffb4d6; --line:#e9679f;
+  --fg:#000000; --muted:#3d0f24; --accent:#b8004f; --accent-ink:#ffffff;
+  --done:#0d6634; --done-bg:#c6f0d4; --warn:#7a4400; --danger:#a3000b;
+  --p-red:#c4161c; --p-blue:#1f3fb8; --p-yellow:#a87400; --p-green:#1f7a3e;
   color-scheme:light}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4}
@@ -71,6 +71,7 @@ h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 .chip .plate{width:18px;height:18px;border-radius:50%;border:4px solid var(--pc,var(--muted));background:transparent}
 .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .chip.ghost{padding:7px 12px;color:var(--muted)}
+.chip.ghost[aria-pressed="true"]{color:var(--bg)}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
 .week div{text-align:center;font-size:.72rem;color:var(--muted);padding:6px 0 5px;border-radius:6px;background:var(--sunk);font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .week div b{display:block;height:4px;margin:4px 8px 0;border-radius:2px;background:var(--pc,transparent)}
@@ -305,7 +306,7 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
     <button type="button" data-theme-pick="dark" style="--sw:#101315"><i></i>Nero</button>
     <button type="button" data-theme-pick="light" style="--sw:#eceeed"><i></i>Bianco</button>
     <button type="button" data-theme-pick="blue" style="--sw:#0d1b33"><i></i>Blu</button>
-    <button type="button" data-theme-pick="pink" style="--sw:#fbe8ef"><i></i>Rosa</button>
+    <button type="button" data-theme-pick="pink" style="--sw:#ff94c4"><i></i>Rosa</button>
   </div>
   <button class="btn primary" type="submit" id="onb-ok">Inizia</button>
   <button class="btn" type="button" id="onb-cancel" hidden>Annulla</button>
@@ -945,7 +946,7 @@ $("#onb-form").addEventListener("submit", e=>{ e.preventDefault();
   if(!n){ $("#onb-name").focus(); return; }
   user.name = n.charAt(0).toUpperCase()+n.slice(1); LS.set("mypt.user", user); $("#onb").hidden=true; route();
 });
-const THEME_BG = {dark:"#101315", light:"#eceeed", blue:"#0d1b33", pink:"#fbe8ef"};
+const THEME_BG = {dark:"#101315", light:"#eceeed", blue:"#0d1b33", pink:"#ff94c4"};
 function currentTheme(){ return document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); }
 function applyTheme(t){
   document.documentElement.dataset.theme=t; LS.set("mypt.theme",t);
