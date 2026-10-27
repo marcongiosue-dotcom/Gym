@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<title>MyPersonalTraining</title>
+<title>MyPT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -585,7 +585,7 @@ function renderHome(){
                     : `<div class="sport soon" style="--pc:var(${s.pc})" aria-disabled="true">${inner}</div>`;
   };
   $("#home").innerHTML = `
-    <header class="home-head"><p class="kicker">${esc(dateStr)}</p><h1>MyPersonalTraining</h1></header>
+    <header class="home-head"><p class="kicker">${esc(dateStr)}</p><h1>MyPT</h1></header>
     <a class="body-card" href="#body"><span class="go">Riepilogo ›</span><p class="kicker" style="color:inherit;opacity:.7">Il tuo corpo</p><h2>My Body</h2>
       <div class="mini"><div><b>${w?num1(w.v):"–"}</b><span>Peso kg</span></div><div><b>${b?num1(b):"–"}</b><span>BMI</span></div><div><b>${f?num1(f.v):"–"}</b><span>Grasso %</span></div></div></a>
     <div class="sec-title"><h2>Sport</h2><button class="btn ${homeEdit?"primary":""}" data-hedit>${homeEdit?"Fatto":"Personalizza"}</button></div>
