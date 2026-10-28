@@ -347,6 +347,13 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .bbar span{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
 .bbar .btn{padding:11px 18px;font-size:1rem}
 .btn:disabled{opacity:.45;cursor:default}
+.cta-new{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:12px 14px;border:0;border-radius:var(--r);background:var(--accent);color:var(--accent-ink);text-align:left}
+.cta-ico{flex:none;width:40px;height:48px;display:grid;place-items:center;border-radius:8px;background:color-mix(in srgb,var(--accent-ink) 18%,transparent)}
+.cta-ico svg{width:22px;height:36px;fill:currentColor}
+.cta-tx{flex:1;min-width:0}
+.cta-tx b{display:block;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.2rem;letter-spacing:.02em;line-height:1.1}
+.cta-tx small{display:block;font-size:.82rem;opacity:.85;margin-top:2px}
+.cta-go{font-size:1.8rem;line-height:1;opacity:.85}
 @media (prefers-reduced-motion: reduce){.bodymap .mz{transition:none}}
 </style>
 
@@ -879,7 +886,8 @@ function render(){
   if(view==="history"){ main.innerHTML = renderHistory(); return; }
   if(view==="builder" && bld){ main.innerHTML = renderBuilder(); return; }
   const w = W();
-  if(!w){ main.innerHTML = `<div class="empty" style="margin-top:22px">Nessuna scheda. Tocca <b>+ Nuova scheda</b> per crearne una.</div>`; return; }
+  const cta = `<button class="cta-new" data-add><span class="cta-ico" aria-hidden="true"><svg viewBox="0 0 40 64"><circle cx="20" cy="7" r="6"/><path d="M8 16h24l3 20h-6l-2-12-1 38h-6l-1-22h-2l-1 22h-6l-1-38-2 12H5z"/></svg></span><span class="cta-tx"><b>Crea una nuova scheda</b><small>Tocca i muscoli sulla sagoma e scegli gli esercizi</small></span><span class="cta-go" aria-hidden="true">›</span></button>`;
+  if(!w){ main.innerHTML = cta + `<div class="empty" style="margin-top:22px">Nessuna scheda. Tocca <b>+ Nuova scheda</b> per crearne una.</div>`; return; }
   const dayName = w.day!=null && w.day>=0 ? ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"][w.day] : "Giorno libero";
   let h = `<div class="head"><div><h2>${esc(w.name)}</h2><p>${esc(dayName)} · ${esc(w.subtitle||"")}</p></div>
     <button class="btn ${editing?'primary':''}" data-edit>${editing?"Fatto":"Modifica"}</button></div>`;
@@ -897,7 +905,7 @@ function render(){
   if(editing) h += `<div class="footer-actions"><button class="btn primary" data-addlib>+ Dalla libreria</button><button class="btn" data-addex>+ Esercizio personalizzato</button></div>`;
   else if(w.exercises.length) h += `<div class="footer-actions"><button class="btn" data-reset>Azzera serie</button><button class="btn primary" data-finish>Termina allenamento</button></div>
     <div class="notes"><div><b>RIR 1–2:</b> chiudi ogni serie con 1–2 ripetizioni di margine.</div><div><b>Tempo:</b> discesa 2–3 s, 1 s di pausa in allungamento, spinta decisa.</div><div><b>Progressione:</b> quando arrivi al tetto delle ripetizioni in tutte le serie, aggiungi 1–2,5 kg la volta dopo.</div></div>`;
-  main.innerHTML = h;
+  main.innerHTML = (editing ? "" : cta) + h;
 }
 function renderCard(w,e,i){
   const d = draftFor(w,e);
