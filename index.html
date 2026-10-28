@@ -414,7 +414,10 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
     <div class="edit-actions" style="margin-top:0"><button class="btn" type="button" data-export>Esporta backup</button><label class="btn" for="imp2" style="cursor:pointer">Importa backup</label><input type="file" id="imp2" accept="application/json,.json" hidden></div>
     <p class="set-note">I dati restano solo su questo telefono. Esporta un backup ogni tanto: ti serve se cambi telefono o cancelli i dati del browser.</p>
     <div class="edit-actions"><button class="btn danger" type="button" data-wipe>Cancella tutti i dati</button></div></div>
-  <p class="set-note" style="margin-top:22px;text-align:center">MyPT · versione 1.0</p>
+  <div class="set-group"><p class="kicker">Condividi MyPT</p>
+    <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
+    <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
+  <p class="set-note" style="margin-top:22px;text-align:center">MyPT · versione 1.1</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -1410,6 +1413,10 @@ function refresh(){ route(); }
 document.addEventListener("click", ev=>{
   if(ev.target.closest("[data-rename]")){ openSettings(); return; }
   const b=ev.target.closest("#set button"); if(!b) return;
+  if(b.hasAttribute("data-shareapp")){ const url="https://marcongiosue-dotcom.github.io/Gym/scarica.html", text="Prova MyPT, l'app per palestra, misure e alimentazione:";
+    if(navigator.share){ navigator.share({title:"MyPT",text,url}).catch(()=>{}); }
+    else { (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>toast("Link copiato")).catch(()=>toast("Copia il link qui sotto")); }
+    return; }
   if(b.hasAttribute("data-setname")){ const n=$("#set-name").value.trim().replace(/\s+/g," "); if(!n){ $("#set-name").focus(); return; }
     user.name=n.charAt(0).toUpperCase()+n.slice(1); LS.set("mypt.user",user); $("#set-name").value=user.name; refresh(); toast("Nome salvato"); return; }
   if(b.hasAttribute("data-settgt")){ const T=food.targets; [["kcal","#s-kcal"],["p","#s-p"],["c","#s-c"],["f","#s-f"],["water","#s-water"]].forEach(([k,id])=>{ const v=parseNum($(id).value); if(v!=null&&v>=0) T[k]=Math.round(v); }); saveFood(); refresh(); toast("Obiettivi salvati"); return; }
