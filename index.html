@@ -354,6 +354,23 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .cta-tx b{display:block;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.2rem;letter-spacing:.02em;line-height:1.1}
 .cta-tx small{display:block;font-size:.82rem;opacity:.85;margin-top:2px}
 .cta-go{font-size:1.8rem;line-height:1;opacity:.85}
+.week button{text-align:center;font-size:.72rem;color:var(--muted);padding:6px 0 5px;border-radius:6px;background:var(--sunk);border:0;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.week button b{display:block;height:4px;margin:4px 8px 0;border-radius:2px;background:var(--pc,transparent)}
+.week button.today{outline:2px solid var(--fg);outline-offset:-2px;color:var(--fg)}
+.week button:disabled{cursor:default}
+.sec-title .cnt{font-family:var(--mono);font-size:.85rem;color:var(--muted);font-weight:500;margin-left:4px}
+.back-list{border:0;background:none;color:var(--muted);font-weight:600;font-size:.9rem;padding:14px 0 0}
+.slist{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.scard{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--pc);border-radius:var(--r);padding:12px 12px 12px 14px}
+.scard.is-today{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc)}
+.sc-top{display:flex;align-items:center;gap:8px}
+.sc-top b{flex:1;min-width:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.3rem;line-height:1.05}
+.sc-top .plate{flex:none;width:16px;height:16px;border-radius:50%;border:4px solid var(--pc)}
+.today-pill{flex:none;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--fg);color:var(--bg);border-radius:999px;padding:2px 8px}
+.sc-go{flex:none;font-size:1.5rem;line-height:1;color:var(--muted)}
+.sc-meta{font-size:.84rem;color:var(--muted)}
+.sc-tags{display:flex;flex-wrap:wrap;gap:4px}
+.linkish{border:0;background:none;color:var(--accent);font-weight:600;text-decoration:underline;padding:0}
 @media (prefers-reduced-motion: reduce){.bodymap .mz{transition:none}}
 </style>
 
@@ -791,7 +808,7 @@ document.addEventListener("click", ev=>{
   const z = ev.target.closest(".mz");
   if(z){ bldToggleMuscle(z.dataset.m); render(); return; }
   const b = ev.target.closest("button"); if(!b) return;
-  if(b.hasAttribute("data-bx")){ bld=null; view="workout"; render(); return; }
+  if(b.hasAttribute("data-bx")){ const t=bld.target; bld=null; view=t?"workout":"list"; render(); scrollTo(0,0); return; }
   if(b.dataset.side){ bld.side=b.dataset.side; render(); return; }
   if(b.dataset.mk){ bldToggleMuscle(b.dataset.mk); render(); return; }
   if(b.hasAttribute("data-bclear")){ bld.muscles=[]; bld.only=null; render(); return; }
@@ -814,7 +831,7 @@ document.addEventListener("input", ev=>{
 });
 
 /* ---------- state ---------- */
-let plan = null, sessions = [], current = null, editing = false, view = "workout";
+let plan = null, sessions = [], current = null, editing = false, view = "list", keepView = false, listQ = "", listM = "";
 let drafts = {}; // workoutId -> exId -> [{kg,reps,done}]
 let store = {mode:"local"}; // {mode:"db", planRef, sessCol}
 const LS = {
@@ -872,22 +889,26 @@ function armButton(btn, fn){
 
 /* ---------- render ---------- */
 function renderNav(){
-  const nav = $("#nav");
+  const nav = $("#nav"); nav.hidden = true; nav.innerHTML = ""; return renderWeek();
+}
+function renderWeek(){
+  const nav = {};
   nav.innerHTML = plan.workouts.map(w=>`<button class="chip" style="--pc:var(${PLATES[w.color%4]})" data-w="${w.id}" aria-pressed="${view==='workout'&&w.id===current}"><span class="plate"></span>${esc(w.name)}</button>`).join("")
    + `<button class="chip ghost" data-add aria-label="Nuova scheda" aria-pressed="${view==='builder'}">+ Nuova scheda</button>`
    + `<button class="chip ghost" data-hist aria-pressed="${view==='history'}">Storico</button>`;
   const week = $("#week");
   week.innerHTML = DAYS.map((d,i)=>{ const w=plan.workouts.find(w=>w.day===i);
-    return `<div class="${i===todayIdx?'today':''}" title="${w?esc(w.name):'Recupero'}" style="${w?`--pc:var(${PLATES[w.color%4]})`:''}">${d}<b></b></div>`}).join("");
+    return `<button class="${i===todayIdx?'today':''}" ${w?`data-w="${w.id}"`:"disabled"} title="${w?esc(w.name):'Recupero'}" aria-label="${d}: ${w?esc(w.name):'recupero'}" style="${w?`--pc:var(${PLATES[w.color%4]})`:''}">${d}<b></b></button>`}).join("");
 }
 function render(){
   renderNav();
   const main = $("#main");
-  if(view==="history"){ main.innerHTML = renderHistory(); return; }
+  const back = `<button class="back-list" data-list>‹ Le mie schede</button>`;
+  if(view==="history"){ main.innerHTML = back + renderHistory(); return; }
   if(view==="builder" && bld){ main.innerHTML = renderBuilder(); return; }
   const w = W();
   const cta = `<button class="cta-new" data-add><span class="cta-ico" aria-hidden="true"><svg viewBox="0 0 40 64"><circle cx="20" cy="7" r="6"/><path d="M8 16h24l3 20h-6l-2-12-1 38h-6l-1-22h-2l-1 22h-6l-1-38-2 12H5z"/></svg></span><span class="cta-tx"><b>Crea una nuova scheda</b><small>Tocca i muscoli sulla sagoma e scegli gli esercizi</small></span><span class="cta-go" aria-hidden="true">›</span></button>`;
-  if(!w){ main.innerHTML = cta + `<div class="empty" style="margin-top:22px">Nessuna scheda. Tocca <b>+ Nuova scheda</b> per crearne una.</div>`; return; }
+  if(view==="list" || !w){ main.innerHTML = cta + renderMyList(); return; }
   const dayName = w.day!=null && w.day>=0 ? ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"][w.day] : "Giorno libero";
   let h = `<div class="head"><div><h2>${esc(w.name)}</h2><p>${esc(dayName)} · ${esc(w.subtitle||"")}</p></div>
     <button class="btn ${editing?'primary':''}" data-edit>${editing?"Fatto":"Modifica"}</button></div>`;
@@ -896,7 +917,7 @@ function render(){
       <label>Nome allenamento<input class="tin" id="w-name" value="${esc(w.name)}"></label>
       <label>Giorno<select class="tin" id="w-day">${["—",...DAYS].map((d,i)=>`<option value="${i-1}" ${w.day===i-1?'selected':''}>${d}</option>`).join("")}</select></label>
       <label class="full">Descrizione<input class="tin" id="w-sub" value="${esc(w.subtitle||"")}"></label></div>
-      <div class="edit-actions"><span class="sp"></span><button class="btn danger" data-delw>Elimina allenamento</button></div></div>`;
+      <div class="edit-actions"><span class="sp"></span><button class="btn danger" data-delw>Elimina scheda</button></div></div>`;
   }
   h += `<div class="list" style="margin-top:12px">`;
   if(!w.exercises.length) h += `<div class="empty">Nessun esercizio. ${editing?"Aggiungine uno qui sotto.":"Tocca <b>Modifica</b> per aggiungerne."}</div>`;
@@ -905,7 +926,37 @@ function render(){
   if(editing) h += `<div class="footer-actions"><button class="btn primary" data-addlib>+ Dalla libreria</button><button class="btn" data-addex>+ Esercizio personalizzato</button></div>`;
   else if(w.exercises.length) h += `<div class="footer-actions"><button class="btn" data-reset>Azzera serie</button><button class="btn primary" data-finish>Termina allenamento</button></div>
     <div class="notes"><div><b>RIR 1–2:</b> chiudi ogni serie con 1–2 ripetizioni di margine.</div><div><b>Tempo:</b> discesa 2–3 s, 1 s di pausa in allungamento, spinta decisa.</div><div><b>Progressione:</b> quando arrivi al tetto delle ripetizioni in tutte le serie, aggiungi 1–2,5 kg la volta dopo.</div></div>`;
-  main.innerHTML = (editing ? "" : cta) + h;
+  main.innerHTML = back + h;
+}
+function wMuscles(w){ const c={}; w.exercises.forEach(e=>{ const l=LIBX[libOf(e)]; if(l) c[l.m]=(c[l.m]||0)+e.sets; }); return MKEYS.filter(k=>c[k]).sort((a,b)=>c[b]-c[a]); }
+function lastDone(w){ const s=sessions.find(s=>s.workoutId===w.id); return s?s.date:null; }
+function listMatches(w){
+  if(listM && !wMuscles(w).includes(listM)) return false;
+  const q=listQ.trim().toLowerCase(); if(!q) return true;
+  const day = w.day>=0 ? ["lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"][w.day] : "";
+  const hay = [w.name,w.subtitle,day,...w.exercises.map(e=>e.name+" "+(e.target||"")),...wMuscles(w).map(k=>MUSCLES[k])].join(" ").toLowerCase();
+  return q.split(/\s+/).every(t=>hay.includes(t));
+}
+function renderMyList(){
+  const used = MKEYS.filter(k=>plan.workouts.some(w=>wMuscles(w).includes(k)));
+  if(listM && !used.includes(listM)) listM="";
+  return `<div class="sec-title"><h2>Le mie schede <span class="cnt">${plan.workouts.length}</span></h2><button class="btn" data-hist>Storico</button></div>
+    ${plan.workouts.length?`<input class="tin" id="wq" type="search" placeholder="Cerca per nome, muscolo, esercizio o giorno" value="${esc(listQ)}" aria-label="Cerca tra le tue schede">
+    <div class="filters" style="margin:10px 0 4px"><button class="chip ghost" data-lm="" aria-pressed="${!listM}">Tutte</button>${used.map(k=>`<button class="chip ghost" data-lm="${k}" aria-pressed="${listM===k}">${MUSCLES[k]}</button>`).join("")}</div>`:""}
+    <div id="slist">${renderSheetCards()}</div>`;
+}
+function renderSheetCards(){
+  if(!plan.workouts.length) return `<div class="empty">Non hai ancora schede. Tocca <b>Crea una nuova scheda</b> qui sopra.</div>`;
+  const DN=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+  const list = plan.workouts.filter(listMatches).sort((a,b)=>((a.day<0?9:(a.day-todayIdx+7)%7)-(b.day<0?9:(b.day-todayIdx+7)%7)));
+  if(!list.length) return `<div class="empty">Nessuna scheda trovata. <button class="linkish" data-lclear>Mostra tutte</button></div>`;
+  return `<div class="slist">${list.map(w=>{
+    const ms=wMuscles(w), nSets=w.exercises.reduce((a,e)=>a+e.sets,0), ld=lastDone(w), today=w.day===todayIdx;
+    return `<button class="scard ${today?"is-today":""}" data-w="${w.id}" style="--pc:var(${PLATES[w.color%4]})">
+      <span class="sc-top"><span class="plate"></span><b>${esc(w.name)}</b>${today?`<span class="today-pill">Oggi</span>`:""}<span class="sc-go" aria-hidden="true">›</span></span>
+      <span class="sc-meta">${w.day>=0?DN[w.day]:"Nessun giorno"} · ${w.exercises.length} esercizi · ${nSets} serie${ld?` · ultima ${new Date(ld).toLocaleDateString("it-IT",{day:"numeric",month:"short"})}`:""}</span>
+      ${ms.length?`<span class="sc-tags">${ms.slice(0,5).map(k=>`<span class="tag">${MUSCLES[k]}</span>`).join("")}${ms.length>5?`<span class="tag">+${ms.length-5}</span>`:""}</span>`:""}
+    </button>`; }).join("")}</div>`;
 }
 function renderCard(w,e,i){
   const d = draftFor(w,e);
@@ -971,11 +1022,14 @@ document.addEventListener("click", ev=>{
   const b = ev.target.closest("button"); if(!b) return;
   const w = W();
   if(b.dataset.w){ current=b.dataset.w; view="workout"; editing=false; bld=null; render(); scrollTo(0,0); return; }
-  if(b.hasAttribute("data-hist")){ view="history"; editing=false; bld=null; render(); return; }
+  if(b.hasAttribute("data-hist")){ view="history"; editing=false; bld=null; render(); scrollTo(0,0); return; }
+  if(b.hasAttribute("data-list")){ view="list"; editing=false; bld=null; render(); scrollTo(0,0); return; }
+  if(b.dataset.lm!=null){ listM=b.dataset.lm; document.querySelectorAll("[data-lm]").forEach(x=>x.setAttribute("aria-pressed",x===b)); $("#slist").innerHTML=renderSheetCards(); return; }
+  if(b.hasAttribute("data-lclear")){ listQ=""; listM=""; render(); return; }
   if(b.hasAttribute("data-add")){ openBuilder(); return; }
   if(b.hasAttribute("data-addlib")){ openBuilder(w.id); return; }
   if(b.hasAttribute("data-edit")){ editing=!editing; render(); return; }
-  if(b.hasAttribute("data-delw")){ armButton(b,()=>{ plan.workouts=plan.workouts.filter(x=>x!==w); delete drafts[w.id]; saveDrafts(); current=plan.workouts[0]?.id; editing=false; savePlan(); render(); toast("Allenamento eliminato"); }); return; }
+  if(b.hasAttribute("data-delw")){ armButton(b,()=>{ plan.workouts=plan.workouts.filter(x=>x!==w); delete drafts[w.id]; saveDrafts(); current=plan.workouts[0]?.id; editing=false; view="list"; savePlan(); render(); toast("Scheda eliminata"); }); return; }
   if(b.hasAttribute("data-addex")){ const e=ex("Nuovo esercizio","",3,8,12,90); w.exercises.push(e); savePlan(); render(); document.getElementById("n-"+e.id)?.select(); return; }
   if(b.dataset.mv){ const i=w.exercises.findIndex(e=>e.id===b.dataset.ex), j=i+Number(b.dataset.mv); [w.exercises[i],w.exercises[j]]=[w.exercises[j],w.exercises[i]]; savePlan(); render(); return; }
   if(b.dataset.delex){ armButton(b,()=>{ w.exercises=w.exercises.filter(e=>e.id!==b.dataset.delex); savePlan(); render(); }); return; }
@@ -1004,6 +1058,7 @@ document.addEventListener("click", ev=>{
   if(b.dataset.delsess){ armButton(b,async()=>{ const id=b.dataset.delsess; sessions=sessions.filter(s=>s.id!==id); LS.set("gym.sessions",sessions); render(); }); return; }
 });
 document.addEventListener("input", ev=>{
+  if(ev.target.id==="wq"){ listQ=ev.target.value; $("#slist").innerHTML=renderSheetCards(); return; }
   const t = ev.target, w = W(); if(!w) return;
   if(t.id==="w-name"){ w.name=t.value; savePlan(); renderNav(); return; }
   if(t.id==="w-sub"){ w.subtitle=t.value; savePlan(); return; }
@@ -1364,7 +1419,7 @@ document.addEventListener("click", ev=>{
   if(b.dataset.cnav){ calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+Number(b.dataset.cnav), 1); renderCal(); return; }
   if(b.hasAttribute("data-ctoday")){ const d=new Date(); calMonth=new Date(d.getFullYear(),d.getMonth(),1); calSel=TODAY(); renderCal(); return; }
   if(b.dataset.cday){ calSel=b.dataset.cday; renderCal(); return; }
-  if(b.dataset.gow){ current=b.dataset.gow; view="workout"; editing=false; location.hash="#gym"; return; }
+  if(b.dataset.gow){ current=b.dataset.gow; view="workout"; keepView=true; editing=false; location.hash="#gym"; return; }
   if(b.dataset.gofood){ foodDay=b.dataset.gofood; foodAdd=null; location.hash="#food"; return; }
   if(b.dataset.fday){ const d=fromIso(foodDay); d.setDate(d.getDate()+Number(b.dataset.fday)); foodDay=iso(d); foodAdd=null; renderFood(); return; }
   if(b.dataset.fadd!=null){ foodAdd=b.dataset.fadd||null; renderFood(); if(foodAdd) $("#f-name")?.focus(); return; }
@@ -1441,7 +1496,7 @@ function route(){
   const h = location.hash.slice(1);
   const sec = ["gym","body","cal","food","set"].includes(h) ? h : "home";
   ["home","gym","body","cal","food","set"].forEach(id=>$("#"+id).hidden = id!==sec);
-  if(sec==="gym") render(); else if(sec==="body") renderBody(); else if(sec==="cal") renderCal(); else if(sec==="food") renderFood(); else if(sec==="set") fillSettings(); else renderHome();
+  if(sec==="gym"){ if(lastSec!=="gym" && !keepView){ view="list"; editing=false; bld=null; } keepView=false; render(); } else if(sec==="body") renderBody(); else if(sec==="cal") renderCal(); else if(sec==="food") renderFood(); else if(sec==="set") fillSettings(); else renderHome();
   const isTab = TABS.includes(sec);
   $("#tabbar").hidden = !isTab;
   document.querySelectorAll("#tabbar a").forEach(a=>{ if(a.dataset.tab===sec) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
