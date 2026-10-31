@@ -403,6 +403,29 @@ body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .info-grid span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
 .info-grid b{font-weight:600}
 #exinfo .panel{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bsum{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-top:8px}
+.board{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:10px -16px 0;padding:0 16px 10px;scroll-padding-inline:16px;-webkit-overflow-scrolling:touch}
+.bcol{flex:0 0 calc((100% - 22px)/2.15);max-width:250px;min-width:150px;scroll-snap-align:start;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--pc);border-radius:var(--r);overflow:hidden}
+.bcol.is-today{box-shadow:0 0 0 2px var(--pc)}
+.bcol-h{display:flex;align-items:flex-start;gap:2px;padding:8px 4px 8px 10px;border-bottom:1px solid var(--line)}
+.bcol-open{flex:1;min-width:0;border:0;background:none;text-align:left;padding:0;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.bcol-open b{display:block;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.1rem;line-height:1.05;overflow-wrap:anywhere}
+.bcol-open small{display:block;color:var(--muted);font-size:.74rem;margin-top:2px}
+.bcol-more{flex:none;border:0;background:none;width:32px;height:32px;border-radius:50%;font-size:1.2rem;font-weight:800;color:var(--muted);line-height:1}
+.bcol-ex{list-style:none;margin:0;padding:4px;display:flex;flex-direction:column;gap:2px;flex:1}
+.bx{display:flex;gap:8px;align-items:center;width:100%;border:0;background:none;text-align:left;padding:5px;border-radius:7px}
+.bx:not(:disabled):hover{background:var(--sunk)}
+.bx .th{flex:none;width:42px;height:32px;border-radius:5px;object-fit:cover;object-position:left center;background:#fff}
+.bx-t{min-width:0}
+.bx-t b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.8rem;font-weight:600;line-height:1.2}
+.bx-t small{display:block;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.bcol-start{margin:6px 8px 8px;padding:8px}
+.wm-title{display:flex;align-items:center;gap:8px;min-width:0}
+.wm-title .plate{flex:none;width:18px;height:18px;border-radius:50%;border:4px solid var(--pc)}
+.wm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.wm-grid .btn{white-space:normal;padding:10px 8px}
+#wmenu .panel{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#wmenu .days button{color:var(--fg)}
 .slist .scard[data-w]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .scard.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 .sc-check{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:.9rem;color:var(--accent-ink)}
@@ -486,7 +509,7 @@ body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.4</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.5</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -1229,27 +1252,44 @@ function renderMyList(){
   if(listM && !used.includes(listM)) listM="";
   if(!plan.workouts.length) manage=false;
   return `<div class="sec-title"><h2>Le mie schede <span class="cnt">${plan.workouts.length}</span></h2><span class="sec-btns">${plan.workouts.length?`<button class="btn ${manage?"primary":""}" data-manage aria-pressed="${manage}">${manage?"Fatto":"Gestisci"}</button>`:""}<button class="btn" data-hist>Storico</button></span></div>
-    ${manage?`<p class="set-note" style="margin:0 0 10px">Rinomina, cambia giorno o colore, duplica o elimina le tue schede. Le modifiche si salvano subito.</p>`:""}
+    ${manage?`<p class="set-note" style="margin:0 0 10px">Le tue schede affiancate: scorri di lato per vederle tutte. Tocca ⋯ o tieni premuto sul nome per le opzioni.</p>`:""}
     ${plan.workouts.length?`<input class="tin" id="wq" type="search" placeholder="Cerca per nome, muscolo, esercizio o giorno" value="${esc(listQ)}" aria-label="Cerca tra le tue schede">
     <div class="filters" style="margin:10px 0 4px"><button class="chip ghost" data-lm="" aria-pressed="${!listM}">Tutte</button>${used.map(k=>`<button class="chip ghost" data-lm="${k}" aria-pressed="${listM===k}">${MUSCLES[k]}</button>`).join("")}</div>`:""}
     <div id="slist">${renderSheetCards()}</div>
-    ${plan.workouts.length>1 && !manage && !selMode ? `<p class="set-note lp-hint">Tieni premuto su una scheda per selezionarla ed eliminarne più di una.</p>`:""}
+    ${plan.workouts.length>1 && !manage && !selMode ? `<p class="set-note lp-hint">Tieni premuto su una scheda per avviarla o cambiarne le impostazioni.</p>`:""}
     ${selMode?`<div class="selbar" role="toolbar" aria-label="Schede selezionate"><div class="in-s">
       <button class="sx" data-selx aria-label="Esci dalla selezione">✕</button>
       <span class="sn2">${sel.size} ${sel.size===1?"selezionata":"selezionate"}</span>
       <button class="btn" data-selall>${plan.workouts.filter(listMatches).every(w=>sel.has(w.id))?"Nessuna":"Tutte"}</button>
       <button class="btn danger-fill" data-seldel ${sel.size?"":"disabled"}>Elimina</button></div></div>`:""}`;
 }
+function renderBoard(list){
+  const DN=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+  const tot={}; list.filter(w=>w.day>=0).forEach(w=>w.exercises.forEach(e=>{ const l=LIBX[libOf(e)]; if(l) tot[l.m]=(tot[l.m]||0)+e.sets; }));
+  const tk=MKEYS.filter(k=>tot[k]).sort((a,b)=>tot[b]-tot[a]);
+  const col = w=>{ const nSets=w.exercises.reduce((a,e)=>a+e.sets,0);
+    return `<section class="bcol ${w.day===todayIdx?"is-today":""}" style="--pc:var(${PLATES[w.color%4]})" aria-label="${esc(w.name)}">
+      <div class="bcol-h"><button class="bcol-open" data-w="${w.id}" data-lp="${w.id}"><b>${esc(w.name)}</b><small>${w.day>=0?DN[w.day]:"Nessun giorno"} · ${w.exercises.length} es. · ${nSets} serie</small></button>
+        <button class="bcol-more" data-wmenu="${w.id}" aria-label="Opzioni di ${esc(w.name)}">⋯</button></div>
+      ${w.exercises.length?`<ol class="bcol-ex">${w.exercises.map(e=>{ const lid=libOf(e), l=LIBX[lid];
+        return `<li><button class="bx" ${l?`data-info="${lid}"`:"disabled"} aria-label="${esc(e.name)}">${l?thumb(l,"th"):`<span class="th noimg" aria-hidden="true">–</span>`}<span class="bx-t"><b>${esc(e.name)}</b><small>${e.sets} × ${repLabel(e)}</small></span></button></li>`; }).join("")}</ol>`
+        :`<p class="set-note" style="padding:10px">Nessun esercizio.</p>`}
+      <button class="btn bcol-start" data-wstart="${w.id}">▶ Avvia</button>
+    </section>`; };
+  return `<div class="bsum"><span class="lbl2" style="margin:0">Serie a settimana per muscolo</span>
+      <div class="meta" style="margin-top:6px">${tk.length?tk.map(k=>`<span class="tag">${MUSCLES[k]} ${tot[k]}</span>`).join(""):`<span class="set-note" style="margin:0">Assegna un giorno alle schede per vedere il totale.</span>`}</div></div>
+    <div class="board">${list.map(col).join("")}</div>`;
+}
 function renderSheetCards(){
   if(!plan.workouts.length) return `<div class="empty">Non hai ancora schede. Tocca <b>Crea una nuova scheda</b> qui sopra.</div>`;
   const DN=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
   const list = plan.workouts.filter(listMatches).sort((a,b)=>((a.day<0?9:(a.day-todayIdx+7)%7)-(b.day<0?9:(b.day-todayIdx+7)%7)));
   if(!list.length) return `<div class="empty">Nessuna scheda trovata. <button class="linkish" data-lclear>Mostra tutte</button></div>`;
-  if(manage) return `<div class="slist">${list.map(manageCard).join("")}</div>`;
+  if(manage) return renderBoard(list);
   return `<div class="slist">${list.map(w=>{
     const ms=wMuscles(w), nSets=w.exercises.reduce((a,e)=>a+e.sets,0), ld=lastDone(w), today=w.day===todayIdx;
     const on = selMode && sel.has(w.id);
-    return `<button class="scard ${today?"is-today":""} ${on?"sel":""}" data-w="${w.id}" ${selMode?`aria-pressed="${on}"`:""} style="--pc:var(${PLATES[w.color%4]})">
+    return `<button class="scard ${today?"is-today":""} ${on?"sel":""}" data-w="${w.id}" data-lp="${w.id}" ${selMode?`aria-pressed="${on}"`:""} style="--pc:var(${PLATES[w.color%4]})">
       <span class="sc-top"><span class="plate"></span><b>${esc(w.name)}</b>${today?`<span class="today-pill">Oggi</span>`:""}${selMode?`<span class="sc-check" aria-hidden="true">${on?"✓":""}</span>`:`<span class="sc-go" aria-hidden="true">›</span>`}</span>
       <span class="sc-meta">${w.day>=0?DN[w.day]:"Nessun giorno"} · ${w.exercises.length} esercizi · ${nSets} serie${ld?` · ultima ${new Date(ld).toLocaleDateString("it-IT",{day:"numeric",month:"short"})}`:""}</span>
       ${ms.length?`<span class="sc-tags">${ms.slice(0,5).map(k=>`<span class="tag">${MUSCLES[k]}</span>`).join("")}${ms.length>5?`<span class="tag">+${ms.length-5}</span>`:""}</span>`:""}
@@ -1340,24 +1380,76 @@ document.addEventListener("change", ev=>{
   if(moved.length) toast(`${moved.map(x=>x.name).join(", ")} ora senza giorno`);
 });
 
+/* ---------- menu della scheda (pressione lunga o ⋯) ---------- */
+function closeWMenu(){ $("#wmenu")?.remove(); }
+function showWMenu(id, focusName){
+  const w = WX(id); if(!w) return; closeWMenu();
+  const DN=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+  const nSets=w.exercises.reduce((a,e)=>a+e.sets,0);
+  const el=document.createElement("div"); el.className="sheet"; el.id="wmenu"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label","Opzioni di "+w.name);
+  el.innerHTML=`<div class="panel" style="--pc:var(${PLATES[w.color%4]})"><div class="grab"></div>
+    <div class="sh-top"><h2 class="wm-title"><span class="plate"></span>${esc(w.name)}</h2><button class="btn" data-wmx aria-label="Chiudi">✕</button></div>
+    <p class="set-note" style="margin:0 0 12px">${w.day>=0?DN[w.day]:"Nessun giorno"} · ${w.exercises.length} esercizi · ${nSets} serie</p>
+    <button class="btn primary big" data-wstart="${w.id}" ${w.exercises.length?"":"disabled"}>▶ Avvia allenamento</button>
+    <div class="wm-grid">
+      <button class="btn" data-wedit="${w.id}">Modifica esercizi</button>
+      <button class="btn" data-waddlib="${w.id}">Aggiungi esercizi</button>
+      <button class="btn" data-wdup="${w.id}">Duplica</button>
+      <button class="btn" data-wsel="${w.id}">Seleziona più schede</button>
+    </div>
+    <label class="mlbl" style="margin-top:16px">Nome<input class="tin" id="wm-name" data-wmname="${w.id}" maxlength="40" value="${esc(w.name)}"></label>
+    <p class="lbl2">Giorno</p>
+    <div class="days">${DAYS.map((d,i)=>{ const o=plan.workouts.find(x=>x.day===i && x!==w); return `<button data-wmday="${i}" data-wid="${w.id}" aria-pressed="${w.day===i}">${d}<small>${w.day===i?"questa":o?esc(o.name):"libero"}</small></button>`; }).join("")}
+      <button class="nod" data-wmday="-1" data-wid="${w.id}" aria-pressed="${w.day<0}">Nessun giorno</button></div>
+    <p class="lbl2">Colore</p>
+    <div class="cdots">${PLATES.map((pc,i)=>`<button class="cdot" data-wmcol="${i}" data-wid="${w.id}" aria-pressed="${w.color%4===i}" style="--pc:var(${pc})" aria-label="${COLN[i]}"></button>`).join("")}</div>
+    <div class="edit-actions" style="margin-top:18px"><span class="sp"></span><button class="btn danger" data-wdel="${w.id}">Elimina scheda</button></div>
+  </div>`;
+  document.body.appendChild(el);
+  const f = focusName ? el.querySelector("#wm-name") : el.querySelector("[data-wmx]"); f.focus(); if(focusName) f.select();
+}
+function openWorkout(id, edit){ closeWMenu(); current=id; view="workout"; editing=!!edit; selMode=false; sel.clear(); render(); scrollTo(0,0); }
+document.addEventListener("click", ev=>{
+  const m = $("#wmenu");
+  const b = ev.target.closest("button");
+  if(b && b.dataset.wmenu){ showWMenu(b.dataset.wmenu); return; }
+  if(b && b.dataset.wstart){ openWorkout(b.dataset.wstart, false); return; }
+  if(!m || !m.contains(ev.target)) return;
+  if(ev.target===m || (b && b.hasAttribute("data-wmx"))){ closeWMenu(); return; }
+  if(!b) return;
+  if(b.dataset.wedit){ openWorkout(b.dataset.wedit, true); return; }
+  if(b.dataset.waddlib){ const id=b.dataset.waddlib; closeWMenu(); current=id; openBuilder(id); return; }
+  if(b.dataset.wsel){ closeWMenu(); manage=false; view="list"; selMode=true; sel.clear(); sel.add(b.dataset.wsel); render(); return; }
+  if(b.dataset.wdup){ const w=WX(b.dataset.wdup); if(!w) return; const c=JSON.parse(JSON.stringify(w));
+    c.id=uid(); c.name=(w.name+" (copia)").slice(0,40); c.day=-1; c.color=(w.color+1)%4; c.exercises.forEach(e=>e.id=uid());
+    plan.workouts.splice(plan.workouts.indexOf(w)+1,0,c); savePlan(); listQ=""; listM=""; render(); toast("Scheda duplicata: dagli un nome"); showWMenu(c.id, true); return; }
+  if(b.dataset.wmday!=null){ const w=WX(b.dataset.wid); if(!w) return; const d=Number(b.dataset.wmday);
+    const moved = d>=0 ? plan.workouts.filter(x=>x!==w && x.day===d) : [];
+    moved.forEach(x=>x.day=-1); w.day=d; savePlan(); render(); showWMenu(w.id);
+    if(moved.length) toast(`${moved.map(x=>x.name).join(", ")} ora senza giorno`); return; }
+  if(b.dataset.wmcol!=null){ const w=WX(b.dataset.wid); if(!w) return; w.color=Number(b.dataset.wmcol); savePlan(); render(); showWMenu(w.id); return; }
+  if(b.dataset.wdel){ armButton(b,()=>{ const w=WX(b.dataset.wdel); closeWMenu(); if(w){ deleteWorkout(w); if(current===w.id||view!=="list") view="list"; render(); } }); return; }
+});
+document.addEventListener("input", ev=>{ const id=ev.target.dataset?.wmname; if(!id) return; const w=WX(id); if(!w) return;
+  if(ev.target.value.trim()){ w.name=ev.target.value; savePlan(); render(); const t=$("#wmenu .wm-title"); if(t) t.lastChild.textContent=w.name; } });
+document.addEventListener("keydown", ev=>{ if(ev.key==="Escape" && $("#wmenu")) closeWMenu(); if(ev.key==="Enter" && ev.target.id==="wm-name") closeWMenu(); });
+
 /* ---------- selezione con pressione lunga ---------- */
 let lp = null, eatClick = false;
 function selToggle(id){ if(sel.has(id)) sel.delete(id); else sel.add(id); if(!sel.size) selMode=false; render(); }
 document.addEventListener("pointerdown", ev=>{
-  const c = ev.target.closest(".scard[data-w]"); if(!c || view!=="list" || manage || ev.button>0) return;
-  const id = c.dataset.w;
+  const c = ev.target.closest("[data-lp]"); if(!c || view!=="list" || ev.button>0 || $("#wmenu")) return;
+  const id = c.dataset.lp;
   lp = {x:ev.clientX, y:ev.clientY, fired:false, t:setTimeout(()=>{ if(!lp) return; lp.fired=true;
-    if(!selMode){ selMode=true; sel.clear(); }
-    if(!sel.has(id)) sel.add(id);
     try{ navigator.vibrate && navigator.vibrate(30); }catch(e){}
-    render(); }, 480)};
+    if(selMode){ if(!sel.has(id)) sel.add(id); render(); } else showWMenu(id); }, 480)};
 });
 document.addEventListener("pointermove", ev=>{ if(lp && !lp.fired && Math.hypot(ev.clientX-lp.x, ev.clientY-lp.y)>10){ clearTimeout(lp.t); lp=null; } });
 ["pointerup","pointercancel"].forEach(t=>document.addEventListener(t, ()=>{ if(!lp) return; clearTimeout(lp.t); if(lp.fired) eatClick=performance.now(); lp=null; }));
-document.addEventListener("contextmenu", ev=>{ if(ev.target.closest(".scard[data-w]")) ev.preventDefault(); });
+document.addEventListener("contextmenu", ev=>{ if(ev.target.closest("[data-lp]")) ev.preventDefault(); });
 document.addEventListener("click", ev=>{
   const c = ev.target.closest(".scard[data-w]");
-  if(eatClick){ const fresh=performance.now()-eatClick<80; eatClick=false; if(fresh && c){ ev.preventDefault(); ev.stopPropagation(); return; } }
+  if(eatClick){ const fresh=performance.now()-eatClick<80; eatClick=false; if(fresh){ ev.preventDefault(); ev.stopPropagation(); return; } }
   if(selMode && c){ ev.preventDefault(); ev.stopPropagation(); selToggle(c.dataset.w); }
 }, true);
 document.addEventListener("click", ev=>{
@@ -1846,6 +1938,7 @@ $("#set-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDe
 const TABS = ["home","cal","food","set"];
 let lastSec = null;
 function route(){
+  closeWMenu(); closeInfo();
   const h = location.hash.slice(1);
   const sec = ["gym","body","cal","food","set"].includes(h) ? h : "home";
   ["home","gym","body","cal","food","set"].forEach(id=>$("#"+id).hidden = id!==sec);
