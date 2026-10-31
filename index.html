@@ -371,6 +371,20 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .sc-meta{font-size:.84rem;color:var(--muted)}
 .sc-tags{display:flex;flex-wrap:wrap;gap:4px}
 .linkish{border:0;background:none;color:var(--accent);font-weight:600;text-decoration:underline;padding:0}
+.sec-btns{display:flex;gap:6px;flex:none}
+.mcard{gap:10px}
+.mlbl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;min-width:0}
+.mcard .tin{color:var(--fg)}
+.mcard input.tin{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.cdots{display:flex;gap:6px;height:40px;align-items:center}
+.cdot{width:30px;height:30px;border-radius:50%;border:5px solid var(--pc);background:transparent;padding:0}
+.cdot[aria-pressed="true"]{background:var(--pc);box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--pc)}
+.mcard .edit-actions{margin-top:0}
+.undo{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:21;display:flex;align-items:center;gap:12px;background:var(--fg);color:var(--bg);padding:7px 7px 7px 16px;border-radius:999px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.28);font-size:.9rem}
+.undo span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.undo button{flex:none;border:0;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:7px 14px;font-weight:700}
+body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 @media (prefers-reduced-motion: reduce){.bodymap .mz{transition:none}}
 </style>
 
@@ -441,7 +455,7 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   <div class="set-group"><p class="kicker">Condividi MyPT</p>
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
-  <p class="set-note" style="margin-top:22px;text-align:center">MyPT · versione 1.1</p>
+  <p class="set-note" style="margin-top:22px;text-align:center">MyPT · versione 1.2</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -455,6 +469,7 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
+<div class="undo" id="undo" role="status" hidden><span></span><button type="button" data-undo>Annulla</button></div>
 
 <script>
 const PLATES = ["--p-red","--p-blue","--p-yellow","--p-green"];
@@ -831,7 +846,7 @@ document.addEventListener("input", ev=>{
 });
 
 /* ---------- state ---------- */
-let plan = null, sessions = [], current = null, editing = false, view = "list", keepView = false, listQ = "", listM = "";
+let plan = null, sessions = [], current = null, editing = false, view = "list", keepView = false, listQ = "", listM = "", manage = false, undoDel = null;
 let drafts = {}; // workoutId -> exId -> [{kg,reps,done}]
 let store = {mode:"local"}; // {mode:"db", planRef, sessCol}
 const LS = {
@@ -937,10 +952,40 @@ function listMatches(w){
   const hay = [w.name,w.subtitle,day,...w.exercises.map(e=>e.name+" "+(e.target||"")),...wMuscles(w).map(k=>MUSCLES[k])].join(" ").toLowerCase();
   return q.split(/\s+/).every(t=>hay.includes(t));
 }
+const COLN = ["Rosso","Blu","Giallo","Verde"];
+function manageCard(w){
+  const opts = [`<option value="-1" ${w.day<0?"selected":""}>Nessun giorno</option>`].concat(DAYS.map((d,i)=>{ const o=plan.workouts.find(x=>x.day===i && x!==w);
+    return `<option value="${i}" ${w.day===i?"selected":""}>${d}${o?" · ora "+esc(o.name):""}</option>`; })).join("");
+  return `<div class="scard mcard" data-card-w="${w.id}" style="--pc:var(${PLATES[w.color%4]})">
+    <label class="mlbl">Nome<input class="tin" id="mn-${w.id}" data-mname="${w.id}" maxlength="40" value="${esc(w.name)}"></label>
+    <div class="mrow">
+      <label class="mlbl">Giorno<select class="tin" id="md-${w.id}" data-mday="${w.id}">${opts}</select></label>
+      <div class="mlbl">Colore<div class="cdots" role="group" aria-label="Colore di ${esc(w.name)}">${PLATES.map((pc,i)=>`<button class="cdot" data-mcol="${i}" data-wid="${w.id}" aria-pressed="${w.color%4===i}" style="--pc:var(${pc})" aria-label="${COLN[i]}"></button>`).join("")}</div></div>
+    </div>
+    <div class="edit-actions"><button class="btn" data-mopen="${w.id}">Esercizi</button><button class="btn" data-mdup="${w.id}">Duplica</button><span class="sp"></span><button class="btn danger" data-mdel="${w.id}">Elimina</button></div>
+  </div>`;
+}
+function deleteWorkout(w){
+  const idx = plan.workouts.indexOf(w); if(idx<0) return;
+  undoDel = {w, idx, d:drafts[w.id]};
+  plan.workouts.splice(idx,1); delete drafts[w.id]; saveDrafts(); savePlan();
+  if(current===w.id) current = plan.workouts[0]?.id;
+  showUndo(`"${w.name}" eliminata`);
+}
+let undoT;
+function showUndo(msg){ const u=$("#undo"); u.querySelector("span").textContent=msg; u.hidden=false; clearTimeout(undoT); undoT=setTimeout(()=>{ u.hidden=true; undoDel=null; },7000); }
+function restoreWorkout(){
+  if(!undoDel) return; const {w,idx,d}=undoDel; undoDel=null;
+  if(w.day>=0 && plan.workouts.some(x=>x.day===w.day)) w.day=-1;
+  plan.workouts.splice(Math.min(idx,plan.workouts.length),0,w); if(d) drafts[w.id]=d;
+  saveDrafts(); savePlan(); $("#undo").hidden=true; clearTimeout(undoT); render(); toast(`"${w.name}" ripristinata`);
+}
 function renderMyList(){
   const used = MKEYS.filter(k=>plan.workouts.some(w=>wMuscles(w).includes(k)));
   if(listM && !used.includes(listM)) listM="";
-  return `<div class="sec-title"><h2>Le mie schede <span class="cnt">${plan.workouts.length}</span></h2><button class="btn" data-hist>Storico</button></div>
+  if(!plan.workouts.length) manage=false;
+  return `<div class="sec-title"><h2>Le mie schede <span class="cnt">${plan.workouts.length}</span></h2><span class="sec-btns">${plan.workouts.length?`<button class="btn ${manage?"primary":""}" data-manage aria-pressed="${manage}">${manage?"Fatto":"Gestisci"}</button>`:""}<button class="btn" data-hist>Storico</button></span></div>
+    ${manage?`<p class="set-note" style="margin:0 0 10px">Rinomina, cambia giorno o colore, duplica o elimina le tue schede. Le modifiche si salvano subito.</p>`:""}
     ${plan.workouts.length?`<input class="tin" id="wq" type="search" placeholder="Cerca per nome, muscolo, esercizio o giorno" value="${esc(listQ)}" aria-label="Cerca tra le tue schede">
     <div class="filters" style="margin:10px 0 4px"><button class="chip ghost" data-lm="" aria-pressed="${!listM}">Tutte</button>${used.map(k=>`<button class="chip ghost" data-lm="${k}" aria-pressed="${listM===k}">${MUSCLES[k]}</button>`).join("")}</div>`:""}
     <div id="slist">${renderSheetCards()}</div>`;
@@ -950,6 +995,7 @@ function renderSheetCards(){
   const DN=["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
   const list = plan.workouts.filter(listMatches).sort((a,b)=>((a.day<0?9:(a.day-todayIdx+7)%7)-(b.day<0?9:(b.day-todayIdx+7)%7)));
   if(!list.length) return `<div class="empty">Nessuna scheda trovata. <button class="linkish" data-lclear>Mostra tutte</button></div>`;
+  if(manage) return `<div class="slist">${list.map(manageCard).join("")}</div>`;
   return `<div class="slist">${list.map(w=>{
     const ms=wMuscles(w), nSets=w.exercises.reduce((a,e)=>a+e.sets,0), ld=lastDone(w), today=w.day===todayIdx;
     return `<button class="scard ${today?"is-today":""}" data-w="${w.id}" style="--pc:var(${PLATES[w.color%4]})">
@@ -1017,6 +1063,32 @@ function renderHistoryList(){
   return `<div class="head"><div><h2>Storico</h2><p>${sessions.length} allenamenti registrati</p></div></div><div class="hist">${list}</div>`;
 }
 
+/* ---------- gestione schede ---------- */
+const WX = id=>plan.workouts.find(x=>x.id===id);
+document.addEventListener("click", ev=>{
+  const b = ev.target.closest("button"); if(!b) return;
+  if(b.hasAttribute("data-undo")){ restoreWorkout(); return; }
+  if(b.hasAttribute("data-manage")){ manage=!manage; render(); return; }
+  if(b.dataset.mcol!=null){ const w=WX(b.dataset.wid); if(!w) return; w.color=Number(b.dataset.mcol); savePlan(); render(); return; }
+  if(b.dataset.mopen){ current=b.dataset.mopen; view="workout"; editing=true; render(); scrollTo(0,0); return; }
+  if(b.dataset.mdup){ const w=WX(b.dataset.mdup); if(!w) return; const c=JSON.parse(JSON.stringify(w));
+    c.id=uid(); c.name=(w.name+" (copia)").slice(0,40); c.day=-1; c.color=(w.color+1)%4; c.exercises.forEach(e=>e.id=uid());
+    plan.workouts.splice(plan.workouts.indexOf(w)+1,0,c); savePlan(); listQ=""; listM=""; render(); toast("Scheda duplicata");
+    const inp=document.getElementById("mn-"+c.id); if(inp){ inp.scrollIntoView({block:"center"}); inp.select(); } return; }
+  if(b.dataset.mdel){ armButton(b,()=>{ const w=WX(b.dataset.mdel); if(w){ deleteWorkout(w); render(); } }); return; }
+});
+document.addEventListener("input", ev=>{
+  const id=ev.target.dataset?.mname; if(!id) return; const w=WX(id); if(!w) return;
+  w.name=ev.target.value.trim()?ev.target.value:w.name; savePlan(); renderWeek();
+});
+document.addEventListener("focusout", ev=>{ const id=ev.target.dataset?.mname; if(id && !ev.target.value.trim()){ const w=WX(id); if(w) ev.target.value=w.name; } });
+document.addEventListener("change", ev=>{
+  const id=ev.target.dataset?.mday; if(!id) return; const w=WX(id); if(!w) return; const d=Number(ev.target.value);
+  const moved = d>=0 ? plan.workouts.filter(x=>x!==w && x.day===d) : [];
+  moved.forEach(x=>x.day=-1); w.day=d; savePlan(); render();
+  if(moved.length) toast(`${moved.map(x=>x.name).join(", ")} ora senza giorno`);
+});
+
 /* ---------- events ---------- */
 document.addEventListener("click", ev=>{
   const b = ev.target.closest("button"); if(!b) return;
@@ -1029,7 +1101,7 @@ document.addEventListener("click", ev=>{
   if(b.hasAttribute("data-add")){ openBuilder(); return; }
   if(b.hasAttribute("data-addlib")){ openBuilder(w.id); return; }
   if(b.hasAttribute("data-edit")){ editing=!editing; render(); return; }
-  if(b.hasAttribute("data-delw")){ armButton(b,()=>{ plan.workouts=plan.workouts.filter(x=>x!==w); delete drafts[w.id]; saveDrafts(); current=plan.workouts[0]?.id; editing=false; view="list"; savePlan(); render(); toast("Scheda eliminata"); }); return; }
+  if(b.hasAttribute("data-delw")){ armButton(b,()=>{ deleteWorkout(w); editing=false; view="list"; render(); scrollTo(0,0); }); return; }
   if(b.hasAttribute("data-addex")){ const e=ex("Nuovo esercizio","",3,8,12,90); w.exercises.push(e); savePlan(); render(); document.getElementById("n-"+e.id)?.select(); return; }
   if(b.dataset.mv){ const i=w.exercises.findIndex(e=>e.id===b.dataset.ex), j=i+Number(b.dataset.mv); [w.exercises[i],w.exercises[j]]=[w.exercises[j],w.exercises[i]]; savePlan(); render(); return; }
   if(b.dataset.delex){ armButton(b,()=>{ w.exercises=w.exercises.filter(e=>e.id!==b.dataset.delex); savePlan(); render(); }); return; }
@@ -1496,7 +1568,7 @@ function route(){
   const h = location.hash.slice(1);
   const sec = ["gym","body","cal","food","set"].includes(h) ? h : "home";
   ["home","gym","body","cal","food","set"].forEach(id=>$("#"+id).hidden = id!==sec);
-  if(sec==="gym"){ if(lastSec!=="gym" && !keepView){ view="list"; editing=false; bld=null; } keepView=false; render(); } else if(sec==="body") renderBody(); else if(sec==="cal") renderCal(); else if(sec==="food") renderFood(); else if(sec==="set") fillSettings(); else renderHome();
+  if(sec==="gym"){ if(lastSec!=="gym" && !keepView){ view="list"; editing=false; bld=null; manage=false; } keepView=false; render(); } else if(sec==="body") renderBody(); else if(sec==="cal") renderCal(); else if(sec==="food") renderFood(); else if(sec==="set") fillSettings(); else renderHome();
   const isTab = TABS.includes(sec);
   $("#tabbar").hidden = !isTab;
   document.querySelectorAll("#tabbar a").forEach(a=>{ if(a.dataset.tab===sec) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
