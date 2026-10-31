@@ -585,6 +585,36 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .cta-new{border-radius:var(--r);min-height:72px;box-shadow:0 6px 20px color-mix(in srgb,var(--accent) 25%,transparent);transition:transform .12s var(--ease)}
 .cta-new:active{transform:scale(.98)}
 .custom-btn{justify-content:flex-start;text-align:left;min-height:56px}
+/* configurazione guidata */
+.cfg{display:grid;gap:14px;padding:14px 12px 4px;margin-top:10px;border-top:1px solid var(--line)}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.pcard.open{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.pcard .prow{border:0;border-radius:0;background:transparent}
+.pcard .cfg{margin-top:0;padding:12px 12px 14px}
+.pnm{position:relative;border:0;background:none;text-align:left;padding:4px 22px 4px 0;color:var(--fg);font-family:var(--body);min-height:44px}
+.pchev{position:absolute;right:2px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cfg-row.col{flex-direction:column;align-items:stretch;gap:8px}
+.cfg-l{font-weight:600;font-size:.95rem;display:block}
+.cfg-l small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;margin-top:1px}
+.cfg-val{float:right;font-family:var(--mono);color:var(--accent);font-size:.9rem}
+.stp{display:inline-flex;align-items:center;flex:none;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.stp button{width:46px;height:46px;border:0;background:var(--sunk);font-size:1.35rem;font-weight:700;line-height:1;color:var(--fg);transition:background-color .12s,transform .1s}
+.stp button:active{transform:scale(.92)}
+.stp output,.stp-in{min-width:58px;text-align:center;font:700 1.15rem var(--mono);font-variant-numeric:tabular-nums;color:var(--fg)}
+.stp-in{width:68px;height:46px;border:0;background:transparent;padding:0}
+.stp-in:focus{outline:none;background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.stp.sm button{width:40px;height:42px;font-size:1.2rem}
+.stp.sm output{min-width:44px;font-size:1.05rem}
+.cfg-chips{display:flex;flex-wrap:wrap;gap:6px}
+.cfg-chip{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-height:42px;min-width:64px;padding:5px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);font-weight:600;font-size:.88rem;line-height:1.1;transition:background-color .15s,border-color .15s,transform .1s}
+.cfg-chip small{font-family:var(--mono);font-weight:500;font-size:.72rem;color:var(--muted);margin-top:2px}
+.cfg-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.cfg-chip[aria-pressed="true"] small{color:inherit;opacity:.85}
+.cfg-chip:active{transform:scale(.96)}
+.cfg-range{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
+.goal-card{margin-bottom:4px}
+.card>.cfg{padding:14px 0 2px}
 .tabbar a{min-height:48px;justify-content:center}
 /* transizioni */
 .v-enter{animation:viewIn .24s var(--ease)}
@@ -661,7 +691,7 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.7</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.8</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -1149,6 +1179,81 @@ function bodySvg(side, sel){
 
 /* ---------- costruttore scheda ---------- */
 let bld = null;
+/* ---------- configurazione guidata: serie, ripetizioni, peso, recupero ---------- */
+const REP_PRESETS = {reps:[["Forza",4,6],["Massa",8,12],["Tono",12,15],["Resistenza",15,20]], s:[["20 s",20,20],["30 s",30,30],["45 s",45,45],["1 min",60,60]], min:[["5 min",5,5],["10 min",10,10],["20 min",20,20],["30 min",30,30]]};
+const REST_PRESETS = [30,45,60,90,120,180];
+const GOALS = [["base","Consigliato","Serie e ripetizioni consigliate per ogni esercizio"],
+  ["forza","Forza","Poche ripetizioni e carichi alti: 3–4 serie da 4–8, recupero lungo"],
+  ["massa","Massa","Ipertrofia: 3–4 serie da 8–12, recupero 1:15–2:00"],
+  ["tono","Tonificazione","3 serie da 12–15, recupero breve"],
+  ["resistenza","Resistenza","2–3 serie da 15–20, recupero 45 s"]];
+const GOALV = {forza:{m:[4,4,6,180],i:[3,6,8,120]}, massa:{m:[4,8,10,120],i:[3,10,12,75]}, tono:{m:[3,12,15,75],i:[3,12,15,60]}, resistenza:{m:[3,15,20,45],i:[2,15,20,45]}};
+const unitWord = u=> u==="s"?"Secondi":u==="min"?"Minuti":"Ripetizioni";
+const fmtRest = r=> r? (r<60? r+" s" : fmtT(r)) : "Nessuno";
+function cfgDefault(id){ const l=LIBX[id], last=lastByLib(id); const kgs=last?last.sets.map(s=>s.kg).filter(v=>v!=null):[];
+  return {sets:l.sets, a:l.repMin, b:l.repMax, rest:l.rest, unit:l.unit, kg:kgs.length?kgs[0]:null, lastKg:kgs.length?kgs[0]:null}; }
+function cfgGet(sc){ const i=sc.indexOf(":"), t=sc.slice(0,i), id=sc.slice(i+1);
+  if(t==="b") return {t, o:bld?.cfg?.[id]};
+  const w=W(); return {t, o:w&&w.exercises.find(x=>x.id===id)}; }
+function cfgRead(sc){ const {t,o}=cfgGet(sc); if(!o) return null; if(t==="b") return o;
+  return {sets:o.sets, a:o.repMin, b:o.repMax, rest:o.rest, unit:o.unit, kg:o.weights?.length?o.weights[0]:null}; }
+function cfgWrite(sc,v){ const {t,o}=cfgGet(sc); if(!o) return;
+  if(t==="b"){ Object.assign(o,v); return; }
+  const oldKg = o.weights?.length?o.weights[0]:null;
+  o.sets=v.sets; o.repMin=v.a; o.repMax=v.b; o.rest=v.rest;
+  if(v.kg!==oldKg) o.weights = v.kg==null?[]:Array(v.sets).fill(v.kg);
+  else if(o.weights?.length){ const w=o.weights; o.weights=Array.from({length:v.sets},(_,k)=>w[k]??w[w.length-1]); }
+  savePlan(); }
+function cfgFix(v, changed){
+  const max = v.unit==="s"?600:v.unit==="min"?240:100;
+  v.sets=Math.min(10,Math.max(1,v.sets)); v.a=Math.min(max,Math.max(1,v.a)); v.b=Math.min(max,Math.max(1,v.b)); v.rest=Math.min(600,Math.max(0,v.rest));
+  if(v.a>v.b){ if(changed==="b") v.a=v.b; else v.b=v.a; }
+  if(v.kg!=null) v.kg=Math.min(500,Math.max(0,Math.round(v.kg*4)/4));
+  return v; }
+const stp = (sc,f,val,lbl,cls="")=>`<div class="stp ${cls}" role="group" aria-label="${lbl}"><button type="button" data-cf="${f}" data-sc="${sc}" data-d="-1" aria-label="${lbl}: meno">−</button><output>${val}</output><button type="button" data-cf="${f}" data-sc="${sc}" data-d="1" aria-label="${lbl}: più">+</button></div>`;
+function cfgUI(sc, v, extra){
+  const u=v.unit||"reps", pr=REP_PRESETS[u]||REP_PRESETS.reps, mk=unitMark(u);
+  const rests = REST_PRESETS.includes(v.rest)||v.rest===0 ? REST_PRESETS : [...REST_PRESETS, v.rest].sort((a,b)=>a-b);
+  return `<div class="cfg">
+    <div class="cfg-row"><span class="cfg-l">Serie</span>${stp(sc,"sets",v.sets,"Serie")}</div>
+    <div class="cfg-row col"><span class="cfg-l">${unitWord(u)} per serie <b class="cfg-val">${v.a===v.b?v.a:v.a+"–"+v.b}${mk}</b></span>
+      <div class="cfg-chips">${pr.map(([n,a,b])=>`<button type="button" class="cfg-chip" data-cfp="${sc}" data-a="${a}" data-b="${b}" aria-pressed="${v.a===a&&v.b===b}">${n}${u==="reps"?`<small>${a}–${b}</small>`:""}</button>`).join("")}</div>
+      <div class="cfg-range"><span>da</span>${stp(sc,"a",v.a,"Minimo","sm")}<span>a</span>${stp(sc,"b",v.b,"Massimo","sm")}</div></div>
+    ${u!=="min"?`<div class="cfg-row"><span class="cfg-l">Peso iniziale<small>${v.lastKg!=null?`ultima volta ${fmtKg(v.lastKg)} kg`:"facoltativo, in kg"}</small></span>
+      <div class="stp" role="group" aria-label="Peso iniziale"><button type="button" data-cf="kg" data-sc="${sc}" data-d="-1" aria-label="Peso: meno 2,5 kg">−</button><input class="stp-in" inputmode="decimal" data-cfk="${sc}" value="${fmtKg(v.kg)}" placeholder="—" aria-label="Peso iniziale in kg"><button type="button" data-cf="kg" data-sc="${sc}" data-d="1" aria-label="Peso: più 2,5 kg">+</button></div></div>`:""}
+    <div class="cfg-row col"><span class="cfg-l">Recupero tra le serie <b class="cfg-val">${fmtRest(v.rest)}</b></span>
+      <div class="cfg-chips">${rests.map(r=>`<button type="button" class="cfg-chip" data-cfr="${sc}" data-v="${r}" aria-pressed="${v.rest===r}">${fmtRest(r)}</button>`).join("")}</div></div>
+    ${extra||""}
+  </div>`;
+}
+const cfgSummary = v=>`${v.sets} × ${v.a===v.b?v.a:v.a+"–"+v.b}${unitMark(v.unit)}${v.unit!=="min"?` · ${v.kg!=null?fmtKg(v.kg)+" kg":"peso libero"}`:""} · rec ${fmtRest(v.rest)}`;
+function applyGoal(g){
+  bld.goal=g;
+  bld.picked.forEach(id=>{ const c=bld.cfg[id], l=LIBX[id]; if(!c) return;
+    if(g==="base" || l.unit!=="reps"){ const d=cfgDefault(id); Object.assign(c,{sets:d.sets,a:d.a,b:d.b,rest:d.rest}); return; }
+    const [st,a,b,r]=GOALV[g][l.type==="m"?"m":"i"]; Object.assign(c,{sets:st,a,b,rest:r}); });
+}
+document.addEventListener("click", ev=>{
+  const b=ev.target.closest("button"); if(!b) return;
+  const sc = b.dataset.sc || b.dataset.cfp || b.dataset.cfr; 
+  if(b.dataset.goal){ applyGoal(b.dataset.goal); render(); return; }
+  if(b.dataset.popen){ bld.open = bld.open===b.dataset.popen ? null : b.dataset.popen; render(); return; }
+  if(!sc) return;
+  const v=cfgRead(sc); if(!v) return; let ch="";
+  if(b.dataset.cf){ const f=b.dataset.cf, d=Number(b.dataset.d); ch=f;
+    if(f==="kg"){ v.kg = v.kg==null ? (d>0?(v.lastKg??10):null) : (v.kg+d*2.5<=0 && d<0 ? null : v.kg+d*2.5); }
+    else if(f==="rest") v.rest+=d*15;
+    else v[f]+= d*(f!=="sets"&&v.unit==="s"?5:1); }
+  else if(b.dataset.cfp){ v.a=Number(b.dataset.a); v.b=Number(b.dataset.b); }
+  else if(b.dataset.cfr){ v.rest=Number(b.dataset.v); }
+  else return;
+  if(sc.startsWith("b:")) bld.goal=null;
+  cfgWrite(sc, cfgFix(v,ch)); render();
+});
+document.addEventListener("input", ev=>{ const sc=ev.target.dataset?.cfk; if(!sc) return; const v=cfgRead(sc); if(!v) return;
+  const n=parseNum(ev.target.value); v.kg = n==null||n<0 ? null : Math.min(500,n); cfgWrite(sc,v);
+  const sm=ev.target.closest(".pcard")?.querySelector(".pnm small"); if(sm) sm.textContent=cfgSummary(v); });
+
 function openBuilder(targetId){
   const t = targetId && plan.workouts.find(w=>w.id===targetId);
   bld = {step:1, side:"front", muscles:[], only:null, eq:"", q:"", picked:[], name:"", day:-1, target:t?t.id:null};
@@ -1192,11 +1297,17 @@ function renderBuilder(){
       <div class="days">${DAYS.map((d,i)=>`<button data-bday="${i}" aria-pressed="${bld.day===i}">${d}${occ(i)?`<small>${esc(occ(i).name)}</small>`:"<small>libero</small>"}</button>`).join("")}
         <button data-bday="-1" aria-pressed="${bld.day===-1}" class="nod">Nessun giorno</button></div>
       ${bld.day>=0&&occ(bld.day)?`<p class="set-note">${esc(occ(bld.day).name)} verrà spostata su "nessun giorno".</p>`:""}</div>`;
-    h += `<div class="sec-title"><h2 style="font-size:1.15rem">Esercizi (${bld.picked.length})</h2></div>
+    bld.cfg ??= {}; bld.picked.forEach(id=>{ bld.cfg[id] ??= cfgDefault(id); });
+    if(bld.open===undefined) bld.open = bld.picked[0];
+    const gsel = GOALS.find(g=>g[0]===bld.goal);
+    h += `<div class="card goal-card"><p class="cfg-l" style="margin:0 0 8px">Obiettivo della scheda</p>
+        <div class="cfg-chips">${GOALS.map(([k,l])=>`<button type="button" class="cfg-chip" data-goal="${k}" aria-pressed="${bld.goal===k}">${l}</button>`).join("")}</div>
+        <p class="set-note" style="margin-top:8px">${gsel?gsel[2]:"Scegli un obiettivo per impostare tutti gli esercizi in un tocco, poi ritocca quello che vuoi."}</p></div>
+      <div class="sec-title"><h2 style="font-size:1.15rem">Esercizi (${bld.picked.length})</h2></div>
       <div class="meta" style="margin:0 0 10px">${bldSetsByMuscle(bld.picked)}</div>
-      <div class="plist">${bld.picked.map((id,i)=>{ const l=LIBX[id]; return `<div class="prow"><span class="num">${String(i+1).padStart(2,"0")}</span><button class="pthumb" data-info="${id}" aria-label="Foto e istruzioni: ${esc(l.name)}">${thumb(l)}</button><div class="nm">${esc(l.name)}<small>${l.sets} × ${repLabel(l)} · ${MUSCLES[l.m]}</small></div>
-        <button class="btn" data-pmv="-1" data-pid="${id}" ${i===0?"disabled":""} aria-label="Sposta su">↑</button><button class="btn" data-pmv="1" data-pid="${id}" ${i===bld.picked.length-1?"disabled":""} aria-label="Sposta giù">↓</button><button class="btn danger" data-pick="${id}" aria-label="Togli">✕</button></div>`; }).join("")}</div>
-      <p class="set-note">Serie, ripetizioni e recupero li puoi cambiare dopo con <b>Modifica</b>.</p>`;
+      <div class="plist">${bld.picked.map((id,i)=>{ const l=LIBX[id], c=bld.cfg[id], op=bld.open===id; return `<div class="pcard ${op?"open":""}"><div class="prow"><span class="num">${String(i+1).padStart(2,"0")}</span><button class="pthumb" data-info="${id}" aria-label="Foto e istruzioni: ${esc(l.name)}">${thumb(l)}</button><button class="nm pnm" data-popen="${id}" aria-expanded="${op}">${esc(l.name)}<small>${cfgSummary(c)}</small><span class="pchev" aria-hidden="true">${op?"▴":"▾"}</span></button>
+        <button class="btn" data-pmv="-1" data-pid="${id}" ${i===0?"disabled":""} aria-label="Sposta su">↑</button><button class="btn" data-pmv="1" data-pid="${id}" ${i===bld.picked.length-1?"disabled":""} aria-label="Sposta giù">↓</button><button class="btn danger" data-pick="${id}" aria-label="Togli">✕</button></div>${op?cfgUI("b:"+id,c):""}</div>`; }).join("")}</div>
+      <p class="set-note">Tocca un esercizio per impostare serie, ripetizioni, peso e recupero. Puoi cambiarli anche dopo con <b>Modifica</b>.</p>`;
   }
   const n = bld.picked.length;
   const next = bld.step===1 ? `<button class="btn primary" data-bstep="2" ${bld.muscles.length?"":"disabled"}>Vedi esercizi ›</button>`
@@ -1220,7 +1331,8 @@ function exFromLib(id){
 }
 function saveBuilder(){
   const tgt = bld.target && plan.workouts.find(w=>w.id===bld.target);
-  const exs = bld.picked.map(exFromLib);
+  const exs = bld.picked.map(id=>{ const e=exFromLib(id), c=bld.cfg?.[id]; if(c){ e.sets=c.sets; e.repMin=c.a; e.repMax=c.b; e.rest=c.rest;
+    e.weights = c.kg!=null ? Array(c.sets).fill(c.kg) : []; } return e; });
   if(tgt){ tgt.exercises.push(...exs); current=tgt.id; toast(exs.length===1?"Esercizio aggiunto":exs.length+" esercizi aggiunti"); }
   else {
     const name = bld.name.trim() || bld.muscles.map(k=>MUSCLES[k]).slice(0,3).join(" e ") || "Nuova scheda";
@@ -1491,13 +1603,9 @@ function renderEditCard(w,e,i){
     <div class="edit-grid">
       <label class="full">Esercizio<input class="tin" id="n-${e.id}" data-f="name" data-ex="${e.id}" value="${esc(e.name)}"></label>
       <label class="full">Muscoli target<input class="tin" id="t-${e.id}" data-f="target" data-ex="${e.id}" value="${esc(e.target||"")}"></label>
-      <label>Serie<input class="tin" id="s-${e.id}" type="number" min="1" max="12" inputmode="numeric" data-f="sets" data-ex="${e.id}" value="${e.sets}"></label>
-      <label>Unità<select class="tin" id="u-${e.id}" data-f="unit" data-ex="${e.id}"><option value="reps" ${e.unit!=="s"&&e.unit!=="min"?"selected":""}>Ripetizioni</option><option value="s" ${e.unit==="s"?"selected":""}>Secondi</option><option value="min" ${e.unit==="min"?"selected":""}>Minuti</option></select></label>
-      <label>${unitShort(e.unit)} min<input class="tin" id="a-${e.id}" type="number" min="1" inputmode="numeric" data-f="repMin" data-ex="${e.id}" value="${e.repMin}"></label>
-      <label>${unitShort(e.unit)} max<input class="tin" id="b-${e.id}" type="number" min="1" inputmode="numeric" data-f="repMax" data-ex="${e.id}" value="${e.repMax}"></label>
-      <label>Kg di partenza<input class="tin" id="k-${e.id}" inputmode="decimal" data-f="kg" data-ex="${e.id}" value="${fmtKg(e.weights?.[0])}" placeholder="es. 40"></label>
-      <label>Recupero (s)<input class="tin" id="r-${e.id}" type="number" min="0" step="15" inputmode="numeric" data-f="rest" data-ex="${e.id}" value="${e.rest}"></label>
+      <label class="full">Si misura in<select class="tin" id="u-${e.id}" data-f="unit" data-ex="${e.id}"><option value="reps" ${e.unit!=="s"&&e.unit!=="min"?"selected":""}>Ripetizioni</option><option value="s" ${e.unit==="s"?"selected":""}>Secondi</option><option value="min" ${e.unit==="min"?"selected":""}>Minuti</option></select></label>
     </div>
+    ${cfgUI("e:"+e.id, cfgRead("e:"+e.id))}
     <div class="edit-actions">
       <button class="btn" data-mv="-1" data-ex="${e.id}" ${i===0?"disabled":""} aria-label="Sposta su">↑</button>
       <button class="btn" data-mv="1" data-ex="${e.id}" ${i===w.exercises.length-1?"disabled":""} aria-label="Sposta giù">↓</button>
