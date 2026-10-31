@@ -464,6 +464,132 @@ body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .selbar .danger-fill{background:var(--danger);border-color:var(--danger);color:#fff}
 .selbar .danger-fill.armed{background:#fff;color:var(--danger);border-color:#fff}
 @media (prefers-reduced-motion: reduce){.bodymap .mz{transition:none}}
+
+/* ===== Restyling 1.7: struttura, proporzioni e spaziature (stessi colori e temi) ===== */
+:root{--r:14px;--r-sm:10px;--r-lg:20px;--s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--tap:44px;
+  --sh:0 1px 2px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.06);--ease:cubic-bezier(.2,.7,.2,1)}
+body{line-height:1.45;-webkit-tap-highlight-color:transparent;text-rendering:optimizeLegibility}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+h1{letter-spacing:.005em}
+.kicker{letter-spacing:.09em;font-size:.8rem}
+.ico{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-timer .ico{fill:currentColor;stroke:none}
+/* pulsanti */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--tap);padding:10px 14px;border-radius:12px;line-height:1.1;text-align:center;transition:transform .12s var(--ease),background-color .15s,border-color .15s,box-shadow .15s}
+.btn:active:not(:disabled),.chip:active,.scard:active,.lrow:active,.tick:active,.stepper button:active{transform:scale(.97)}
+.btn.primary{box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 28%,transparent)}
+.btn.big{display:flex;min-height:50px}
+.sec-btns .btn,.edit-actions .btn{min-height:40px}
+.footer-actions .btn{min-height:52px;border-radius:14px;font-size:1rem}
+.chip{min-height:38px;transition:background-color .15s,color .15s,border-color .15s,transform .12s var(--ease)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tin{min-height:44px;border-radius:var(--r-sm);border-width:1.5px}
+.tin:focus{border-color:var(--accent)}
+/* card */
+.card,.scard,.hcard,.stat,.bsum,.bcol,.cprev{border-radius:var(--r)}
+.card{padding:var(--s4);box-shadow:var(--sh)}
+.list{gap:var(--s3)}
+/* intestazione Palestra */
+#gym .top{margin-bottom:var(--s1)}
+.week{gap:6px;margin-top:var(--s3)}
+.week button{min-height:46px;border-radius:var(--r-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0;transition:transform .12s var(--ease)}
+.week button b{width:60%;margin:5px auto 0}
+.week button.rest{opacity:.55}
+.week button.rest b{height:2px;background:var(--line)}
+.back-list{display:inline-flex;align-items:center;min-height:var(--tap);padding:0;margin-top:var(--s2)}
+.head{margin:var(--s2) 0 var(--s4);align-items:flex-start}
+.wk-head{gap:var(--s3)}
+.wk-t{min-width:0}
+.wk-day{margin:0 0 4px!important;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:.8rem;color:var(--muted)}
+.wk-day.is-today{color:var(--accent)}
+.wk-head h2{font-size:2.15rem;line-height:.98;letter-spacing:.005em}
+.wk-sub{margin:6px 0 0!important;color:var(--muted);font-size:.92rem;line-height:1.35}
+.wk-stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s3)}
+.wk-stats span{display:inline-flex;align-items:baseline;gap:4px;background:var(--sunk);border-radius:999px;padding:4px 10px;font-size:.8rem;color:var(--muted)}
+.wk-stats b{font-family:var(--mono);color:var(--fg);font-size:.85rem}
+.btn-edit{flex:none}
+/* card esercizio */
+.excard{display:flex;flex-direction:column;gap:var(--s3)}
+.excard .ex-top{display:grid;grid-template-columns:88px minmax(0,1fr);gap:var(--s3);align-items:start}
+.exmedia{position:relative;width:88px;height:68px;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.exmedia .th{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
+.exmedia.none{background:var(--sunk);display:grid;place-items:center}
+.exmedia .num{position:absolute;left:5px;top:5px;min-width:24px;height:22px;padding:0 5px;border-radius:7px;background:var(--fg);color:var(--bg);font:700 .72rem/22px var(--mono);text-align:center;font-variant-numeric:tabular-nums}
+.exmedia.none .num{position:static;font-size:.9rem;height:28px;line-height:28px;min-width:34px}
+.exmedia .i{position:absolute;right:5px;bottom:5px;width:18px;height:18px;border-radius:50%;background:var(--fg);color:var(--bg);font:italic 700 .72rem/18px var(--body);text-align:center}
+.excard .ex-title h3{font-size:1.08rem;line-height:1.22;font-weight:600;letter-spacing:.005em}
+.excard .ex-title .tgt{font-size:.84rem;line-height:1.3;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.excard .meta{margin-top:var(--s2);gap:6px}
+.tag{display:inline-flex;align-items:center;gap:5px;border-radius:7px;padding:4px 8px;font-size:.76rem;line-height:1.2}
+.t-sets::before,.t-rest::before{content:"";width:13px;height:13px;flex:none;background:currentColor;opacity:.7;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+.t-sets{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 7v10M3.5 9.5v5M18 7v10M20.5 9.5v5M6 12h12'/%3E%3C/svg%3E")}
+.t-rest{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='13' r='8'/%3E%3Cpath d='M12 9v4l2.5 2M9.5 2.5h5'/%3E%3C/svg%3E")}
+.excard .last{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0;padding:7px 10px;border-radius:var(--r-sm);background:var(--sunk);font-family:var(--body)}
+.excard .last span{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;font-weight:600;color:var(--muted)}
+.excard .last b{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--fg);word-spacing:.2em}
+/* registrazione serie */
+.excard .sets{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0}
+.srow{display:grid;grid-template-columns:32px minmax(0,1fr) minmax(0,1fr) 52px;gap:8px;align-items:center;padding:4px;border-radius:14px;transition:background-color .2s}
+.srow.sh{padding-top:0;padding-bottom:0}
+.srow.sh span{font-size:.66rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600;text-align:center}
+.srow .sn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);color:var(--muted);font:700 .82rem var(--mono);transition:background-color .2s,color .2s}
+.srow .in{height:50px;padding:0 6px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);font-size:1.2rem;font-weight:700;transition:border-color .15s,background-color .2s,box-shadow .15s}
+.srow .in:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);outline:none}
+.srow .in::placeholder{font-weight:500;opacity:.55}
+.srow .tick{width:52px;height:50px;border-radius:12px;border-width:1.5px;transition:background-color .15s,border-color .15s,transform .12s var(--ease)}
+.srow .tick svg{width:22px;height:22px}
+.srow.done{background:color-mix(in srgb,var(--done) 10%,transparent)}
+.srow.done .sn{background:var(--done);color:#fff}
+.srow.done .in{background:var(--done-bg);border-color:color-mix(in srgb,var(--done) 45%,transparent);color:var(--fg)}
+.srow.done .tick{box-shadow:0 4px 12px color-mix(in srgb,var(--done) 35%,transparent)}
+.srow.just{animation:rowFlash .6s var(--ease)}
+.srow.just .tick{animation:tickPop .32s var(--ease)}
+@keyframes rowFlash{0%{background:color-mix(in srgb,var(--done) 28%,transparent)}100%{background:color-mix(in srgb,var(--done) 10%,transparent)}}
+@keyframes tickPop{0%{transform:scale(.82)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.card.complete{border-color:var(--done);box-shadow:0 0 0 1px var(--done),var(--sh)}
+/* recupero nella card */
+.excard .rest-line{margin:0;padding-top:var(--s3);gap:var(--s2) var(--s3)}
+.rl-l{display:flex;align-items:center;gap:10px}
+.rl-l>span{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted)}
+.excard .stepper{border-radius:12px}
+.excard .stepper button{width:40px;height:40px;font-size:1.1rem}
+.excard .stepper output{font-size:1rem;font-weight:700;min-width:4em}
+.btn-timer{flex:1 1 130px;background:color-mix(in srgb,var(--accent) 12%,var(--surface));border-color:color-mix(in srgb,var(--accent) 45%,var(--line));color:var(--accent);font-weight:700}
+.notes{gap:8px;margin-top:var(--s5);padding:var(--s3) var(--s4);border:1px dashed var(--line);border-radius:var(--r)}
+/* timer */
+.timer{left:max(8px,env(safe-area-inset-left,0px));right:max(8px,env(safe-area-inset-right,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));max-width:624px;margin:0 auto;padding:12px 14px 14px;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.35);transform:translateY(calc(100% + 24px));transition:transform .3s var(--ease),background-color .25s}
+.timer .bar{display:none}
+.timer .in-t{display:flex;flex-direction:column;align-items:stretch;gap:10px;max-width:none}
+.t-row1{display:flex;align-items:center;gap:12px;min-width:0}
+.tring{flex:none;width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--p-yellow) calc(var(--p,0) * 1%),color-mix(in srgb,currentColor 18%,transparent) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));transition:background .2s linear}
+.timer.over .tring{background:currentColor}
+.timer .clock{font-size:2.4rem;line-height:1;min-width:3.6ch}
+.timer .lbl{flex:1;min-width:0;opacity:1;font-size:.8rem}
+.timer .lbl b{font-size:.92rem}
+.timer .lbl span{display:block;opacity:.72;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer button{height:44px;border-radius:12px;font-family:var(--body);font-weight:700;font-size:.92rem;border:1.5px solid color-mix(in srgb,currentColor 35%,transparent);opacity:1;transition:transform .12s var(--ease),background-color .15s}
+.timer button:active{transform:scale(.96)}
+.timer .t-x{flex:none;width:40px;min-width:40px;height:40px;border-radius:50%;padding:0;font-size:1rem;align-self:flex-start}
+.t-row2{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px}
+.timer .t-main{background:var(--bg);color:var(--fg);border-color:var(--bg);font-size:1.05rem}
+.timer.over .t-main{background:#fff;color:var(--p-red);border-color:#fff}
+body.timing .tabbar{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+@media (max-width:380px){.timer .clock{font-size:2rem}.timer .lbl{display:block}}
+/* elenco schede, costruttore, menu */
+.scard{padding:14px 14px 14px 16px;transition:transform .12s var(--ease),box-shadow .15s}
+.sc-top b{font-size:1.32rem}
+.lrow{min-height:60px;border-radius:12px}
+.lthumb{border-radius:12px}
+.sheet .panel{border-radius:var(--r-lg) var(--r-lg) 0 0}
+.cta-new{border-radius:var(--r);min-height:72px;box-shadow:0 6px 20px color-mix(in srgb,var(--accent) 25%,transparent);transition:transform .12s var(--ease)}
+.cta-new:active{transform:scale(.98)}
+.custom-btn{justify-content:flex-start;text-align:left;min-height:56px}
+.tabbar a{min-height:48px;justify-content:center}
+/* transizioni */
+.v-enter{animation:viewIn .24s var(--ease)}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.v-enter,.srow.just,.srow.just .tick{animation:none}.btn,.chip,.timer,.srow,.tick{transition:none}}
 </style>
 
 </head>
@@ -535,17 +661,22 @@ body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.6</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.7</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
   <div class="in-t">
-    <div class="clock" id="tclock">0:00</div>
-    <div class="lbl"><b id="tname">Recupero</b><span id="tsub">Recupero</span></div>
-    <button id="tminus" aria-label="Togli 15 secondi">−15</button>
-    <button id="tplus" aria-label="Aggiungi 15 secondi">+15</button>
-    <button id="tpause" aria-label="Pausa">❚❚</button>
-    <button id="tstop" aria-label="Chiudi timer">✕</button>
+    <div class="t-row1">
+      <div class="tring" aria-hidden="true"></div>
+      <div class="clock" id="tclock">0:00</div>
+      <div class="lbl"><b id="tname">Recupero</b><span id="tsub">Recupero</span></div>
+      <button id="tstop" class="t-x" aria-label="Chiudi timer">✕</button>
+    </div>
+    <div class="t-row2">
+      <button id="tminus" aria-label="Togli 15 secondi">−15 s</button>
+      <button id="tpause" class="t-main" aria-label="Pausa">❚❚</button>
+      <button id="tplus" aria-label="Aggiungi 15 secondi">+15 s</button>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
@@ -1203,11 +1334,14 @@ function renderWeek(){
    + `<button class="chip ghost" data-hist aria-pressed="${view==='history'}">Storico</button>`;
   const week = $("#week");
   week.innerHTML = DAYS.map((d,i)=>{ const w=plan.workouts.find(w=>w.day===i);
-    return `<button class="${i===todayIdx?'today':''}" ${w?`data-w="${w.id}"`:"disabled"} title="${w?esc(w.name):'Recupero'}" aria-label="${d}: ${w?esc(w.name):'recupero'}" style="${w?`--pc:var(${PLATES[w.color%4]})`:''}">${d}<b></b></button>`}).join("");
+    return `<button class="${i===todayIdx?'today':''} ${w?'':'rest'}" ${w?`data-w="${w.id}"`:"disabled"} title="${w?esc(w.name):'Recupero'}" aria-label="${d}: ${w?esc(w.name):'recupero'}" style="${w?`--pc:var(${PLATES[w.color%4]})`:''}">${d}<b></b></button>`}).join("");
 }
+let lastView = null;
 function render(){
   renderNav();
   const main = $("#main");
+  const vk = view+":"+(view==="workout"?current:"");
+  if(vk!==lastView){ lastView=vk; main.classList.remove("v-enter"); void main.offsetWidth; main.classList.add("v-enter"); }
   if(view!=="list" || manage){ selMode=false; sel.clear(); }
   const back = `<button class="back-list" data-list>‹ Le mie schede</button>`;
   if(view==="history"){ main.innerHTML = back + renderHistory(); return; }
@@ -1216,8 +1350,10 @@ function render(){
   const cta = `<button class="cta-new" data-add><span class="cta-ico" aria-hidden="true"><svg viewBox="0 0 40 64"><circle cx="20" cy="7" r="6"/><path d="M8 16h24l3 20h-6l-2-12-1 38h-6l-1-22h-2l-1 22h-6l-1-38-2 12H5z"/></svg></span><span class="cta-tx"><b>Crea una nuova scheda</b><small>Tocca i muscoli sulla sagoma e scegli gli esercizi</small></span><span class="cta-go" aria-hidden="true">›</span></button>`;
   if(view==="list" || !w){ main.innerHTML = cta + renderMyList(); return; }
   const dayName = w.day!=null && w.day>=0 ? ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"][w.day] : "Giorno libero";
-  let h = `<div class="head"><div><h2>${esc(w.name)}</h2><p>${esc(dayName)} · ${esc(w.subtitle||"")}</p></div>
-    <button class="btn ${editing?'primary':''}" data-edit>${editing?"Fatto":"Modifica"}</button></div>`;
+  const isToday = w.day===todayIdx, totSets = w.exercises.reduce((a,x)=>a+x.sets,0);
+  let h = `<div class="head wk-head"><div class="wk-t"><p class="wk-day ${isToday?"is-today":""}">${esc(dayName)}${isToday?" · oggi":""}</p><h2>${esc(w.name)}</h2>${w.subtitle?`<p class="wk-sub">${esc(w.subtitle)}</p>`:""}
+      <div class="wk-stats"><span><b>${w.exercises.length}</b> esercizi</span><span><b>${totSets}</b> serie</span></div></div>
+    <button class="btn btn-edit ${editing?'primary':''}" data-edit><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>${editing?"Fatto":"Modifica"}</button></div>`;
   if(editing){
     h += `<div class="card"><div class="edit-grid">
       <label>Nome allenamento<input class="tin" id="w-name" value="${esc(w.name)}"></label>
@@ -1326,22 +1462,28 @@ function renderCard(w,e,i){
   const last = lastFor(e);
   const allDone = d.length && d.every(s=>s.done);
   const unit = unitShort(e.unit);
-  let rows = `<div class="h"></div><div class="h">Kg</div><div class="h">${unit}</div><div class="h"></div>`;
+  let rows = `<div class="srow sh" aria-hidden="true"><span>Serie</span><span>Kg</span><span>${unit}</span><span>Fatto</span></div>`;
   d.forEach((s,k)=>{
     const prevKg = e.weights?.[k] ?? e.weights?.[e.weights.length-1] ?? "";
     const prevReps = last?.x.sets[k]?.reps;
-    rows += `<div class="sn">${k+1}</div>
+    rows += `<div class="srow ${s.done?"done":""}"><span class="sn">${k+1}</span>
       <input class="in" inputmode="decimal" id="kg-${e.id}-${k}" data-kg="${k}" data-ex="${e.id}" value="${fmtKg(s.kg)}" placeholder="${fmtKg(prevKg)||'kg'}" aria-label="Kg serie ${k+1}">
       <input class="in" inputmode="numeric" id="rp-${e.id}-${k}" data-reps="${k}" data-ex="${e.id}" value="${s.reps??""}" placeholder="${prevReps??repLabel(e)}" aria-label="${unit} serie ${k+1}">
-      <button class="tick" data-tick="${k}" data-ex="${e.id}" aria-pressed="${!!s.done}" aria-label="Serie ${k+1} completata"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>`;
+      <button class="tick" data-tick="${k}" data-ex="${e.id}" aria-pressed="${!!s.done}" aria-label="Serie ${k+1} completata"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>`;
   });
-  return `<article class="card ${allDone?'complete':''}" data-card="${e.id}">
-    <div class="ex-top"><div class="num">${String(i+1).padStart(2,"0")}</div><div class="ex-title"><h3>${esc(e.name)}</h3><div class="tgt">${esc(e.target||"")}</div></div>${LIBX[libOf(e)]?`<button class="exthumb" data-info="${libOf(e)}" aria-label="Foto e istruzioni: ${esc(e.name)}">${thumb(LIBX[libOf(e)])}<span class="i">i</span></button>`:""}</div>
-    <div class="meta"><span class="tag">${e.sets} × ${repLabel(e)}</span><span class="tag">rec ${fmtT(e.rest)}</span>${readyToProgress(e)?'<span class="tag up">↑ +1–2,5 kg</span>':''}</div>
-    ${last?`<div class="last">Ultima: ${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</div>`:""}
-    <div class="sets">${rows}</div>
-    <div class="rest-line"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><output>${fmtT(e.rest)}</output><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div>
-    <button class="btn" data-start="${e.id}">Avvia timer</button></div>
+  const lid = libOf(e), L = LIBX[lid], nn = String(i+1).padStart(2,"0");
+  const doneN = d.filter(s=>s.done).length;
+  return `<article class="card excard ${allDone?'complete':''}" data-card="${e.id}">
+    <div class="ex-top">
+      ${L?`<button class="exmedia" data-info="${lid}" aria-label="Foto e istruzioni: ${esc(e.name)}">${thumb(L)}<span class="num">${nn}</span><span class="i" aria-hidden="true">i</span></button>`
+         :`<div class="exmedia none"><span class="num">${nn}</span></div>`}
+      <div class="ex-title"><h3>${esc(e.name)}</h3><div class="tgt">${esc(e.target||"")}</div>
+        <div class="meta"><span class="tag t-sets">${e.sets} × ${repLabel(e)}</span><span class="tag t-rest">rec ${fmtT(e.rest)}</span>${readyToProgress(e)?'<span class="tag up">↑ +1–2,5 kg</span>':''}</div></div>
+    </div>
+    ${last?`<div class="last"><span>Ultima volta</span><b>${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</b></div>`:""}
+    <div class="sets" role="group" aria-label="Serie di ${esc(e.name)}">${rows}</div>
+    <div class="rest-line"><div class="rl-l"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><output>${fmtT(e.rest)}</output><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div></div>
+    <button class="btn btn-timer" data-start="${e.id}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Avvia timer</button></div>
   </article>`;
 }
 function renderEditCard(w,e,i){
@@ -1519,6 +1661,7 @@ document.addEventListener("click", ev=>{
       startTimer(e.rest, e.name, next<0 ? "Esercizio completato" : `Prossima: serie ${next+1} di ${e.sets}`);
     }
     b.setAttribute("aria-pressed",s.done);
+    { const row=b.closest(".srow"); if(row){ row.classList.toggle("done",s.done); if(s.done){ row.classList.remove("just"); void row.offsetWidth; row.classList.add("just"); setTimeout(()=>row.classList.remove("just"),600); } } }
     b.closest(".card").classList.toggle("complete", d.every(x=>x.done));
     saveDrafts(); return;
   }
@@ -1595,6 +1738,7 @@ function tick(){
   const r=remaining(), over=r<=0;
   $("#tclock").textContent = over ? "+"+fmtT(-r) : fmtT(Math.ceil(r));
   $("#tbar").style.width = (tTotal? Math.min(100,Math.max(0,(1-r/tTotal)*100)) : 100)+"%";
+  $("#timer").style.setProperty("--p", tTotal? Math.min(100,Math.max(0,(1-r/tTotal)*100)) : 100);
   $("#timer").classList.toggle("over",over);
   if(over && !beeped){ beeped=true; beep(); $("#tsub").textContent="Recupero finito: vai!"; }
 }
