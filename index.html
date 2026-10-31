@@ -621,6 +621,49 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .setctl button:disabled{opacity:.35}
 .setctl span{min-width:76px;text-align:center;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
 .setctl b{font-family:var(--mono);font-size:1.05rem;color:var(--fg);letter-spacing:0}
+/* riga serie selezionata e pannello -/+ */
+.srow .sn{border:0;padding:0;cursor:pointer}
+.srow.act:not(.done){background:color-mix(in srgb,var(--accent) 9%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 55%,transparent)}
+.srow.act:not(.done) .sn{background:var(--accent);color:var(--accent-ink)}
+.srow.act.done{box-shadow:inset 0 0 0 1.5px var(--done)}
+.spad{border:1px solid var(--line);background:var(--sunk);border-radius:var(--r);padding:10px 12px 12px}
+.spad-t{margin:0 0 8px;font-size:.88rem;color:var(--muted)}
+.spad-t b{color:var(--fg);font-family:var(--mono)}
+.spad-t .ok{color:var(--done);font-weight:700}
+.spad-t small{display:block;font-size:.72rem;opacity:.8}
+.spad-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px}
+.spad-c>span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;font-weight:600;color:var(--muted);margin-bottom:4px;text-align:center}
+.spad-s{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.spad-s button{width:48px;height:50px;border:0;background:var(--surface);color:var(--fg);font-size:1.5rem;font-weight:700;line-height:1;transition:transform .1s,background-color .15s}
+.spad-s button:active{transform:scale(.9);background:color-mix(in srgb,var(--accent) 18%,var(--surface))}
+.spad-s output{flex:1;text-align:center;font:700 1.25rem var(--mono);font-variant-numeric:tabular-nums;color:var(--fg)}
+.spad-s output.ph{color:var(--muted);font-weight:500}
+.timer .t-hint{display:block;font-style:normal;font-size:.68rem;opacity:.55;margin-top:1px}
+.timer{cursor:pointer}
+/* countdown a schermo intero */
+.tfull{position:fixed;inset:0;z-index:40;background:var(--bg);color:var(--fg);display:flex;flex-direction:column;justify-content:space-between;
+  padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:tfIn .25s var(--ease)}
+@keyframes tfIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:none}}
+.tf-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tf-top button{min-height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);font-weight:700}
+.tf-k{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.tf-mid{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.tf-ring{position:relative;width:min(76vw,300px);aspect-ratio:1;max-width:100%;border-radius:50%;display:grid;place-items:center;margin-bottom:14px;
+  background:conic-gradient(var(--accent) calc(var(--p,0) * 1%),var(--sunk) 0);transition:background .2s linear}
+.tf-ring::before{content:"";position:absolute;inset:14px;border-radius:50%;background:var(--bg)}
+.tf-in{position:relative;text-align:center}
+.tf-clock{font:700 clamp(3.6rem,19vw,5.4rem)/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.tf-of{margin-top:6px;color:var(--muted);font-size:.9rem}
+.tf-name{margin:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.35rem;line-height:1.1;max-width:30ch;text-wrap:balance}
+.tf-sub{margin:0;color:var(--muted)}
+.tf-btns{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:10px;max-width:520px;width:100%;margin:0 auto}
+.tf-btns button{height:64px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);font-weight:700;font-size:1.05rem;transition:transform .1s}
+.tf-btns button:active{transform:scale(.96)}
+.tf-btns .tf-main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:1.5rem}
+.tfull.over .tf-ring{background:var(--p-red);animation:tfPulse 1s ease-in-out infinite}
+.tfull.over .tf-of{color:var(--p-red);font-weight:700}
+@keyframes tfPulse{50%{transform:scale(1.03)}}
+@media (prefers-reduced-motion: reduce){.tfull,.tfull.over .tf-ring{animation:none}}
 .tabbar a{min-height:48px;justify-content:center}
 /* transizioni */
 .v-enter{animation:viewIn .24s var(--ease)}
@@ -697,7 +740,7 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.9</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 2.0</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -705,7 +748,7 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <div class="t-row1">
       <div class="tring" aria-hidden="true"></div>
       <div class="clock" id="tclock">0:00</div>
-      <div class="lbl"><b id="tname">Recupero</b><span id="tsub">Recupero</span></div>
+      <div class="lbl"><b id="tname">Recupero</b><span id="tsub">Recupero</span><em class="t-hint">Tocca per ingrandire</em></div>
       <button id="tstop" class="t-x" aria-label="Chiudi timer">✕</button>
     </div>
     <div class="t-row2">
@@ -714,6 +757,14 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
       <button id="tplus" aria-label="Aggiungi 15 secondi">+15 s</button>
     </div>
   </div>
+</div>
+<div class="tfull" id="tfull" role="dialog" aria-modal="true" aria-label="Recupero" hidden>
+  <div class="tf-top"><button type="button" id="fmin" aria-label="Riduci il timer">⌄ Riduci</button><span class="tf-k">Recupero</span><button type="button" id="fstop">Salta</button></div>
+  <div class="tf-mid">
+    <div class="tf-ring" id="fring"><div class="tf-in"><div class="tf-clock" id="fclock">0:00</div><div class="tf-of" id="fof"></div></div></div>
+    <p class="tf-name" id="fname"></p><p class="tf-sub" id="fsub"></p>
+  </div>
+  <div class="tf-btns"><button type="button" id="fminus">−15 s</button><button type="button" id="fpause" class="tf-main" aria-label="Pausa">❚❚</button><button type="button" id="fplus">+15 s</button></div>
 </div>
 <div class="toast" id="toast" hidden></div>
 <div class="undo" id="undo" role="status" hidden><span></span><button type="button" data-undo>Annulla</button></div>
@@ -1575,6 +1626,37 @@ function renderSheetCards(){
       ${ms.length?`<span class="sc-tags">${ms.slice(0,5).map(k=>`<span class="tag">${MUSCLES[k]}</span>`).join("")}${ms.length>5?`<span class="tag">+${ms.length-5}</span>`:""}</span>`:""}
     </button>`; }).join("")}</div>`;
 }
+/* pannello serie: -/+ grandi per kg e ripetizioni della serie selezionata */
+const padRow = {};
+function padIdx(w,e){ const d=draftFor(w,e); let k=padRow[e.id]; if(k==null||k>=d.length){ k=d.findIndex(s=>!s.done); if(k<0) k=d.length-1; } return k; }
+function padVals(w,e,k){ const d=draftFor(w,e), s=d[k], last=lastFor(e);
+  const pk = e.weights?.[k] ?? e.weights?.[e.weights.length-1] ?? last?.x.sets[k]?.kg ?? last?.x.sets.at(-1)?.kg ?? null, pr = last?.x.sets[k]?.reps ?? null;
+  return {s, kg: s.kg ?? pk, reps: s.reps ?? pr ?? e.repMin, kgReal: s.kg!=null, repsReal: s.reps!=null}; }
+function padHTML(w,e){
+  const k=padIdx(w,e), v=padVals(w,e,k), u=unitShort(e.unit);
+  return `<div class="spad" data-pad="${e.id}"><p class="spad-t">Serie <b>${k+1}</b> di ${e.sets}${v.s.done?' · <span class="ok">fatta</span>':""}<small>tocca il numero di una serie per sceglierla</small></p>
+    <div class="spad-g">
+      ${e.unit!=="min"?`<div class="spad-c"><span>Kg</span><div class="spad-s"><button type="button" data-padf="kg" data-d="-1" data-ex="${e.id}" aria-label="Meno 2,5 kg">−</button><output class="${v.kgReal?"":"ph"}">${v.kg!=null?fmtKg(v.kg):"–"}</output><button type="button" data-padf="kg" data-d="1" data-ex="${e.id}" aria-label="Più 2,5 kg">+</button></div></div>`:""}
+      <div class="spad-c"><span>${u}</span><div class="spad-s"><button type="button" data-padf="reps" data-d="-1" data-ex="${e.id}" aria-label="Meno uno">−</button><output class="${v.repsReal?"":"ph"}">${v.reps}</output><button type="button" data-padf="reps" data-d="1" data-ex="${e.id}" aria-label="Più uno">+</button></div></div>
+    </div></div>`;
+}
+function padRefresh(w,e){ const card=document.querySelector(`[data-card="${e.id}"]`); if(!card) return; const k=padIdx(w,e);
+  card.querySelectorAll(".srow[data-row]").forEach(r=>r.classList.toggle("act", Number(r.dataset.row)===k));
+  const old=card.querySelector(".spad"); if(old) old.outerHTML=padHTML(w,e); }
+document.addEventListener("click", ev=>{
+  const b=ev.target.closest("button"); if(!b) return; const w=W(); if(!w || view!=="workout" || editing) return;
+  if(b.dataset.act!=null){ const e=w.exercises.find(x=>x.id===b.dataset.ex); if(!e) return; padRow[e.id]=Number(b.dataset.act); padRefresh(w,e); return; }
+  if(b.dataset.padf){ const e=w.exercises.find(x=>x.id===b.dataset.ex); if(!e) return; const k=padIdx(w,e), v=padVals(w,e,k), dd=Number(b.dataset.d), card=b.closest(".card");
+    if(b.dataset.padf==="kg"){ v.s.kg=Math.max(0,Math.round(((v.kg??0)+dd*2.5)*4)/4); const inp=card.querySelector(`[data-kg="${k}"]`); if(inp) inp.value=fmtKg(v.s.kg); }
+    else { const step=e.unit==="s"?5:1; v.s.reps=Math.max(0,(Number(v.reps)||0)+dd*step); const inp=card.querySelector(`[data-reps="${k}"]`); if(inp) inp.value=v.s.reps; }
+    saveDrafts(); padRefresh(w,e); return; }
+  if(b.dataset.tick!=null){ const e=w.exercises.find(x=>x.id===b.dataset.ex); if(!e) return; setTimeout(()=>{ const d=draftFor(w,e); const nx=d.findIndex(s=>!s.done); padRow[e.id]= nx<0 ? Number(b.dataset.tick) : nx; padRefresh(w,e); },0); }
+});
+document.addEventListener("focusin", ev=>{ const t=ev.target; if(!t.dataset || (t.dataset.kg==null && t.dataset.reps==null)) return; const w=W(); if(!w) return;
+  const e=w.exercises.find(x=>x.id===t.dataset.ex); if(!e) return; const k=Number(t.dataset.kg ?? t.dataset.reps); if(padRow[e.id]!==k){ padRow[e.id]=k; padRefresh(w,e); } });
+document.addEventListener("input", ev=>{ const t=ev.target; if(!t.dataset || (t.dataset.kg==null && t.dataset.reps==null)) return; const w=W(); if(!w) return;
+  const e=w.exercises.find(x=>x.id===t.dataset.ex); if(!e) return; const card=t.closest(".card"), o=card?.querySelectorAll(".spad output"); if(!o) return; setTimeout(()=>padRefresh(w,e),0); });
+
 function renderCard(w,e,i){
   const d = draftFor(w,e);
   const last = lastFor(e);
@@ -1584,7 +1666,7 @@ function renderCard(w,e,i){
   d.forEach((s,k)=>{
     const prevKg = e.weights?.[k] ?? e.weights?.[e.weights.length-1] ?? "";
     const prevReps = last?.x.sets[k]?.reps;
-    rows += `<div class="srow ${s.done?"done":""}"><span class="sn">${k+1}</span>
+    rows += `<div class="srow ${s.done?"done":""} ${k===padIdx(w,e)?"act":""}" data-row="${k}"><button type="button" class="sn" data-act="${k}" data-ex="${e.id}" aria-label="Seleziona serie ${k+1}">${k+1}</button>
       <input class="in" inputmode="decimal" id="kg-${e.id}-${k}" data-kg="${k}" data-ex="${e.id}" value="${fmtKg(s.kg)}" placeholder="${fmtKg(prevKg)||'kg'}" aria-label="Kg serie ${k+1}">
       <input class="in" inputmode="numeric" id="rp-${e.id}-${k}" data-reps="${k}" data-ex="${e.id}" value="${s.reps??""}" placeholder="${prevReps??repLabel(e)}" aria-label="${unit} serie ${k+1}">
       <button class="tick" data-tick="${k}" data-ex="${e.id}" aria-pressed="${!!s.done}" aria-label="Serie ${k+1} completata"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>`;
@@ -1600,6 +1682,7 @@ function renderCard(w,e,i){
     </div>
     ${last?`<div class="last"><span>Ultima volta</span><b>${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</b></div>`:""}
     <div class="sets" role="group" aria-label="Serie di ${esc(e.name)}">${rows}</div>
+    ${padHTML(w,e)}
     <div class="setctl"><button type="button" data-setd="-1" data-ex="${e.id}" ${e.sets<=1?"disabled":""} aria-label="Togli una serie">−</button><span><b>${e.sets}</b> ${e.sets===1?"serie":"serie"}</span><button type="button" data-setd="1" data-ex="${e.id}" ${e.sets>=10?"disabled":""} aria-label="Aggiungi una serie">+</button></div>
     <div class="rest-line"><div class="rl-l"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><output>${fmtT(e.rest)}</output><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div></div>
     <button class="btn btn-timer" data-start="${e.id}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Avvia timer</button></div>
@@ -1765,7 +1848,7 @@ document.addEventListener("click", ev=>{
   if(b.dataset.setd){ const e=w.exercises.find(e=>e.id===b.dataset.ex); if(!e) return; const n=Math.min(10,Math.max(1,e.sets+Number(b.dataset.setd))); if(n===e.sets) return;
     e.sets=n; if(e.weights?.length){ const wt=e.weights; e.weights=Array.from({length:n},(_,k)=>wt[k]??wt[wt.length-1]); }
     draftFor(w,e); saveDrafts(); savePlan(); render(); toast(Number(b.dataset.setd)>0?"Serie aggiunta":"Serie tolta"); return; }
-  if(b.dataset.start){ const e=w.exercises.find(e=>e.id===b.dataset.start); startTimer(e.rest,e.name,"Recupero"); return; }
+  if(b.dataset.start){ const e=w.exercises.find(e=>e.id===b.dataset.start); startTimer(e.rest,e.name,"Recupero"); openFull(); return; }
   if(b.dataset.tick!=null){
     const e=w.exercises.find(e=>e.id===b.dataset.ex), k=Number(b.dataset.tick), d=draftFor(w,e), s=d[k];
     s.done=!s.done;
@@ -1850,13 +1933,16 @@ function startTimer(sec,name,sub){
   $("#tname").textContent=name; $("#tsub").textContent=sub; $("#tpause").textContent="❚❚"; $("#tpause").setAttribute("aria-label","Pausa");
   $("#timer").classList.add("show"); clearInterval(tInt); tInt=setInterval(tick,200); tick();
 }
-function stopTimer(){ clearInterval(tInt); $("#timer").classList.remove("show","over"); }
+function stopTimer(){ clearInterval(tInt); $("#timer").classList.remove("show","over"); $("#tfull").hidden=true; }
 function remaining(){ return tPaused!=null ? tPaused : (tEnd-Date.now())/1000; }
 function tick(){
   const r=remaining(), over=r<=0;
   $("#tclock").textContent = over ? "+"+fmtT(-r) : fmtT(Math.ceil(r));
   $("#tbar").style.width = (tTotal? Math.min(100,Math.max(0,(1-r/tTotal)*100)) : 100)+"%";
   $("#timer").style.setProperty("--p", tTotal? Math.min(100,Math.max(0,(1-r/tTotal)*100)) : 100);
+  { const f=$("#tfull"); if(f && !f.hidden){ f.style.setProperty("--p", tTotal? Math.min(100,Math.max(0,(1-r/tTotal)*100)) : 100); f.classList.toggle("over",over);
+    $("#fclock").textContent=$("#tclock").textContent; $("#fname").textContent=$("#tname").textContent; $("#fsub").textContent=$("#tsub").textContent;
+    $("#fof").textContent = over ? "tempo scaduto" : "di "+fmtT(tTotal); const pz=$("#tpause"); $("#fpause").textContent=pz.textContent; $("#fpause").setAttribute("aria-label",pz.getAttribute("aria-label")); } }
   $("#timer").classList.toggle("over",over);
   if(over && !beeped){ beeped=true; beep(); $("#tsub").textContent="Recupero finito: vai!"; }
 }
@@ -1864,6 +1950,14 @@ $("#tplus").onclick=()=>{ if(tPaused!=null) tPaused+=15; else tEnd+=15000; tTota
 $("#tminus").onclick=()=>{ if(tPaused!=null) tPaused=Math.max(0,tPaused-15); else tEnd-=15000; tick(); };
 $("#tpause").onclick=()=>{ if(tPaused==null){ tPaused=remaining(); $("#tpause").textContent="▶"; $("#tpause").setAttribute("aria-label","Riprendi"); } else { tEnd=Date.now()+tPaused*1000; tPaused=null; $("#tpause").textContent="❚❚"; $("#tpause").setAttribute("aria-label","Pausa"); } tick(); };
 $("#tstop").onclick=stopTimer;
+function openFull(){ if(!$("#timer").classList.contains("show")) return; $("#tfull").hidden=false; tick(); $("#fpause").focus(); }
+$("#fmin").onclick=()=>{ $("#tfull").hidden=true; };
+$("#fstop").onclick=()=>$("#tstop").click();
+$("#fplus").onclick=()=>$("#tplus").click();
+$("#fminus").onclick=()=>$("#tminus").click();
+$("#fpause").onclick=()=>{ $("#tpause").click(); tick(); };
+$("#timer").addEventListener("click", ev=>{ if(!ev.target.closest("button")) openFull(); });
+document.addEventListener("keydown", ev=>{ if(ev.key==="Escape" && !$("#tfull").hidden) $("#tfull").hidden=true; });
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && $("#timer").classList.contains("show")){ wake=null; lockWake(); tick(); } });
 
 /* ---------- home & sections ---------- */
