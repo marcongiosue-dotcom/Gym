@@ -1,0 +1,3 @@
+Foto degli esercizi: free-exercise-db di yuhonas (https://github.com/yuhonas/free-exercise-db),
+rilasciato nel pubblico dominio (The Unlicense). Ogni immagine unisce posizione iniziale e finale.
+Alcune foto mostrano la variante più simile all'esercizio indicato nell'app.

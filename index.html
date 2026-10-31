@@ -387,6 +387,22 @@ body.timing .tabbar{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .undo span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .undo button{flex:none;border:0;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:7px 14px;font-weight:700}
 body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.lrow-w{display:flex;gap:6px;align-items:stretch}
+.lrow-w .lrow{flex:1;min-width:0}
+.lthumb,.pthumb,.exthumb{flex:none;padding:0;border:1px solid var(--line);background:#fff;border-radius:8px;overflow:hidden;position:relative}
+.lthumb{width:76px}
+.lthumb .th,.pthumb .th,.exthumb .th{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
+.lthumb .th{min-height:56px}
+.pthumb{width:52px;height:40px}
+.exthumb{width:74px;height:56px}
+.exthumb .i{position:absolute;right:3px;bottom:3px;width:16px;height:16px;border-radius:50%;background:var(--fg);color:var(--bg);font:700 .7rem/16px var(--body);text-align:center;font-style:italic}
+.noimg{display:grid!important;place-items:center;background:var(--sunk);color:var(--muted);font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:.9rem}
+.info-img{display:block;width:100%;height:auto;border-radius:10px;margin-top:6px;background:#fff}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.info-grid div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.info-grid span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.info-grid b{font-weight:600}
+#exinfo .panel{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .slist .scard[data-w]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .scard.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 .sc-check{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:.9rem;color:var(--accent-ink)}
@@ -469,7 +485,8 @@ body.timing .undo{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   <div class="set-group"><p class="kicker">Condividi MyPT</p>
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
-  <p class="set-note" style="margin-top:22px;text-align:center">MyPT · versione 1.3</p>
+  <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.4</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -529,9 +546,9 @@ function defaultPlan(){
 }
 
 /* ---------- libreria esercizi ---------- */
-const MUSCLES = {petto:"Petto",spalle:"Spalle",trapezio:"Trapezio",dorsali:"Dorsali",lombari:"Lombari",bicipiti:"Bicipiti",tricipiti:"Tricipiti",avambracci:"Avambracci",addome:"Addome",obliqui:"Obliqui",glutei:"Glutei",quadricipiti:"Quadricipiti",femorali:"Femorali",adduttori:"Adduttori",polpacci:"Polpacci"};
+const MUSCLES = {petto:"Petto",spalle:"Spalle",trapezio:"Trapezio",dorsali:"Dorsali",lombari:"Lombari",bicipiti:"Bicipiti",tricipiti:"Tricipiti",avambracci:"Avambracci",addome:"Addome",obliqui:"Obliqui",glutei:"Glutei",quadricipiti:"Quadricipiti",femorali:"Femorali",adduttori:"Adduttori",polpacci:"Polpacci",cardio:"Cardio"};
 const MKEYS = Object.keys(MUSCLES);
-const EQUIP = {M:"Macchina",C:"Cavi",D:"Manubri",B:"Bilanciere",L:"Corpo libero"};
+const EQUIP = {M:"Macchina",C:"Cavi",D:"Manubri",B:"Bilanciere",K:"Kettlebell",L:"Corpo libero",E:"Elastici e TRX",O:"Altri attrezzi",X:"Cardio"};
 const PRESETS = [
   {l:"Parte alta", m:["petto","spalle","trapezio","dorsali","bicipiti","tricipiti"]},
   {l:"Parte bassa", m:["glutei","quadricipiti","femorali","adduttori","polpacci"]},
@@ -539,157 +556,364 @@ const PRESETS = [
   {l:"Pull", m:["dorsali","trapezio","bicipiti","avambracci"]},
   {l:"Braccia", m:["bicipiti","tricipiti","avambracci"]},
   {l:"Core", m:["addome","obliqui","lombari"]},
-  {l:"Total body", m:MKEYS}
+  {l:"Cardio", m:["cardio"]},
+  {l:"Total body", m:MKEYS.filter(k=>k!=="cardio")}
 ];
-// id|nome|muscolo principale|secondari|attrezzo|m=multiarticolare i=isolamento|serie|rip min|rip max|recupero s|unità
+// id|nome|muscolo principale|secondari|attrezzo|m=multiarticolare i=isolamento|serie|min|max|recupero s|unità (reps, s, min)|foto (free-exercise-db, pubblico dominio)|indicazione tecnica (dalla guida)
 const LIB = `
-panca_bil|Panca piana con bilanciere|petto|spalle tricipiti|B|m|4|6|8|150
-panca_man|Panca piana con manubri|petto|spalle tricipiti|D|m|4|8|10|120
-panca_incl_bil|Panca inclinata con bilanciere|petto|spalle tricipiti|B|m|4|6|8|150
-panca_incl_man|Panca inclinata 30° con manubri|petto|spalle tricipiti|D|m|4|8|10|120
-panca_decl|Panca declinata con bilanciere|petto|tricipiti|B|m|3|8|10|120
-chest_press|Chest press alla macchina|petto|spalle tricipiti|M|m|4|8|10|120
-chest_press_incl|Chest press inclinata alla macchina|petto|spalle tricipiti|M|m|4|8|10|120
-panca_multi|Panca piana al multipower|petto|spalle tricipiti|M|m|4|8|10|120
-croci_man|Croci con manubri su panca piana|petto|spalle|D|i|3|10|12|90
-croci_cavi|Croci ai cavi in piedi|petto|spalle|C|i|3|12|15|90
-croci_cavi_bassi|Croci ai cavi dal basso|petto|spalle|C|i|3|12|15|75
-pectoral|Pectoral machine|petto||M|i|3|12|15|90
-dip_petto|Dip alle parallele (busto inclinato)|petto|tricipiti spalle|L|m|3|8|12|120
-piegamenti|Piegamenti sulle braccia|petto|tricipiti spalle|L|m|3|10|20|75
-pullover|Pullover con manubrio|petto|dorsali|D|i|3|10|12|90
-military|Military press con bilanciere|spalle|tricipiti trapezio|B|m|4|6|8|150
-lento_man|Lento avanti con manubri seduto|spalle|tricipiti|D|m|4|8|10|120
-shoulder_press|Shoulder press alla macchina|spalle|tricipiti|M|m|3|8|10|120
-arnold|Arnold press|spalle|tricipiti|D|m|3|8|12|90
-alzate_lat|Alzate laterali con manubri|spalle||D|i|4|12|15|75
-alzate_lat_cavo|Alzate laterali al cavo|spalle||C|i|4|12|15|75
-alzate_lat_macc|Alzate laterali alla macchina|spalle||M|i|3|12|15|75
-alzate_front|Alzate frontali con manubri|spalle|petto|D|i|3|10|12|75
-alzate_post|Alzate posteriori a busto flesso|spalle|trapezio|D|i|3|12|15|75
-reverse_fly|Reverse fly alla pectoral machine|spalle|trapezio|M|i|3|12|15|75
-face_pull|Face pull ai cavi con corda|spalle|trapezio|C|i|4|12|15|75
-tirata_mento|Tirate al mento al cavo|spalle|trapezio bicipiti|C|m|3|10|12|90
-pike_push|Pike push-up|spalle|tricipiti|L|m|3|8|12|90
-scrollate_man|Scrollate con manubri|trapezio|avambracci|D|i|4|10|15|75
-scrollate_bil|Scrollate con bilanciere|trapezio|avambracci|B|i|4|10|12|90
-scrollate_macc|Scrollate alla macchina|trapezio||M|i|3|12|15|75
-farmer|Camminata del contadino con manubri|trapezio|avambracci addome|D|m|3|30|45|90|s
-y_raise|Y-raise su panca inclinata|trapezio|spalle|D|i|3|12|15|60
-trazioni|Trazioni alla sbarra presa prona|dorsali|bicipiti trapezio|L|m|4|6|10|150
-trazioni_sup|Trazioni presa supina|dorsali|bicipiti|L|m|3|6|10|150
-trazioni_ass|Trazioni assistite alla macchina|dorsali|bicipiti|M|m|3|8|12|120
-lat_larga|Lat machine presa larga|dorsali|bicipiti trapezio|C|m|4|8|10|120
-lat_neutra|Lat machine presa stretta neutra|dorsali|bicipiti|C|m|4|8|10|120
-lat_supina|Lat machine presa supina|dorsali|bicipiti|C|m|3|10|12|90
-pulley|Pulley basso presa stretta|dorsali|trapezio bicipiti|C|m|4|8|12|120
-pulley_larga|Pulley basso presa larga|trapezio|dorsali spalle|C|m|3|10|12|90
-rematore_bil|Rematore con bilanciere|dorsali|trapezio bicipiti lombari|B|m|4|6|10|150
-rematore_man|Rematore con manubrio a un braccio|dorsali|trapezio bicipiti|D|m|3|8|12|90
-rematore_panca|Rematore con manubri su panca inclinata|dorsali|trapezio spalle|D|m|4|8|10|120
-tbar|T-bar row con petto in appoggio|dorsali|trapezio bicipiti|M|m|4|8|10|120
-row_macc|Rematore alla macchina|dorsali|trapezio bicipiti|M|m|3|8|12|120
-pulldown_tese|Pulldown a braccia tese al cavo|dorsali||C|i|3|12|15|75
-rematore_cavo|Rematore al cavo a un braccio|dorsali|bicipiti|C|m|3|10|12|75
-pullover_macc|Pullover alla macchina|dorsali|petto|M|i|3|10|12|90
-rematore_inv|Rematore inverso a corpo libero|dorsali|trapezio bicipiti|L|m|3|8|15|90
-stacco|Stacco da terra con bilanciere|lombari|glutei femorali trapezio avambracci|B|m|4|4|6|180
-iperestensioni|Iperestensioni a 45°|lombari|glutei femorali|L|i|3|12|15|90
-good_morning|Good morning con bilanciere|lombari|femorali glutei|B|m|3|8|10|120
-lombari_macc|Lombari alla macchina|lombari||M|i|3|12|15|75
-superman|Superman a terra|lombari|glutei|L|i|3|12|15|60
-curl_bil|Curl con bilanciere|bicipiti|avambracci|B|i|3|8|12|90
-curl_ez|Curl con bilanciere EZ|bicipiti|avambracci|B|i|3|8|12|90
-curl_man|Curl con manubri alternato|bicipiti|avambracci|D|i|3|10|12|90
-curl_incl|Curl con manubri su panca inclinata|bicipiti||D|i|3|10|12|90
-hammer|Curl a martello con manubri|bicipiti|avambracci|D|i|3|10|12|90
-hammer_cavo|Curl a martello al cavo con corda|bicipiti|avambracci|C|i|3|10|12|75
-curl_scott|Curl alla panca Scott|bicipiti||B|i|3|10|12|90
-curl_scott_macc|Curl alla macchina Scott|bicipiti||M|i|3|10|12|75
-curl_cavo|Curl al cavo basso|bicipiti|avambracci|C|i|3|10|12|75
-curl_conc|Curl di concentrazione|bicipiti||D|i|3|10|12|60
-curl_spider|Spider curl|bicipiti||D|i|3|10|12|75
-curl_cavo_alto|Curl ai cavi alti|bicipiti||C|i|3|12|15|60
-pushdown|Pushdown ai cavi con barra|tricipiti||C|i|3|10|12|90
-pushdown_corda|Pushdown ai cavi con corda|tricipiti||C|i|3|12|15|75
-french|French press con bilanciere EZ|tricipiti||B|i|3|8|12|90
-french_man|French press con manubri|tricipiti||D|i|3|10|12|90
-overhead_cavo|Estensioni sopra la testa al cavo|tricipiti||C|i|3|10|12|90
-overhead_man|Estensioni sopra la testa con manubrio|tricipiti||D|i|3|10|12|90
-panca_stretta|Panca piana presa stretta|tricipiti|petto spalle|B|m|4|6|10|120
-dip|Dip alle parallele (busto dritto)|tricipiti|petto spalle|L|m|3|8|12|120
-dip_panca|Dip tra due panche|tricipiti|spalle|L|m|3|10|15|75
-kickback|Kickback con manubrio|tricipiti||D|i|3|12|15|60
-dip_macc|Dip alla macchina|tricipiti|petto|M|m|3|10|12|90
-piegamenti_stretti|Piegamenti presa stretta|tricipiti|petto|L|m|3|10|15|75
-curl_polso|Curl di polso con bilanciere|avambracci||B|i|3|12|20|60
-curl_polso_inv|Curl di polso inverso con manubri|avambracci||D|i|3|12|20|60
-curl_inverso|Curl inverso con bilanciere EZ|avambracci|bicipiti|B|i|3|10|12|75
-sospensione|Sospensione alla sbarra|avambracci|dorsali|L|i|3|30|60|90|s
-pinza|Presa a pinza con dischi|avambracci||B|i|3|20|30|60|s
-crunch|Crunch a terra|addome||L|i|3|15|20|60
-crunch_cavo|Crunch ai cavi in ginocchio|addome||C|i|3|12|15|60
-crunch_macc|Crunch alla macchina|addome||M|i|3|12|15|60
-plank|Plank|addome|obliqui lombari|L|i|3|30|60|60|s
-knee_raise|Sollevamento ginocchia alla sedia romana|addome||L|i|3|12|15|60
-leg_raise|Sollevamento gambe alla sbarra|addome|obliqui|L|i|3|8|12|75
-crunch_inv|Crunch inverso|addome||L|i|3|12|15|60
-ab_wheel|Ruota per addominali|addome|lombari spalle|L|i|3|8|12|75
-hollow|Hollow hold|addome||L|i|3|20|40|60|s
-dead_bug|Dead bug|addome|obliqui|L|i|3|10|12|60
-russian|Russian twist|obliqui|addome|L|i|3|15|20|60
-plank_lat|Plank laterale|obliqui|addome|L|i|3|30|45|45|s
-woodchop|Woodchopper al cavo|obliqui|addome|C|i|3|12|15|60
-pallof|Pallof press al cavo|obliqui|addome|C|i|3|10|12|60
-crunch_obl|Crunch obliqui|obliqui|addome|L|i|3|15|20|60
-pieg_lat|Piegamenti laterali con manubrio|obliqui||D|i|3|12|15|60
-hip_thrust|Hip thrust con bilanciere|glutei|femorali|B|m|4|8|10|120
-hip_thrust_macc|Hip thrust alla macchina|glutei|femorali|M|m|4|8|12|120
-ponte|Ponte glutei a terra|glutei|femorali|L|i|3|12|20|60
-kickback_cavo|Slanci posteriori al cavo|glutei|femorali|C|i|3|12|15|60
-glute_macc|Slanci posteriori alla macchina glutei|glutei||M|i|3|12|15|60
-abductor|Abductor machine|glutei||M|i|3|15|20|60
-abd_cavo|Abduzioni dell'anca al cavo|glutei||C|i|3|12|15|60
-step_up|Step-up su panca con manubri|glutei|quadricipiti|D|m|3|10|12|90
-stacco_sumo|Stacco sumo con bilanciere|glutei|adduttori femorali lombari quadricipiti|B|m|4|5|8|150
-squat|Squat con bilanciere|quadricipiti|glutei adduttori lombari|B|m|4|6|8|180
-front_squat|Front squat con bilanciere|quadricipiti|glutei addome|B|m|4|6|8|150
-squat_multi|Squat al multipower|quadricipiti|glutei|M|m|4|8|10|150
-goblet|Goblet squat con manubrio|quadricipiti|glutei|D|m|3|10|12|90
-leg_press|Pressa 45° (leg press)|quadricipiti|glutei adduttori|M|m|4|8|12|150
-hack|Hack squat alla macchina|quadricipiti|glutei|M|m|4|8|10|120
-pendulum|Pendulum squat / V-squat|quadricipiti|glutei|M|m|3|8|12|120
-leg_ext|Leg extension|quadricipiti||M|i|3|12|15|90
-affondi|Affondi con manubri|quadricipiti|glutei|D|m|3|10|12|90
-affondi_cam|Affondi in camminata|quadricipiti|glutei|D|m|3|10|12|90
-bulgari|Affondi bulgari con manubri|quadricipiti|glutei|D|m|3|8|12|90
-sissy|Sissy squat|quadricipiti||L|i|3|10|15|75
-squat_libero|Squat a corpo libero|quadricipiti|glutei|L|m|3|15|20|60
-sedia|Sedia al muro|quadricipiti||L|i|3|30|60|60|s
-curl_seduto|Leg curl da seduto|femorali||M|i|4|10|12|90
-curl_sdraiato|Leg curl da sdraiato|femorali||M|i|3|10|12|90
-curl_piedi|Leg curl in piedi a una gamba|femorali||M|i|3|10|12|75
-rumeno|Stacco rumeno con bilanciere|femorali|glutei lombari|B|m|4|8|10|120
-rumeno_man|Stacco rumeno con manubri|femorali|glutei lombari|D|m|3|8|12|120
-gambe_tese|Stacco a gambe tese|femorali|glutei lombari|B|m|3|8|10|120
-nordic|Nordic curl|femorali||L|i|3|5|8|120
-adductor|Adductor machine|adduttori||M|i|3|12|15|60
-adduz_cavo|Adduzioni dell'anca al cavo|adduttori||C|i|3|12|15|60
-squat_sumo|Squat sumo con manubrio|adduttori|glutei quadricipiti|D|m|3|10|12|90
-copenhagen|Copenhagen plank|adduttori|obliqui|L|i|3|20|30|60|s
-calf_piedi|Calf in piedi alla macchina|polpacci||M|i|4|10|15|60
-calf_seduto|Calf da seduto alla macchina|polpacci||M|i|4|15|20|60
-calf_pressa|Calf alla pressa|polpacci||M|i|4|12|15|60
-calf_multi|Calf al multipower|polpacci||M|i|4|10|15|60
-calf_man|Calf a una gamba con manubrio|polpacci||D|i|3|12|15|60
-calf_gradino|Calf sul gradino a corpo libero|polpacci||L|i|3|15|25|45
-`.trim().split("\n").map(r=>{ const [id,name,m,sec,eq,type,sets,a,b,rest,unit]=r.split("|");
-  return {id,name,m,sec:sec?sec.split(" "):[],eq,type,sets:+sets,repMin:+a,repMax:+b,rest:+rest,unit:unit||"reps"}; });
+panca_bil|Panca piana con bilanciere|petto|spalle tricipiti|B|m|4|6|8|150|reps|Barbell_Bench_Press_-_Medium_Grip|Scapole stabili, piedi a terra e discesa controllata; usa le sicurezze.
+panca_man|Panca piana con manubri|petto|spalle tricipiti|D|m|4|8|10|120|reps|Dumbbell_Bench_Press|Abbassa i manubri ai lati del petto e spingi senza urtarli.
+panca_incl_bil|Panca inclinata con bilanciere|petto|spalle tricipiti|B|m|4|6|8|150|reps|Barbell_Incline_Bench_Press_-_Medium_Grip|Usa inclinazione moderata e traiettoria controllata.
+panca_incl_man|Panca inclinata 30° con manubri|petto|spalle tricipiti|D|m|4|8|10|120|reps|Incline_Dumbbell_Press|Mantieni i polsi stabili e i gomiti in posizione confortevole.
+panca_decl|Panca declinata con bilanciere|petto|tricipiti|B|m|3|8|10|120|reps|Decline_Barbell_Bench_Press|Controlla la discesa e usa supporti/spotter adeguati.
+chest_press|Chest press alla macchina|petto|spalle tricipiti|M|m|4|8|10|120|reps|Leverage_Chest_Press|Regola il sedile e spingi senza bloccare bruscamente i gomiti.
+chest_press_incl|Chest press inclinata alla macchina|petto|spalle tricipiti|M|m|4|8|10|120|reps|Leverage_Incline_Chest_Press|Spingi lungo la traiettoria della macchina, mantenendo le spalle basse.
+panca_multi|Panca piana al multipower|petto|spalle tricipiti|M|m|4|8|10|120|reps|Smith_Machine_Bench_Press|Regola i fermi di sicurezza e scendi controllato fino al petto.
+croci_man|Croci con manubri su panca piana|petto|spalle|D|i|3|10|12|90|reps|Dumbbell_Flyes|Usa carico leggero e ampiezza confortevole.
+croci_cavi|Croci ai cavi in piedi|petto|spalle|C|i|3|12|15|90|reps|Single-Arm_Cable_Crossover|Avvicina le mani senza trasformare il gesto in una spinta.
+croci_cavi_bassi|Croci ai cavi dal basso|petto|spalle|C|i|3|12|15|75|reps|Low_Cable_Crossover|Solleva le braccia in arco controllato senza inarcare la schiena.
+pectoral|Pectoral machine|petto||M|i|3|12|15|90|reps|Butterfly|Regola il sedile e non forzare l'allungamento.
+dip_petto|Dip alle parallele (busto inclinato)|petto|tricipiti spalle|L|m|3|8|12|120|reps|Dips_-_Chest_Version|Inclina leggermente il busto in avanti e scendi solo fin dove le spalle sono comode.
+piegamenti|Piegamenti sulle braccia|petto|tricipiti spalle|L|m|3|10|20|75|reps|Pushups|Corpo in linea, gomiti controllati e discesa fluida.
+pullover|Pullover con manubrio|petto|dorsali|D|i|3|10|12|90|reps|Straight-Arm_Dumbbell_Pullover|Usa carico gestibile e non forzare l'arco dietro la testa.
+military|Military press con bilanciere|spalle|tricipiti trapezio|B|m|4|6|8|150|reps|Standing_Military_Press|Tecnica da apprendere con carico leggero e supervisione.
+lento_man|Lento avanti con manubri seduto|spalle|tricipiti|D|m|4|8|10|120|reps|Seated_Dumbbell_Press|Parti all'altezza delle spalle e spingi nella traiettoria naturale.
+shoulder_press|Shoulder press alla macchina|spalle|tricipiti|M|m|3|8|10|120|reps|Machine_Shoulder_Military_Press|Spingi in alto senza inarcare molto la schiena.
+arnold|Arnold press|spalle|tricipiti|D|m|3|8|12|90|reps|Arnold_Dumbbell_Press|Ruota i manubri in modo fluido e senza forzare le spalle.
+alzate_lat|Alzate laterali con manubri|spalle||D|i|4|12|15|75|reps|Side_Lateral_Raise|Solleva lateralmente senza slanci.
+alzate_lat_cavo|Alzate laterali al cavo|spalle||C|i|4|12|15|75|reps|Cable_Seated_Lateral_Raise|Mantieni tensione continua e spalla rilassata.
+alzate_lat_macc|Alzate laterali alla macchina|spalle||M|i|3|12|15|75|reps|Side_Lateral_Raise|Regola sedile e appoggi prima di iniziare.
+alzate_front|Alzate frontali con manubri|spalle|petto|D|i|3|10|12|75|reps|Front_Dumbbell_Raise|Solleva fino a un'altezza confortevole senza slancio.
+alzate_post|Alzate posteriori a busto flesso|spalle|trapezio|D|i|3|12|15|75|reps|Seated_Bent-Over_Rear_Delt_Raise|Inclina il busto e apri le braccia con gomiti morbidi.
+reverse_fly|Reverse fly alla pectoral machine|spalle|trapezio|M|i|3|12|15|75|reps|Reverse_Machine_Flyes|Apri le braccia senza sollevare le spalle.
+face_pull|Face pull ai cavi con corda|spalle|trapezio|C|i|4|12|15|75|reps|Face_Pull|Tira verso il viso aprendo le mani, senza inarcare.
+tirata_mento|Tirate al mento al cavo|spalle|trapezio bicipiti|C|m|3|10|12|90|reps|Upright_Cable_Row|Tira la corda fino al petto con gomiti alti, senza alzare le spalle verso le orecchie.
+pike_push|Pike push-up|spalle|tricipiti|L|m|3|8|12|90|reps|Handstand_Push-Ups|Bacino alto e testa tra le braccia: scendi piano verso il pavimento.
+scrollate_man|Scrollate con manubri|trapezio|avambracci|D|i|4|10|15|75|reps|Dumbbell_Shrug|Solleva le spalle in verticale e abbassale lentamente.
+scrollate_bil|Scrollate con bilanciere|trapezio|avambracci|B|i|4|10|12|90|reps|Barbell_Shrug|Evita rotazioni delle spalle e slanci.
+scrollate_macc|Scrollate alla macchina|trapezio||M|i|3|12|15|75|reps|Leverage_Shrug|Solleva le spalle in verticale e fai una breve pausa in alto, senza ruotarle.
+farmer|Camminata del contadino con manubri|trapezio|avambracci addome|D|m|3|30|45|90|s|Farmers_Walk|Cammina con pesi ai lati, busto alto e passi controllati.
+y_raise|Y-raise su panca inclinata|trapezio|spalle|D|i|3|12|15|60|reps|Straight_Raises_on_Incline_Bench|Usa carico minimo e movimento controllato.
+trazioni|Trazioni alla sbarra presa prona|dorsali|bicipiti trapezio|L|m|4|6|10|150|reps|Pullups|Evita slanci; usa assistenza se serve.
+trazioni_sup|Trazioni presa supina|dorsali|bicipiti|L|m|3|6|10|150|reps|Chin-Up|Mantieni il corpo stabile e non calciare.
+trazioni_ass|Trazioni assistite alla macchina|dorsali|bicipiti|M|m|3|8|12|120|reps|Band_Assisted_Pull-Up|Regola l'assistenza per mantenere ripetizioni pulite.
+lat_larga|Lat machine presa larga|dorsali|bicipiti trapezio|C|m|4|8|10|120|reps|Wide-Grip_Lat_Pulldown|Tira davanti al petto, evitando la nuca.
+lat_neutra|Lat machine presa stretta neutra|dorsali|bicipiti|C|m|4|8|10|120|reps|V-Bar_Pulldown|Tira le maniglie verso la parte alta del torace.
+lat_supina|Lat machine presa supina|dorsali|bicipiti|C|m|3|10|12|90|reps|Underhand_Cable_Pulldowns|Mantieni polsi stabili e busto fermo.
+pulley|Pulley basso presa stretta|dorsali|trapezio bicipiti|C|m|4|8|12|120|reps|Seated_Cable_Rows|Tira verso l'addome senza oscillare.
+pulley_larga|Pulley basso presa larga|trapezio|dorsali spalle|C|m|3|10|12|90|reps|Elevated_Cable_Rows|Guida i gomiti verso l'esterno in modo controllato.
+rematore_bil|Rematore con bilanciere|dorsali|trapezio bicipiti lombari|B|m|4|6|10|150|reps|Bent_Over_Barbell_Row|Usa carico gestibile e busto inclinato stabile.
+rematore_man|Rematore con manubrio a un braccio|dorsali|trapezio bicipiti|D|m|3|8|12|90|reps|One-Arm_Dumbbell_Row|Appoggia mano su supporto stabile e tira il gomito al fianco.
+rematore_panca|Rematore con manubri su panca inclinata|dorsali|trapezio spalle|D|m|4|8|10|120|reps|Dumbbell_Incline_Row|Appoggia il torace al supporto per ridurre lo slancio.
+tbar|T-bar row con petto in appoggio|dorsali|trapezio bicipiti|M|m|4|8|10|120|reps|T-Bar_Row_with_Handle|Mantieni il busto stabile e non strattonare.
+row_macc|Rematore alla macchina|dorsali|trapezio bicipiti|M|m|3|8|12|120|reps|Leverage_Iso_Row|Mantieni il petto stabile contro il supporto.
+pulldown_tese|Pulldown a braccia tese al cavo|dorsali||C|i|3|12|15|75|reps|Straight-Arm_Pulldown|Braccia quasi distese, porta la barra verso le cosce.
+rematore_cavo|Rematore al cavo a un braccio|dorsali|bicipiti|C|m|3|10|12|75|reps|Seated_One-arm_Cable_Pulley_Rows|Stabilizza il tronco e lavora un lato per volta.
+pullover_macc|Pullover alla macchina|dorsali|petto|M|i|3|10|12|90|reps|Bent-Arm_Barbell_Pullover|Regola il perno e muovi le braccia entro un arco confortevole.
+rematore_inv|Rematore inverso a corpo libero|dorsali|trapezio bicipiti|L|m|3|8|15|90|reps|Inverted_Row|Corpo in linea; piega i gomiti e avvicina il petto alla barra.
+stacco|Stacco da terra con bilanciere|lombari|glutei femorali trapezio avambracci|B|m|4|4|6|180|reps|Barbell_Deadlift|Tecnica da apprendere con carichi bassi e supervisione.
+iperestensioni|Iperestensioni a 45°|lombari|glutei femorali|L|i|3|12|15|90|reps|Hyperextensions_Back_Extensions|Muovi le anche e fermati in posizione neutra.
+good_morning|Good morning con bilanciere|lombari|femorali glutei|B|m|3|8|10|120|reps|Good_Morning|Esercizio tecnico: carico molto leggero e supervisione.
+lombari_macc|Lombari alla macchina|lombari||M|i|3|12|15|75|reps|Hyperextensions_With_No_Hyperextension_Bench|Movimento lento e controllato, senza iperestendere la schiena in fondo.
+superman|Superman a terra|lombari|glutei|L|i|3|12|15|60|reps|Superman|Solleva insieme braccia e gambe di pochi centimetri, collo neutro.
+curl_bil|Curl con bilanciere|bicipiti|avambracci|B|i|3|8|12|90|reps|Barbell_Curl|Gomiti vicini al corpo e busto fermo.
+curl_ez|Curl con bilanciere EZ|bicipiti|avambracci|B|i|3|8|12|90|reps|EZ-Bar_Curl|Usa la presa più confortevole per i polsi.
+curl_man|Curl con manubri alternato|bicipiti|avambracci|D|i|3|10|12|90|reps|Dumbbell_Alternate_Bicep_Curl|Alterna i lati senza inclinarti.
+curl_incl|Curl con manubri su panca inclinata|bicipiti||D|i|3|10|12|90|reps|Incline_Dumbbell_Curl|Non forzare l'allungamento della spalla.
+hammer|Curl a martello con manubri|bicipiti|avambracci|D|i|3|10|12|90|reps|Hammer_Curls|Palmi uno di fronte all'altro, polsi neutri.
+hammer_cavo|Curl a martello al cavo con corda|bicipiti|avambracci|C|i|3|10|12|75|reps|Cable_Hammer_Curls_-_Rope_Attachment|Gomiti fermi ai fianchi e presa neutra sulla corda per tutta la salita.
+curl_scott|Curl alla panca Scott|bicipiti||B|i|3|10|12|90|reps|Preacher_Curl|Braccia appoggiate e ritorno lento.
+curl_scott_macc|Curl alla macchina Scott|bicipiti||M|i|3|10|12|75|reps|Machine_Preacher_Curls|Regola il sedile e non rimbalzare in basso.
+curl_cavo|Curl al cavo basso|bicipiti|avambracci|C|i|3|10|12|75|reps|Standing_Biceps_Cable_Curl|Mantieni tensione continua e gomiti fermi.
+curl_conc|Curl di concentrazione|bicipiti||D|i|3|10|12|60|reps|Concentration_Curls|Appoggia il braccio alla coscia e controlla la discesa.
+curl_spider|Spider curl|bicipiti||D|i|3|10|12|75|reps|Spider_Curl|Lascia pendere le braccia e non usare slancio.
+curl_cavo_alto|Curl ai cavi alti|bicipiti||C|i|3|12|15|60|reps|High_Cable_Curls|Braccia sollevate solo se la posizione è confortevole.
+pushdown|Pushdown ai cavi con barra|tricipiti||C|i|3|10|12|90|reps|Triceps_Pushdown|Gomiti vicini al busto e ritorno lento.
+pushdown_corda|Pushdown ai cavi con corda|tricipiti||C|i|3|12|15|75|reps|Triceps_Pushdown_-_Rope_Attachment|Separa leggermente le estremità in basso senza muovere le spalle.
+french|French press con bilanciere EZ|tricipiti||B|i|3|8|12|90|reps|EZ-Bar_Skullcrusher|Abbassa verso la fronte o dietro la testa solo entro un arco comodo.
+french_man|French press con manubri|tricipiti||D|i|3|10|12|90|reps|Lying_Dumbbell_Tricep_Extension|Gomiti stabili e carico moderato.
+overhead_cavo|Estensioni sopra la testa al cavo|tricipiti||C|i|3|10|12|90|reps|Cable_Rope_Overhead_Triceps_Extension|Mantieni costole controllate e gomiti confortevoli.
+overhead_man|Estensioni sopra la testa con manubrio|tricipiti||D|i|3|10|12|90|reps|Standing_Dumbbell_Triceps_Extension|Evita di inarcare la zona lombare.
+panca_stretta|Panca piana presa stretta|tricipiti|petto spalle|B|m|4|6|10|120|reps|Close-Grip_Barbell_Bench_Press|Presa moderata e gomiti vicini al busto, senza dolore ai polsi.
+dip|Dip alle parallele (busto dritto)|tricipiti|petto spalle|L|m|3|8|12|120|reps|Dips_-_Triceps_Version|Busto dritto e gomiti indietro; scendi solo fin dove le spalle sono comode.
+dip_panca|Dip tra due panche|tricipiti|spalle|L|m|3|10|15|75|reps|Bench_Dips|Usa ampiezza ridotta; interrompi se dà fastidio alle spalle.
+kickback|Kickback con manubrio|tricipiti||D|i|3|12|15|60|reps|Tricep_Dumbbell_Kickback|Busto stabile e gomito fermo.
+dip_macc|Dip alla macchina|tricipiti|petto|M|m|3|10|12|90|reps|Dip_Machine|Riduci la profondità se le spalle danno fastidio.
+piegamenti_stretti|Piegamenti presa stretta|tricipiti|petto|L|m|3|10|15|75|reps|Pushups_Close_and_Wide_Hand_Positions|Mani sotto il petto e gomiti vicini al busto.
+curl_polso|Curl di polso con bilanciere|avambracci||B|i|3|12|20|60|reps|Palms-Up_Barbell_Wrist_Curl_Over_A_Bench|Muovi i polsi con ampiezza confortevole.
+curl_polso_inv|Curl di polso inverso con manubri|avambracci||D|i|3|12|20|60|reps|Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench|Usa poco carico e non muovere gli avambracci.
+curl_inverso|Curl inverso con bilanciere EZ|avambracci|bicipiti|B|i|3|10|12|75|reps|Reverse_Barbell_Curl|Presa prona e carico moderato.
+sospensione|Sospensione alla sbarra|avambracci|dorsali|L|i|3|30|60|90|s|One_Handed_Hang|Sospensione controllata solo se spalle e presa lo consentono.
+pinza|Presa a pinza con dischi|avambracci||B|i|3|20|30|60|s|Plate_Pinch|Stringi i dischi in sicurezza e interrompi prima che scivolino.
+crunch|Crunch a terra|addome||L|i|3|15|20|60|reps|Crunches|Solleva leggermente le spalle espirando, senza tirare il collo.
+crunch_cavo|Crunch ai cavi in ginocchio|addome||C|i|3|12|15|60|reps|Cable_Crunch|Fletti il tronco senza tirare con le braccia.
+crunch_macc|Crunch alla macchina|addome||M|i|3|12|15|60|reps|Ab_Crunch_Machine|Regola il sedile e controlla la fase di ritorno.
+plank|Plank|addome|obliqui lombari|L|i|3|30|60|60|s|Plank|Corpo in linea e respirazione regolare.
+knee_raise|Sollevamento ginocchia alla sedia romana|addome||L|i|3|12|15|60|reps|Knee_Hip_Raise_On_Parallel_Bars|Evita oscillazioni e abbassa lentamente.
+leg_raise|Sollevamento gambe alla sbarra|addome|obliqui|L|i|3|8|12|75|reps|Hanging_Leg_Raise|Avanzato: mantieni il corpo fermo e usa una variante più facile se serve.
+crunch_inv|Crunch inverso|addome||L|i|3|12|15|60|reps|Reverse_Crunch|Avvicina il bacino alle costole senza slanciare le gambe.
+ab_wheel|Ruota per addominali|addome|lombari spalle|L|i|3|8|12|75|reps|Ab_Roller|Avanzato: limita l'estensione per non inarcare la schiena.
+hollow|Hollow hold|addome||L|i|3|20|40|60|s|Flutter_Kicks|Riduci l'estensione delle gambe se la schiena si inarca.
+dead_bug|Dead bug|addome|obliqui|L|i|3|10|12|60|reps|Dead_Bug|Estendi braccio e gamba opposti mantenendo il bacino stabile.
+russian|Russian twist|obliqui|addome|L|i|3|15|20|60|reps|Russian_Twist|Ruota il torace in un arco moderato; non forzare la zona lombare.
+plank_lat|Plank laterale|obliqui|addome|L|i|3|30|45|45|s|Side_Bridge|Bacino sollevato e spalla sopra il gomito.
+woodchop|Woodchopper al cavo|obliqui|addome|C|i|3|12|15|60|reps|Standing_Cable_Wood_Chop|Ruota in modo coordinato senza strattoni.
+pallof|Pallof press al cavo|obliqui|addome|C|i|3|10|12|60|reps|Pallof_Press|Resisti alla rotazione mentre spingi le mani avanti.
+crunch_obl|Crunch obliqui|obliqui|addome|L|i|3|15|20|60|reps|Oblique_Crunches_-_On_The_Floor|Porta la spalla verso il ginocchio opposto senza tirare il collo con le mani.
+pieg_lat|Piegamenti laterali con manubrio|obliqui||D|i|3|12|15|60|reps|Dumbbell_Side_Bend|Fletti il busto di lato senza ruotarlo, peso su un solo lato.
+hip_thrust|Hip thrust con bilanciere|glutei|femorali|B|m|4|8|10|120|reps|Barbell_Hip_Thrust|Estendi le anche senza iperestendere la schiena.
+hip_thrust_macc|Hip thrust alla macchina|glutei|femorali|M|m|4|8|12|120|reps|Smith_Machine_Hip_Raise|Regola il supporto e controlla il bacino in alto.
+ponte|Ponte glutei a terra|glutei|femorali|L|i|3|12|20|60|reps|Butt_Lift_Bridge|Solleva il bacino senza inarcare la zona lombare.
+kickback_cavo|Slanci posteriori al cavo|glutei|femorali|C|i|3|12|15|60|reps|One-Legged_Cable_Kickback|Muovi l'anca senza ruotare il bacino.
+glute_macc|Slanci posteriori alla macchina glutei|glutei||M|i|3|12|15|60|reps|Glute_Kickback|Regola il supporto e non inarcare la schiena.
+abductor|Abductor machine|glutei||M|i|3|15|20|60|reps|Thigh_Abductor|Apri le ginocchia senza rimbalzi.
+abd_cavo|Abduzioni dell'anca al cavo|glutei||C|i|3|12|15|60|reps|Side_Leg_Raises|Gamba verso l'esterno senza inclinare il busto.
+step_up|Step-up su panca con manubri|glutei|quadricipiti|D|m|3|10|12|90|reps|Dumbbell_Step_Ups|Usa altezza gestibile e supporto stabile.
+stacco_sumo|Stacco sumo con bilanciere|glutei|adduttori femorali lombari quadricipiti|B|m|4|5|8|150|reps|Sumo_Deadlift|Posizione ampia confortevole e spinta uniforme dei piedi.
+squat|Squat con bilanciere|quadricipiti|glutei adduttori lombari|B|m|4|6|8|180|reps|Barbell_Squat|Usa rack e sicurezze adeguate.
+front_squat|Front squat con bilanciere|quadricipiti|glutei addome|B|m|4|6|8|150|reps|Front_Barbell_Squat|Richiede mobilità e tecnica; inizia leggero.
+squat_multi|Squat al multipower|quadricipiti|glutei|M|m|4|8|10|150|reps|Smith_Machine_Squat|Posizione dei piedi personalizzata e fermo di sicurezza.
+goblet|Goblet squat con manubrio|quadricipiti|glutei|D|m|3|10|12|90|reps|Goblet_Squat|Peso vicino al petto, talloni stabili.
+leg_press|Pressa 45° (leg press)|quadricipiti|glutei adduttori|M|m|4|8|12|150|reps|Leg_Press|Scendi solo finché il bacino resta stabile.
+hack|Hack squat alla macchina|quadricipiti|glutei|M|m|4|8|10|120|reps|Hack_Squat|Schiena sul supporto e profondità controllata.
+pendulum|Pendulum squat / V-squat|quadricipiti|glutei|M|m|3|8|12|120|reps|Lying_Machine_Squat|Segui la traiettoria della macchina senza rimbalzare.
+leg_ext|Leg extension|quadricipiti||M|i|3|12|15|90|reps|Leg_Extensions|Allinea il perno al ginocchio e non far cadere il peso.
+affondi|Affondi con manubri|quadricipiti|glutei|D|m|3|10|12|90|reps|Dumbbell_Lunges|Fai un passo controllato e mantieni equilibrio.
+affondi_cam|Affondi in camminata|quadricipiti|glutei|D|m|3|10|12|90|reps|Bodyweight_Walking_Lunge|Passi regolari e tronco stabile.
+bulgari|Affondi bulgari con manubri|quadricipiti|glutei|D|m|3|8|12|90|reps|Split_Squats|Supporto posteriore stabile e carico iniziale leggero.
+sissy|Sissy squat|quadricipiti||L|i|3|10|15|75|reps|Weighted_Sissy_Squat|Variante impegnativa per il ginocchio: usa supporto e interrompi se dolorosa.
+squat_libero|Squat a corpo libero|quadricipiti|glutei|L|m|3|15|20|60|reps|Bodyweight_Squat|Scendi entro la mobilità che controlli.
+sedia|Sedia al muro|quadricipiti||L|i|3|30|60|60|s|Chair_Squat|Schiena al muro e angolo delle ginocchia confortevole.
+curl_seduto|Leg curl da seduto|femorali||M|i|4|10|12|90|reps|Seated_Leg_Curl|Allinea il ginocchio al perno e ritorna lentamente.
+curl_sdraiato|Leg curl da sdraiato|femorali||M|i|3|10|12|90|reps|Lying_Leg_Curls|Mantieni il bacino stabile sulla panca.
+curl_piedi|Leg curl in piedi a una gamba|femorali||M|i|3|10|12|75|reps|Standing_Leg_Curl|Fletti una gamba senza ruotare il bacino.
+rumeno|Stacco rumeno con bilanciere|femorali|glutei lombari|B|m|4|8|10|120|reps|Romanian_Deadlift|Bacino indietro, bilanciere vicino alle gambe, schiena neutra.
+rumeno_man|Stacco rumeno con manubri|femorali|glutei lombari|D|m|3|8|12|120|reps|Stiff-Legged_Dumbbell_Deadlift|Ginocchia morbide e discesa guidata dalle anche.
+gambe_tese|Stacco a gambe tese|femorali|glutei lombari|B|m|3|8|10|120|reps|Stiff-Legged_Barbell_Deadlift|Non bloccare rigidamente le ginocchia e non cercare profondità forzata.
+nordic|Nordic curl|femorali||L|i|3|5|8|120|reps|Natural_Glute_Ham_Raise|Molto impegnativo: usa assistenza e progressione graduale.
+adductor|Adductor machine|adduttori||M|i|3|12|15|60|reps|Thigh_Adductor|Chiudi le gambe con controllo, senza forzare l'apertura.
+adduz_cavo|Adduzioni dell'anca al cavo|adduttori||C|i|3|12|15|60|reps|Cable_Hip_Adduction|Porta la gamba verso la linea mediana senza inclinarti.
+squat_sumo|Squat sumo con manubrio|adduttori|glutei quadricipiti|D|m|3|10|12|90|reps|Plie_Dumbbell_Squat|Piedi larghi e punte in fuori, ginocchia nella direzione dei piedi.
+copenhagen|Copenhagen plank|adduttori|obliqui|L|i|3|20|30|60|s|Side_Bridge|Appoggia la gamba alta sulla panca e tieni il bacino in linea; inizia col ginocchio.
+calf_piedi|Calf in piedi alla macchina|polpacci||M|i|4|10|15|60|reps|Standing_Calf_Raises|Sali e scendi lentamente senza rimbalzare.
+calf_seduto|Calf da seduto alla macchina|polpacci||M|i|4|15|20|60|reps|Seated_Calf_Raise|Talloni sotto il ginocchio e pausa in alto.
+calf_pressa|Calf alla pressa|polpacci||M|i|4|12|15|60|reps|Calf_Press_On_The_Leg_Press_Machine|Muovi solo la caviglia e non bloccare le ginocchia.
+calf_multi|Calf al multipower|polpacci||M|i|4|10|15|60|reps|Smith_Machine_Calf_Raise|Usa uno step stabile e non rimbalzare in basso.
+calf_man|Calf a una gamba con manubrio|polpacci||D|i|3|12|15|60|reps|Standing_Dumbbell_Calf_Raise|Carico ai lati e movimento completo controllato.
+calf_gradino|Calf sul gradino a corpo libero|polpacci||L|i|3|15|25|45|reps|Rocking_Standing_Calf_Raise|Usa un corrimano e scendi entro un allungamento tollerabile.
+chest_conv|Chest press convergente|petto|spalle tricipiti|M|m|4|8|10|120|reps|Machine_Bench_Press|Avvicina le maniglie senza perdere il controllo del ritorno.
+panca_decl_man|Panca declinata con manubri|petto|tricipiti spalle|D|m|3|8|10|120|reps|Decline_Dumbbell_Bench_Press|Mantieni il busto stabile e non rimbalzare in basso.
+floor_bil|Floor press con bilanciere|petto|tricipiti spalle|B|m|3|6|10|120|reps|Floor_Press|La parte alta delle braccia tocca il pavimento con controllo.
+floor_man|Floor press con manubri|petto|tricipiti spalle|D|m|3|8|12|90|reps|Dumbbell_Floor_Press|Pausa breve a terra senza rilassare bruscamente le spalle.
+press_cavo_uni|Press unilaterale al cavo|petto|tricipiti spalle obliqui|C|m|3|10|12|75|reps|Cable_Chest_Press|Spingi in avanti resistendo alla rotazione del tronco.
+croci_cavi_alti|Croci ai cavi dall'alto|petto|spalle|C|i|3|12|15|75|reps|Cable_Crossover|Porta le mani davanti al torace con gomiti morbidi.
+croci_incl|Croci con manubri su panca inclinata|petto|spalle|D|i|3|10|12|90|reps|Incline_Dumbbell_Flyes|Mantieni una lieve flessione dei gomiti.
+pec_uni|Pec deck a un braccio|petto||M|i|3|12|15|60|reps|Butterfly|Se la macchina lo consente, lavora un lato alla volta in modo stabile.
+push_incl|Piegamenti inclinati (mani rialzate)|petto|tricipiti spalle|L|m|3|10|15|60|reps|Incline_Push-Up|Mani su supporto stabile; più alto è il supporto, più facile è.
+push_ginocchia|Piegamenti sulle ginocchia|petto|tricipiti spalle|L|m|3|10|15|60|reps|Incline_Push-Up_Medium|Mantieni linea spalle-bacino-ginocchia.
+push_larga|Piegamenti presa larga|petto|spalle tricipiti|L|m|3|10|15|60|reps|Push-Up_Wide|Usa un'apertura comoda senza forzare le spalle.
+push_rialzati|Piegamenti con piedi rialzati|petto|spalle tricipiti|L|m|3|8|15|75|reps|Push-Ups_With_Feet_Elevated|Scegli altezza moderata e mantieni il bacino stabile.
+push_pausa|Piegamenti con pausa in basso|petto|tricipiti spalle|L|m|3|6|10|75|reps|Pushups|Fermati brevemente senza rilassare la posizione.
+push_lento|Piegamenti a tempo lento|petto|tricipiti spalle|L|m|3|6|10|75|reps|Pushups|Rallenta soprattutto la discesa e conserva la tecnica.
+dip_ass|Dip alle parallele assistite|petto|tricipiti spalle|M|m|3|8|12|90|reps|Parallel_Bar_Dip|Scendi solo fin dove le spalle restano confortevoli.
+lat_media|Lat machine presa prona media|dorsali|bicipiti trapezio|C|m|4|8|10|120|reps|Full_Range-Of-Motion_Lat_Pulldown|Guida il movimento con i gomiti verso il basso.
+lat_uni|Lat machine a un braccio|dorsali|bicipiti|C|m|3|10|12|75|reps|One_Arm_Lat_Pulldown|Tira un gomito verso il fianco senza ruotare il busto.
+pullover_corda|Pullover al cavo con corda|dorsali||C|i|3|12|15|75|reps|Rope_Straight-Arm_Pulldown|Mantieni le costole controllate e le spalle basse.
+trazioni_neutra|Trazioni presa neutra|dorsali|bicipiti trapezio|L|m|3|6|10|150|reps|V-Bar_Pullup|Porta il petto verso le maniglie con controllo.
+rematore_2man|Rematore con due manubri|dorsali|trapezio bicipiti lombari|D|m|3|8|12|90|reps|Bent_Over_Two-Dumbbell_Row|Inclina il busto dai fianchi e mantieni la schiena neutra.
+rematore_bil_sup|Rematore con bilanciere presa supina|dorsali|bicipiti trapezio lombari|B|m|4|8|10|120|reps|Reverse_Grip_Bent-Over_Rows|Mantieni i gomiti vicini e il polso neutro.
+seal_row|Seal row (rematore sdraiato su panca)|dorsali|trapezio bicipiti|B|m|3|8|12|120|reps|Lying_Cambered_Barbell_Row|Panca stabile e tirata senza slancio.
+high_row|High row alla macchina|dorsali|trapezio bicipiti|M|m|3|10|12|90|reps|Leverage_High_Row|Tira i gomiti indietro seguendo il percorso dell'attrezzo.
+lento_man_piedi|Lento avanti con manubri in piedi|spalle|tricipiti addome|D|m|3|8|10|120|reps|Standing_Dumbbell_Press|Attiva l'addome e mantieni i piedi stabili.
+push_press|Push press|spalle|tricipiti quadricipiti glutei|B|m|4|5|8|150|reps|Push_Press|Variante esplosiva avanzata; apprendi la tecnica prima di caricare.
+alzate_lat_sed|Alzate laterali da seduto|spalle||D|i|4|12|15|75|reps|Seated_Side_Lateral_Raise|Riduci il compenso del busto e usa peso leggero.
+alzata_lat_cavo_uni|Alzata laterale a un braccio al cavo|spalle||C|i|3|12|15|60|reps|Standing_Low-Pulley_Deltoid_Raise|Lavora un lato per volta senza inclinare il tronco.
+alzate_front_disco|Alzate frontali con disco|spalle|petto|B|i|3|10|12|75|reps|Front_Plate_Raise|Tieni il disco vicino al corpo e non oscillare.
+alzate_front_cavo|Alzate frontali al cavo|spalle|petto|C|i|3|10|12|75|reps|Front_Cable_Raise|Mantieni polsi neutrali e tronco stabile.
+reverse_fly_cavi|Reverse fly ai cavi|spalle|trapezio|C|i|3|12|15|75|reps|Cable_Rear_Delt_Fly|Incrocia i cavi se previsto e controlla il ritorno.
+extrarot_elastico|Extrarotazioni con elastico|spalle||E|i|3|12|15|45|reps|External_Rotation_with_Band|Gomito vicino al fianco e rotazione piccola e indolore.
+extrarot_cavo|Extrarotazioni al cavo|spalle||C|i|3|12|15|45|reps|External_Rotation_with_Cable|Carico leggero, movimento lento e controllato.
+scrollate_cavo|Scrollate al cavo|trapezio||C|i|3|12|15|60|reps|Cable_Shrugs|Solleva le spalle in verticale senza rotarle.
+landmine_press|Landmine press|spalle|petto tricipiti addome|B|m|3|8|12|90|reps|Single-Arm_Linear_Jammer|Spingi in diagonale mantenendo il tronco stabile.
+scaption|Scaption con manubri|spalle|trapezio|D|i|3|10|15|60|reps|Dumbbell_Scaption|Solleva le braccia leggermente in avanti rispetto al fianco.
+alzata_post_uni|Alzata posteriore a un braccio|spalle|trapezio|C|i|3|12|15|60|reps|Dumbbell_Lying_One-Arm_Rear_Lateral_Raise|Evita di ruotare il busto per completare il gesto.
+wall_slide|Wall slide (scivolamenti al muro)|spalle|trapezio|L|i|2|10|12|45|reps|Upward_Stretch|Scorri gli avambracci al muro senza inarcare la schiena.
+curl_man_sim|Curl con manubri simultaneo|bicipiti|avambracci|D|i|3|10|12|75|reps|Dumbbell_Bicep_Curl|Muovi entrambi i gomiti senza slancio.
+curl_supinato|Curl con manubri in supinazione|bicipiti||D|i|3|10|12|75|reps|Seated_Dumbbell_Curl|Ruota gradualmente il palmo verso l'alto.
+hammer_cross|Curl a martello incrociato|bicipiti|avambracci|D|i|3|10|12|75|reps|Cross_Body_Hammer_Curl|Porta il manubrio verso la spalla opposta senza ruotare il busto.
+bayesian|Bayesian curl al cavo|bicipiti||C|i|3|10|12|75|reps|Standing_One-Arm_Cable_Curl|Braccio leggermente dietro il busto senza forzare la spalla.
+zottman|Zottman curl|bicipiti|avambracci|D|i|3|10|12|75|reps|Zottman_Curl|Ruota i polsi lentamente senza dolore.
+curl_elastico|Curl con elastico|bicipiti||E|i|3|12|15|60|reps|Close-Grip_EZ-Bar_Curl_with_Band|Regola la tensione e controlla entrambe le fasi.
+pronosup|Prono-supinazione dell'avambraccio|avambracci||D|i|3|12|15|45|reps|Dumbbell_Lying_Supination|Ruota l'avambraccio lentamente con gomito appoggiato.
+pushdown_inv|Pushdown presa inversa|tricipiti||C|i|3|10|15|75|reps|Reverse_Grip_Triceps_Pushdown|Carico leggero e polsi stabili.
+kickback_cavo_tri|Kickback al cavo per tricipiti|tricipiti||C|i|3|12|15|60|reps|Standing_Bent-Over_One-Arm_Dumbbell_Triceps_Extension|Estendi il gomito senza ruotare il tronco.
+est_cavo_uni|Estensione a un braccio al cavo|tricipiti||C|i|3|12|15|60|reps|Cable_One_Arm_Tricep_Extension|Lavoro unilaterale con carico leggero.
+jm_press|JM press|tricipiti|petto|B|m|3|8|10|90|reps|JM_Press|Variante tecnica: apprendila con supervisione.
+diamond|Piegamenti a diamante|tricipiti|petto|L|m|3|8|15|75|reps|Push-Ups_-_Close_Triceps_Position|Usa variante inclinata se la versione a terra è troppo difficile.
+pressa_oriz|Pressa orizzontale|quadricipiti|glutei|M|m|4|10|12|120|reps|Smith_Machine_Leg_Press|Bacino appoggiato e ginocchia nella direzione delle punte.
+pressa_uni|Pressa a una gamba|quadricipiti|glutei|M|m|3|10|12|90|reps|Leg_Press|Usa carico ridotto e controlla l'allineamento.
+box_squat|Box squat|quadricipiti|glutei femorali|B|m|4|6|8|150|reps|Box_Squat|Tocca il box senza lasciarti cadere.
+squat_lowbar|Squat low-bar con bilanciere|quadricipiti|glutei femorali lombari|B|m|4|5|8|180|reps|Barbell_Full_Squat|Variante tecnica da apprendere con un istruttore.
+zercher|Zercher squat|quadricipiti|glutei addome|B|m|3|6|8|150|reps|Zercher_Squats|Carico leggero e protezione confortevole nella piega dei gomiti.
+landmine_squat|Landmine squat|quadricipiti|glutei|B|m|3|8|12|90|reps|Goblet_Squat|Tieni il peso vicino al torace e il busto controllato.
+spanish|Spanish squat con fascia|quadricipiti||E|m|3|10|15|75|reps|Bodyweight_Squat|Fascia stabile dietro le ginocchia e movimento controllato.
+step_up_basso|Step-up su gradino basso|quadricipiti|glutei|L|m|3|10|12|60|reps|Step-up_with_Knee_Raise|Sali senza slancio della gamba posteriore.
+step_down|Step-down (discesa controllata)|quadricipiti|glutei|L|i|3|8|12|60|reps|Single-Leg_High_Box_Squat|Scendi lentamente mantenendo il ginocchio allineato.
+affondo_indietro|Affondi all'indietro|quadricipiti|glutei|D|m|3|10|12|90|reps|Dumbbell_Rear_Lunge|Passo indietro e discesa fluida.
+split_squat|Split squat|quadricipiti|glutei|D|m|3|8|12|90|reps|Split_Squat_with_Dumbbells|Piedi fermi e discesa verticale controllata.
+reverse_nordic|Reverse nordic assistito|quadricipiti||L|i|3|6|10|75|reps|Kneeling_Squat|Inginocchiato, inclina il corpo indietro solo entro un arco tollerato.
+leg_ext_uni|Leg extension a una gamba|quadricipiti||M|i|3|12|15|60|reps|Single-Leg_Leg_Extension|Usa carico più basso e movimento controllato.
+cyclist_squat|Cyclist squat (talloni rialzati)|quadricipiti||D|m|3|10|15|75|reps|Narrow_Stance_Squats|Talloni rialzati solo con supporto stabile e buona tolleranza.
+squat_elastico|Squat con elastico|quadricipiti|glutei|E|m|3|12|15|60|reps|Squats_-_With_Bands|Mantieni la fascia stabile e non far collassare le ginocchia.
+stacco_trap|Stacco con trap bar|glutei|quadricipiti femorali lombari trapezio|B|m|4|5|8|150|reps|Trap_Bar_Deadlift|Mantieni il busto stabile e spingi il pavimento.
+pull_through|Pull-through al cavo|glutei|femorali lombari|C|m|3|10|15|75|reps|Pull_Through|Spingi il bacino indietro e poi estendi le anche.
+ponte_uni|Ponte glutei a una gamba|glutei|femorali|L|i|3|10|12|60|reps|Single_Leg_Glute_Bridge|Mantieni il bacino orizzontale.
+frog_pump|Frog pump|glutei||L|i|3|15|25|45|reps|Butt_Lift_Bridge|Piante dei piedi unite e movimento corto e controllato.
+clamshell|Clamshell (apertura a conchiglia)|glutei||E|i|3|15|20|45|reps|Side_Leg_Raises|Bacino fermo e apertura piccola.
+fire_hydrant|Fire hydrant (apertura a quattro zampe)|glutei||L|i|3|12|15|45|reps|Hip_Circles_prone|In quadrupedia, apri il ginocchio senza ruotare il tronco.
+donkey_kick|Donkey kick (slancio a quattro zampe)|glutei|femorali|L|i|3|12|15|45|reps|Glute_Kickback|Spingi il tallone verso l'alto senza inarcare la schiena.
+slider_curl|Leg curl con slider|femorali|glutei|L|i|3|8|12|60|reps|Ball_Leg_Curl|Da ponte, fai scorrere i talloni avanti e indietro lentamente.
+rdl_uni|Stacco rumeno a una gamba|femorali|glutei lombari|D|m|3|8|12|75|reps|Kettlebell_One-Legged_Deadlift|Equilibrio prima del carico; bacino rivolto a terra.
+rdl_cavo|Stacco rumeno al cavo|femorali|glutei lombari|C|m|3|10|12|90|reps|Cable_Deadlifts|Mantieni il cavo vicino e il movimento guidato dalle anche.
+calf_uni|Calf a una gamba|polpacci||L|i|3|12|15|45|reps|Calf_Raise_On_A_Dumbbell|Appoggiati a un supporto e controlla l'equilibrio.
+calf_ginocchia|Calf con ginocchia piegate|polpacci||L|i|3|15|20|45|reps|Barbell_Seated_Calf_Raise|Variante per il soleo, mantenendo il busto stabile.
+tibiale_muro|Tibialis raise al muro|polpacci||L|i|3|15|20|45|reps|Smith_Machine_Reverse_Calf_Raises|Con talloni a terra, solleva le punte senza dolore.
+tibiale_macc|Tibialis raise alla macchina|polpacci||M|i|3|15|20|45|reps|Smith_Machine_Reverse_Calf_Raises|Usa carico moderato e controllo della caviglia.
+talloni|Camminata sui talloni|polpacci||L|i|2|30|45|45|s|Smith_Machine_Reverse_Calf_Raises|Fai pochi passi controllati in uno spazio libero.
+situp|Sit-up|addome||L|i|3|10|15|60|reps|Sit-Up|Usa una variante ridotta se senti fastidio alla schiena.
+bird_dog|Bird dog|lombari|addome glutei|L|i|3|8|12|45|reps|Rear_Leg_Raises|Allunga arti opposti senza ruotare il bacino.
+plank_alto|Plank a braccia tese|addome|spalle|L|i|3|30|60|45|s|Plank|Mani sotto le spalle e addome attivo.
+plank_ginocchia|Plank sulle ginocchia|addome||L|i|3|20|40|45|s|Plank|Variante facilitata mantenendo una linea stabile.
+plank_lat_ginocchia|Plank laterale a ginocchia piegate|obliqui|addome|L|i|3|20|30|45|s|Side_Bridge|Versione più accessibile per imparare la posizione.
+woodchop_basso|Woodchop dal basso verso l'alto|obliqui|addome|C|i|3|10|12|60|reps|Standing_Cable_Lift|Usa carico leggero e tronco controllato.
+mountain_lento|Mountain climber lento|addome|spalle quadricipiti|L|m|3|20|30|45|s|Mountain_Climbers|Porta un ginocchio alla volta senza oscillare.
+mountain|Mountain climber veloce|cardio|addome spalle quadricipiti|L|m|3|20|40|45|s|Mountain_Climbers|Aumenta la velocità solo mantenendo la posizione.
+hollow_rock|Hollow rock|addome||L|i|3|10|20|60|reps|Flutter_Kicks|Variante avanzata: mantieni la forma compatta.
+leg_raise_sup|Sollevamento gambe da supino|addome||L|i|3|10|15|60|reps|Flat_Bench_Lying_Leg_Raise|Piega le ginocchia se la zona lombare si solleva.
+hanging_knee|Sollevamento ginocchia alla sbarra|addome||L|i|3|10|15|60|reps|Hanging_Pike|Parti da sospensione stabile e non dondolare.
+suitcase|Suitcase carry (un manubrio)|obliqui|addome avambracci trapezio|D|m|3|30|45|60|s|One-Arm_Side_Deadlift|Cammina senza inclinarti verso il peso.
+bear_crawl|Bear crawl (in avanti)|addome|spalle quadricipiti|L|m|3|20|40|60|s|Spider_Crawl|Avanza con passi piccoli mantenendo il bacino stabile.
+plank_tap|Plank con tocco della spalla|addome|obliqui spalle|L|i|3|10|20|45|reps|Push_Up_to_Side_Plank|Tocca la spalla opposta riducendo la rotazione del bacino.
+crunch_inv_panca|Crunch inverso su panca|addome||L|i|3|10|15|60|reps|Flat_Bench_Leg_Pull-In|Controlla il bacino e non slanciare le gambe.
+push_muro|Piegamenti al muro|petto|tricipiti spalle|L|m|2|10|15|45|reps|Incline_Push-Up_Wide|Versione iniziale dei piegamenti con mani al muro.
+squat_sedia|Squat alla sedia|quadricipiti|glutei|L|m|3|10|15|60|reps|Chair_Squat|Siediti e rialzati controllando il movimento.
+sit_stand|Alzarsi dalla sedia (sit-to-stand)|quadricipiti|glutei|L|m|2|10|15|45|reps|Sit_Squats|Piedi stabili e spinta uniforme per rialzarsi.
+affondo_statico|Affondo statico assistito|quadricipiti|glutei|L|m|2|8|12|45|reps|Split_Squats|Usa una mano al supporto per l'equilibrio.
+passo_lat_elastico|Camminata laterale con elastico|glutei|adduttori|E|i|3|10|15|45|reps|Monster_Walk|Passi corti e ginocchia allineate.
+monster_walk|Monster walk|glutei||E|i|3|10|15|45|reps|Monster_Walk|Cammina avanti e indietro con tensione costante.
+affondo_lat|Affondo laterale|adduttori|quadricipiti glutei|L|m|3|8|12|60|reps|Barbell_Side_Split_Squat|Sposta il bacino lateralmente entro una profondità comoda.
+curtsy|Affondo incrociato (curtsy lunge)|glutei|quadricipiti adduttori|L|m|3|8|12|60|reps|Crossover_Reverse_Lunge|Passo diagonale controllato; evita se provoca fastidio al ginocchio.
+skater_step|Skater step senza salto|cardio|glutei quadricipiti|L|m|3|30|45|45|s|Skating|Passo laterale e atterraggio controllato.
+skater_jump|Skater jump (balzi laterali)|cardio|glutei quadricipiti|L|m|3|20|40|60|s|Lateral_Bound|Variante esplosiva: atterra morbido e solo se adatta al livello.
+jumping_jack|Jumping jack|cardio|polpacci spalle|L|m|3|30|60|45|s|Star_Jump|Atterraggi morbidi; variante a passo laterale senza salto.
+burpee_lento|Burpee senza salto|cardio|petto quadricipiti addome|L|m|3|8|12|60|reps|Push_Up_to_Side_Plank|Fai un passo indietro e avanti invece di saltare.
+burpee|Burpee completo|cardio|petto quadricipiti addome|L|m|3|8|15|75|reps|Freehand_Jump_Squat|Richiede buona capacità: interrompi se perdi controllo.
+mountain_cross|Mountain climber incrociato|obliqui|addome cardio|L|m|3|20|40|45|s|Mountain_Climbers|Porta il ginocchio verso il gomito opposto senza ruotare troppo.
+bear_indietro|Bear crawl all'indietro|addome|spalle quadricipiti|L|m|3|20|40|60|s|Spider_Crawl|Muoviti lentamente mantenendo il tronco stabile.
+crab_walk|Crab walk (camminata del granchio)|tricipiti|glutei spalle addome|L|m|3|20|30|45|s|Bench_Dips|Sposta mani e piedi in modo coordinato in spazio libero.
+inchworm|Inchworm|addome|femorali spalle|L|m|2|6|10|45|reps|Inchworm|Cammina con le mani fino al plank e ritorna senza forzare.
+marcia_ginocchia|Marcia a ginocchia alte|cardio|addome quadricipiti|L|m|3|30|45|30|s|Fast_Skipping|Marcia sollevando le ginocchia a ritmo gestibile.
+skip|Skip di corsa (ginocchia alte)|cardio|quadricipiti polpacci|L|m|3|20|40|30|s|Fast_Skipping|Aumenta la velocità solo se tollerata.
+calciata|Calciata ai glutei|cardio|femorali polpacci|L|m|3|20|40|30|s|Single_Leg_Butt_Kick|Ritmo leggero e appoggi morbidi.
+corda|Salto con la corda|cardio|polpacci spalle|O|m|3|1|3|60|min|Rope_Jumping|Inizia con intervalli brevi e salti bassi.
+shadow|Shadow boxing|cardio|spalle addome|L|m|3|1|3|60|min|Heavy_Bag_Thrust|Colpi controllati, polsi allineati e piedi stabili.
+battle_alt|Battle ropes: onde alternate|cardio|spalle addome|O|m|4|20|30|60|s|Battling_Ropes|Ginocchia morbide e tronco stabile.
+battle_sim|Battle ropes: onde simultanee|cardio|spalle addome|O|m|4|20|30|60|s|Battling_Ropes|Usa intervalli brevi e tecnica fluida.
+slitta_spinta|Spinta della slitta|quadricipiti|glutei polpacci cardio|O|m|4|15|25|90|s|Sled_Push|Spingi con passi brevi, schiena stabile e percorso libero.
+slitta_indietro|Traino della slitta all'indietro|quadricipiti|polpacci cardio|O|m|4|15|25|90|s|Backward_Drag|Passi controllati e carico gestibile.
+slitta_avanti|Traino della slitta in avanti|glutei|femorali polpacci cardio|O|m|4|15|25|90|s|Sled_Drag_-_Harness|Cammina mantenendo una postura stabile.
+step_lat|Step-up laterale|glutei|quadricipiti|L|m|3|10|12|60|reps|Barbell_Step_Ups|Sali lateralmente su supporto basso e stabile.
+carry_overhead|Camminata con manubri sopra la testa|spalle|trapezio addome|D|m|3|20|40|60|s|Sled_Overhead_Backward_Walk|Solo con controllo e mobilità adeguati; altrimenti evita.
+tapis_camm|Tapis roulant: camminata|cardio|polpacci|X|m|1|10|30|0|min|Walking_Treadmill|Inizia a velocità bassa e sali/scendi solo da fermo.
+tapis_salita|Tapis roulant: camminata in salita|cardio|glutei polpacci|X|m|1|10|30|0|min|Walking_Treadmill|Aumenta gradualmente la pendenza senza aggrapparti ai corrimano.
+tapis_corsa|Tapis roulant: corsa facile|cardio|quadricipiti polpacci|X|m|1|10|30|0|min|Running_Treadmill|Ritmo conversazionale e progressione graduale.
+tapis_int|Tapis roulant: intervalli|cardio|quadricipiti polpacci|X|m|1|10|20|0|min|Jogging_Treadmill|Alterna tratti facili e più rapidi solo se già allenato.
+cyclette|Cyclette verticale|cardio|quadricipiti|X|m|1|10|30|0|min|Bicycling_Stationary|Regola il sellino per mantenere il ginocchio leggermente piegato.
+cyclette_rec|Cyclette reclinata|cardio|quadricipiti|X|m|1|10|30|0|min|Recumbent_Bike|Regola distanza e schienale per pedalare senza dolore.
+air_bike|Air bike|cardio|quadricipiti spalle|X|m|1|5|15|0|min|Bicycling_Stationary|Inizia con intervalli moderati e aumenta gradualmente.
+ellittica|Ellittica|cardio|glutei quadricipiti|X|m|1|10|30|0|min|Elliptical_Trainer|Movimento fluido, busto eretto.
+ellittica_ind|Ellittica all'indietro|cardio|femorali glutei|X|m|1|5|15|0|min|Elliptical_Trainer|Procedi lentamente e solo se il modello lo consente.
+vogatore|Vogatore|cardio|dorsali quadricipiti|X|m|1|10|20|0|min|Rowing_Stationary|Spingi prima con le gambe, poi busto e braccia; ritorna in ordine inverso.
+stepper|Stepper|cardio|glutei polpacci|X|m|1|10|20|0|min|Stairmaster|Passi regolari senza scaricare tutto il peso sui corrimano.
+stair|Stair climber (macchina a scale)|cardio|glutei quadricipiti|X|m|1|10|20|0|min|Step_Mill|Ritmo sostenibile e postura alta.
+ski_erg|Ski erg|cardio|dorsali tricipiti addome|X|m|1|5|15|0|min|Straight-Arm_Pulldown|Tira con movimento coordinato di braccia e tronco senza incurvare eccessivamente.
+nuoto|Nuoto stile libero|cardio|dorsali spalle|X|m|1|15|40|0|min||Scegli stile e durata adeguati alle capacità.
+camm_aperto|Camminata veloce all'aperto|cardio|polpacci|X|m|1|20|45|0|min|Trail_Running_Walking|Aumenta il tempo in modo progressivo.
+corsa_aperto|Corsa facile all'aperto|cardio|quadricipiti polpacci|X|m|1|15|40|0|min|Trail_Running_Walking|Alterna corsa e camminata se sei all'inizio.
+ciclismo|Ciclismo|cardio|quadricipiti|X|m|1|30|90|0|min|Bicycling|Regola sella e intensità in modo confortevole.
+scale|Salita delle scale|cardio|glutei quadricipiti|X|m|1|5|15|0|min|Step_Mill|Usa corrimano se necessario e scendi con attenzione.
+nordic_walk|Camminata con bastoncini (nordic walking)|cardio|spalle|X|m|1|20|45|0|min|Trail_Running_Walking|Coordina passo e braccia a intensità moderata.
+interval_low|Interval training a basso impatto|cardio||X|m|1|10|20|0|min|Elliptical_Trainer|Alterna fasi moderate e facili senza sprint massimali iniziali.
+panca_incl_multi|Panca inclinata al multipower|petto|spalle tricipiti|M|m|4|8|10|120|reps|Smith_Machine_Incline_Bench_Press|Regola la panca e usa i fermi di sicurezza; scendi in modo controllato.
+press_cavo_basso|Press al cavo dal basso verso l'alto|petto|spalle tricipiti|C|m|3|10|12|75|reps|Incline_Cable_Chest_Press|Spingi in diagonale senza ruotare il bacino.
+push_maniglie|Piegamenti con maniglie|petto|tricipiti spalle|L|m|3|8|15|75|reps|Close-Grip_Push-Up_off_of_a_Dumbbell|Usa maniglie stabili e mantieni polsi e tronco allineati.
+rematore_corda|Rematore al cavo con corda|dorsali|trapezio spalle bicipiti|C|m|3|10|12|75|reps|Cable_Rope_Rear-Delt_Rows|Tira la corda verso l'addome mantenendo il busto fermo.
+meadows|Rematore Meadows (landmine)|dorsali|trapezio bicipiti|B|m|3|8|12|90|reps|One-Arm_Long_Bar_Row|Variante tecnica: usa carico contenuto e appoggio stabile.
+pulldown_ginocchio|Pulldown a un braccio in ginocchio|dorsali|bicipiti|C|m|3|10|12|75|reps|Kneeling_Single-Arm_High_Pulley_Row|Tira il gomito verso il fianco senza inclinare il tronco.
+ytw|Y-T-W da prono|trapezio|spalle lombari|D|i|2|8|10|45|reps|Dumbbell_Lying_Rear_Lateral_Raise|Da prono, solleva le braccia in forme Y, T e W con carico minimo.
+alzata_lat_incl_cavo|Alzata laterale inclinata al cavo|spalle||C|i|3|12|15|60|reps|One-Arm_Incline_Lateral_Raise|Inclina il corpo solo se stabile e solleva senza slancio.
+curl_drag|Drag curl|bicipiti||B|i|3|8|12|75|reps|Drag_Curl|Porta i gomiti leggermente indietro e fai scorrere il peso vicino al busto.
+curl_cavo_ez|Curl al cavo con barra EZ|bicipiti|avambracci|C|i|3|10|12|75|reps|Lying_Cable_Curl|Mantieni gomiti fermi e ritorno lento.
+est_cross|Estensione tricipiti incrociata al cavo|tricipiti||C|i|3|12|15|60|reps|Standing_Low-Pulley_One-Arm_Triceps_Extension|Estendi l'avambraccio attraverso il corpo senza ruotare la spalla.
+est_sdraiato_cavo|Estensione tricipiti sdraiato al cavo|tricipiti||C|i|3|10|12|75|reps|Cable_Lying_Triceps_Extension|Mantieni i gomiti stabili e usa un carico leggero.
+squat_trx|Squat al TRX|quadricipiti|glutei|E|m|3|10|15|60|reps|Suspended_Row|Usa le maniglie per equilibrio, senza tirarti su con le braccia.
+split_trx|Split squat al TRX|quadricipiti|glutei|E|m|3|8|12|60|reps|Suspended_Split_Squat|Mantieni il piede anteriore stabile e scendi entro un arco comodo.
+pressa_alti|Pressa con piedi alti|glutei|femorali quadricipiti|M|m|3|10|12|120|reps|Leg_Press|La posizione dei piedi cambia la sensazione del lavoro; mantieni bacino stabile.
+pressa_bassi|Pressa con piedi bassi|quadricipiti|glutei|M|m|3|10|12|120|reps|Narrow_Stance_Leg_Press|Usa un'ampiezza tollerabile e non sollevare i talloni senza controllo.
+affondo_lat_man|Affondo laterale con manubrio|adduttori|quadricipiti glutei|D|m|3|8|12|75|reps|Barbell_Side_Split_Squat|Sposta il bacino indietro e mantieni il piede d'appoggio stabile.
+hip_airplane|Hip airplane assistito|glutei|femorali addome|L|i|2|5|8|45|reps|Kettlebell_One-Legged_Deadlift|Ruota il bacino lentamente su una gamba con appoggio vicino.
+abd_fianco|Abduzione dell'anca sdraiato sul fianco|glutei||L|i|3|12|20|45|reps|Side_Leg_Raises|Solleva la gamba senza ruotare il bacino all'indietro.
+est_anca_cavo|Estensione dell'anca al cavo (ginocchio piegato)|glutei|femorali|C|i|3|12|15|60|reps|One-Legged_Cable_Kickback|Spingi il tallone indietro senza inarcare la schiena.
+ponte_rialzato|Ponte glutei con piedi rialzati|glutei|femorali|L|i|3|10|15|60|reps|Physioball_Hip_Bridge|Scegli altezza stabile e solleva il bacino senza compensi lombari.
+hamstring_walkout|Hamstring walkout|femorali|glutei|L|i|3|6|10|60|reps|Platform_Hamstring_Slides|Da ponte, fai piccoli passi coi talloni avanti e torna lentamente.
+tibiale_seduto|Tibialis raise da seduto|polpacci||M|i|3|15|20|45|reps|Smith_Machine_Reverse_Calf_Raises|Solleva le punte mantenendo i talloni appoggiati.
+plank_ginocchio_gomito|Plank con ginocchio al gomito|obliqui|addome|L|i|3|8|12|45|reps|Plank|Avvicina lentamente il ginocchio senza perdere la linea del tronco.
+crunch_bici|Crunch a bicicletta lento|obliqui|addome|L|i|3|12|20|45|reps|Air_Bike|Ruota il torace controllando il movimento, senza tirare il collo.
+situp_panca|Sit-up su panca inclinata|addome||L|i|3|10|15|60|reps|Decline_Crunch|Usa inclinazione e ampiezza adatte al tuo livello.
+pallof_ginocchio|Pallof press in mezzo inginocchio|obliqui|addome glutei|C|i|3|10|12|60|reps|Pallof_Press_With_Rotation|Resisti alla rotazione con bacino e costole stabili.
+passo_lat_cavo|Camminata laterale al cavo|glutei|obliqui|C|i|3|10|12|60|reps|Monster_Walk|Fai passi laterali controllati mantenendo tensione sul cavo.
+marcia_kb|Marcia con kettlebell in rack|addome|spalle glutei|K|m|3|20|40|60|s|Two-Arm_Kettlebell_Clean|Tieni il peso vicino alla spalla e marcia senza inclinarti.
+kb_stacco|Stacco con kettlebell|glutei|femorali lombari|K|m|3|10|12|75|reps|Kettlebell_Dead_Clean|Pesa vicino al corpo, bacino indietro e schiena neutra.
+kb_swing|Kettlebell swing|glutei|femorali lombari cardio|K|m|4|12|20|75|reps|One-Arm_Kettlebell_Swings|Movimento balistico tecnico: imparalo con istruttore prima di aumentare il carico.
+ski_erg_int|Ski erg a intervalli|cardio|dorsali tricipiti|X|m|1|10|20|0|min|Straight-Arm_Pulldown|Alterna tratti regolari e recupero, evitando di incurvare eccessivamente la schiena.
+`.trim().split("\n").map(r=>{ const [id,name,m,sec,eq,type,sets,a,b,rest,unit,img,tip]=r.split("|");
+  return {id,name,m,sec:sec?sec.split(" "):[],eq,type,sets:+sets,repMin:+a,repMax:+b,rest:+rest,unit:unit||"reps",img:img||"",tip:tip||""}; });
 const LIBX = Object.fromEntries(LIB.map(x=>[x.id,x]));
 // esercizi della scheda iniziale → voce della libreria (per collegare lo storico)
 const NAME2LIB = {"Chest Press guidata / Macchina convergente":"chest_press","Chest-Supported T-Bar Row (o panca 45° manubri)":"tbar","Shoulder Press seduto, schienale 80°":"shoulder_press","Alzate laterali al cavo o manubri seduto":"alzate_lat_cavo","Curl manubri su panca inclinata 60°":"curl_incl","Hammer curl cavo basso o manubri":"hammer_cavo","Pushdown ai cavi (barra o corda)":"pushdown","Cable Crunch in ginocchio / Crunch macchina":"crunch_cavo","Leg Press 45° (piedi al centro)":"leg_press","Leg Curl seduto":"curl_seduto","Leg Extension":"leg_ext","Glute Kickback al cavo (o macchina glutei)":"kickback_cavo","Calf Raise alla Leg Press":"calf_pressa","Knee Raise su Captain's Chair":"knee_raise","Lat Machine presa neutra o larga":"lat_neutra","Incline Chest Press o manubri panca 30°":"chest_press_incl","Pulley basso / Row guidato presa larga":"pulley_larga","Croci ai cavi o Pectoral Machine":"croci_cavi","Face Pull ai cavi alti con corda":"face_pull","Preacher Curl alla panca Scott":"curl_scott","Curl ai cavi bassi (barra o corda)":"curl_cavo","Overhead Triceps Extension al cavo alto":"overhead_cavo","Hip Thrust alla macchina o bilanciere":"hip_thrust_macc","Hack Squat guidato / V-Squat":"hack","Leg Curl sdraiato":"curl_sdraiato","Iperestensioni a 45°":"iperestensioni","Calf Raise da seduto (ginocchia 90°)":"calf_seduto","Plank isometrico / Pallof Press":"plank"};
 const libOf = x => x?.lib || NAME2LIB[x?.name] || null;
 const libTarget = l => [MUSCLES[l.m],...l.sec.map(k=>MUSCLES[k])].join(", ");
+const imgSrc = l => l && l.img ? "img/ex/"+l.img+".webp" : "";
+const thumb = (l, cls="th") => { const src=imgSrc(l); return src ? `<img class="${cls}" src="${src}" alt="" loading="lazy" decoding="async">` : `<span class="${cls} noimg" aria-hidden="true">${esc((MUSCLES[l?.m]||"?").slice(0,2))}</span>`; };
+function showInfo(id){
+  const l = LIBX[id]; if(!l) return;
+  const inB = view==="builder" && bld && bld.step===2, on = inB && bld.picked.includes(id);
+  const el = document.createElement("div"); el.className="sheet"; el.id="exinfo"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label",l.name);
+  el.innerHTML = `<div class="panel"><div class="grab"></div>
+    <div class="sh-top"><h2 style="font-size:1.35rem;line-height:1.1">${esc(l.name)}</h2><button class="btn" data-infox aria-label="Chiudi">✕</button></div>
+    ${l.img?`<img class="info-img" src="${imgSrc(l)}" alt="${esc(l.name)}: posizione iniziale e finale"><p class="set-note" style="margin:4px 0 0">Posizione iniziale e finale. Alcune foto mostrano la variante più simile.</p>`:`<div class="empty">Foto non disponibile per questo esercizio.</div>`}
+    <div class="info-grid">
+      <div><span>Muscolo principale</span><b>${MUSCLES[l.m]}</b></div>
+      <div><span>Attrezzo</span><b>${EQUIP[l.eq]||"–"}</b></div>
+      <div><span>Serie consigliate</span><b>${l.sets} × ${repLabel(l)}</b></div>
+      <div><span>Recupero</span><b>${l.rest?fmtT(l.rest):"–"}</b></div>
+    </div>
+    ${l.sec.length?`<p class="lbl2">Coinvolge anche</p><div class="meta" style="margin-top:0">${l.sec.map(k=>`<span class="tag">${MUSCLES[k]}</span>`).join("")}</div>`:""}
+    ${l.tip?`<p class="lbl2">Come si fa</p><p style="margin:0">${esc(l.tip)}</p>`:""}
+    ${inB?`<div class="edit-actions" style="margin-top:16px"><button class="btn ${on?"":"primary"} big" data-infopick="${l.id}">${on?"Togli dalla scheda":"Aggiungi alla scheda"}</button></div>`:""}
+  </div>`;
+  document.body.appendChild(el); el.querySelector("[data-infox]").focus();
+}
+function closeInfo(){ $("#exinfo")?.remove(); }
+document.addEventListener("click", ev=>{
+  const t = ev.target.closest("[data-info]");
+  if(t){ ev.preventDefault(); ev.stopPropagation(); showInfo(t.dataset.info); return; }
+  const sh = $("#exinfo"); if(!sh) return;
+  if(ev.target===sh || ev.target.closest("[data-infox]")){ ev.stopPropagation(); closeInfo(); return; }
+  const pk = ev.target.closest("[data-infopick]");
+  if(pk){ ev.stopPropagation(); const id=pk.dataset.infopick, i=bld.picked.indexOf(id); if(i<0) bld.picked.push(id); else bld.picked.splice(i,1); closeInfo(); render(); }
+}, true);
+document.addEventListener("keydown", ev=>{ if(ev.key==="Escape" && $("#exinfo")){ closeInfo(); } });
 
 /* ---------- corpo interattivo (metà sinistra, specchiata) ---------- */
 const BODY = {
@@ -769,7 +993,7 @@ function renderBuilder(){
     h += `<div class="presets">${PRESETS.map(p=>`<button class="chip" data-preset="${esc(p.l)}" aria-pressed="${p.m.length===bld.muscles.length&&p.m.every(k=>bld.muscles.includes(k))}">${p.l}</button>`).join("")}</div>
     <div class="bodywrap">
       <div class="bodies">${bodySvg("front", bld.muscles)}${bodySvg("back", bld.muscles)}</div>
-      <p class="hint">Tocca un muscolo per selezionarlo, toccalo di nuovo per toglierlo</p>
+      <p class="hint">Tocca un muscolo per selezionarlo, toccalo di nuovo per toglierlo. Per il cardio usa il pulsante Cardio qui sotto.</p>
     </div>
     <div class="mchips">${MKEYS.map(k=>`<button class="chip" data-mk="${k}" aria-pressed="${bld.muscles.includes(k)}">${MUSCLES[k]}</button>`).join("")}</div>
     ${bld.muscles.length?`<button class="btn small-link" data-bclear>Deseleziona tutto</button>`:""}`;
@@ -790,7 +1014,7 @@ function renderBuilder(){
       ${bld.day>=0&&occ(bld.day)?`<p class="set-note">${esc(occ(bld.day).name)} verrà spostata su "nessun giorno".</p>`:""}</div>`;
     h += `<div class="sec-title"><h2 style="font-size:1.15rem">Esercizi (${bld.picked.length})</h2></div>
       <div class="meta" style="margin:0 0 10px">${bldSetsByMuscle(bld.picked)}</div>
-      <div class="plist">${bld.picked.map((id,i)=>{ const l=LIBX[id]; return `<div class="prow"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="nm">${esc(l.name)}<small>${l.sets} × ${l.unit==="s"?l.repMin+"–"+l.repMax+'"':l.repMin+"–"+l.repMax} · ${MUSCLES[l.m]}</small></div>
+      <div class="plist">${bld.picked.map((id,i)=>{ const l=LIBX[id]; return `<div class="prow"><span class="num">${String(i+1).padStart(2,"0")}</span><button class="pthumb" data-info="${id}" aria-label="Foto e istruzioni: ${esc(l.name)}">${thumb(l)}</button><div class="nm">${esc(l.name)}<small>${l.sets} × ${repLabel(l)} · ${MUSCLES[l.m]}</small></div>
         <button class="btn" data-pmv="-1" data-pid="${id}" ${i===0?"disabled":""} aria-label="Sposta su">↑</button><button class="btn" data-pmv="1" data-pid="${id}" ${i===bld.picked.length-1?"disabled":""} aria-label="Sposta giù">↓</button><button class="btn danger" data-pick="${id}" aria-label="Togli">✕</button></div>`; }).join("")}</div>
       <p class="set-note">Serie, ripetizioni e recupero li puoi cambiare dopo con <b>Modifica</b>.</p>`;
   }
@@ -806,7 +1030,7 @@ function renderLibList(byM){
   if(!keys.length) return `<div class="empty">Nessun esercizio con questi filtri.</div>`;
   return keys.map(k=>`<h3 class="lgrp">${MUSCLES[k]} <span>${byM[k].length}</span></h3><div class="llist">${byM[k].map(l=>{
     const on = bld.picked.includes(l.id), sec = l.sec.map(s=>MUSCLES[s]).join(", ");
-    return `<button class="lrow" data-pick="${l.id}" aria-pressed="${on}"><span class="nm">${esc(l.name)}<small>${EQUIP[l.eq]} · ${l.sets}×${l.unit==="s"?l.repMin+"–"+l.repMax+'"':l.repMin+"–"+l.repMax}${sec?" · anche "+sec:""}</small></span><span class="add" aria-hidden="true">${on?"✓":"+"}</span></button>`; }).join("")}</div>`).join("");
+    return `<div class="lrow-w"><button class="lthumb" data-info="${l.id}" aria-label="Foto e istruzioni: ${esc(l.name)}">${thumb(l)}</button><button class="lrow" data-pick="${l.id}" aria-pressed="${on}"><span class="nm">${esc(l.name)}<small>${EQUIP[l.eq]} · ${l.sets}×${repLabel(l)}${sec?" · anche "+sec:""}</small></span><span class="add" aria-hidden="true">${on?"✓":"+"}</span></button></div>`; }).join("")}</div>`).join("");
 }
 function lastByLib(lib){ for(const s of sessions){ const x=s.exercises?.find(x=>libOf(x)===lib); if(x && x.sets?.length) return x; } return null; }
 function exFromLib(id){
@@ -889,7 +1113,10 @@ const fmtT = s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+String(
 const fmtKg = n=> (n==null||n==="")?"":String(n).replace(".",",");
 const parseNum = v=>{ if(v==null) return null; v=String(v).replace(",",".").trim(); if(v==="") return null; const n=Number(v); return isFinite(n)?n:null; };
 const W = ()=>plan.workouts.find(w=>w.id===current);
-const repLabel = e=> e.unit==="s" ? (e.repMin===e.repMax?e.repMin+'"':e.repMin+"–"+e.repMax+'"') : (e.repMin===e.repMax?String(e.repMin):e.repMin+"–"+e.repMax);
+const unitMark = u=> u==="s"?'"':u==="min"?"′":"";
+const unitShort = u=> u==="s"?"Sec":u==="min"?"Min":"Rip";
+const noVol = u=> u==="s"||u==="min";
+const repLabel = e=> (e.repMin===e.repMax?String(e.repMin):e.repMin+"–"+e.repMax)+unitMark(e.unit);
 function draftFor(w,e){
   drafts[w.id] ??= {};
   let d = drafts[w.id][e.id];
@@ -1032,7 +1259,7 @@ function renderCard(w,e,i){
   const d = draftFor(w,e);
   const last = lastFor(e);
   const allDone = d.length && d.every(s=>s.done);
-  const unit = e.unit==="s" ? "Sec" : "Rip";
+  const unit = unitShort(e.unit);
   let rows = `<div class="h"></div><div class="h">Kg</div><div class="h">${unit}</div><div class="h"></div>`;
   d.forEach((s,k)=>{
     const prevKg = e.weights?.[k] ?? e.weights?.[e.weights.length-1] ?? "";
@@ -1043,7 +1270,7 @@ function renderCard(w,e,i){
       <button class="tick" data-tick="${k}" data-ex="${e.id}" aria-pressed="${!!s.done}" aria-label="Serie ${k+1} completata"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>`;
   });
   return `<article class="card ${allDone?'complete':''}" data-card="${e.id}">
-    <div class="ex-top"><div class="num">${String(i+1).padStart(2,"0")}</div><div class="ex-title"><h3>${esc(e.name)}</h3><div class="tgt">${esc(e.target||"")}</div></div></div>
+    <div class="ex-top"><div class="num">${String(i+1).padStart(2,"0")}</div><div class="ex-title"><h3>${esc(e.name)}</h3><div class="tgt">${esc(e.target||"")}</div></div>${LIBX[libOf(e)]?`<button class="exthumb" data-info="${libOf(e)}" aria-label="Foto e istruzioni: ${esc(e.name)}">${thumb(LIBX[libOf(e)])}<span class="i">i</span></button>`:""}</div>
     <div class="meta"><span class="tag">${e.sets} × ${repLabel(e)}</span><span class="tag">rec ${fmtT(e.rest)}</span>${readyToProgress(e)?'<span class="tag up">↑ +1–2,5 kg</span>':''}</div>
     ${last?`<div class="last">Ultima: ${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</div>`:""}
     <div class="sets">${rows}</div>
@@ -1057,9 +1284,9 @@ function renderEditCard(w,e,i){
       <label class="full">Esercizio<input class="tin" id="n-${e.id}" data-f="name" data-ex="${e.id}" value="${esc(e.name)}"></label>
       <label class="full">Muscoli target<input class="tin" id="t-${e.id}" data-f="target" data-ex="${e.id}" value="${esc(e.target||"")}"></label>
       <label>Serie<input class="tin" id="s-${e.id}" type="number" min="1" max="12" inputmode="numeric" data-f="sets" data-ex="${e.id}" value="${e.sets}"></label>
-      <label>Unità<select class="tin" id="u-${e.id}" data-f="unit" data-ex="${e.id}"><option value="reps" ${e.unit!=="s"?"selected":""}>Ripetizioni</option><option value="s" ${e.unit==="s"?"selected":""}>Secondi</option></select></label>
-      <label>${e.unit==="s"?"Sec":"Rip"} min<input class="tin" id="a-${e.id}" type="number" min="1" inputmode="numeric" data-f="repMin" data-ex="${e.id}" value="${e.repMin}"></label>
-      <label>${e.unit==="s"?"Sec":"Rip"} max<input class="tin" id="b-${e.id}" type="number" min="1" inputmode="numeric" data-f="repMax" data-ex="${e.id}" value="${e.repMax}"></label>
+      <label>Unità<select class="tin" id="u-${e.id}" data-f="unit" data-ex="${e.id}"><option value="reps" ${e.unit!=="s"&&e.unit!=="min"?"selected":""}>Ripetizioni</option><option value="s" ${e.unit==="s"?"selected":""}>Secondi</option><option value="min" ${e.unit==="min"?"selected":""}>Minuti</option></select></label>
+      <label>${unitShort(e.unit)} min<input class="tin" id="a-${e.id}" type="number" min="1" inputmode="numeric" data-f="repMin" data-ex="${e.id}" value="${e.repMin}"></label>
+      <label>${unitShort(e.unit)} max<input class="tin" id="b-${e.id}" type="number" min="1" inputmode="numeric" data-f="repMax" data-ex="${e.id}" value="${e.repMax}"></label>
       <label>Kg di partenza<input class="tin" id="k-${e.id}" inputmode="decimal" data-f="kg" data-ex="${e.id}" value="${fmtKg(e.weights?.[0])}" placeholder="es. 40"></label>
       <label>Recupero (s)<input class="tin" id="r-${e.id}" type="number" min="0" step="15" inputmode="numeric" data-f="rest" data-ex="${e.id}" value="${e.rest}"></label>
     </div>
@@ -1077,7 +1304,7 @@ function renderHistoryList(){
   const list = sessions.map(s=>{
     const w = plan.workouts.find(w=>w.id===s.workoutId);
     const nSets = s.exercises.reduce((a,x)=>a+x.sets.length,0);
-    const vol = s.exercises.reduce((a,x)=>a+x.sets.reduce((b,y)=>b+(y.kg||0)*(x.unit==="s"?0:(y.reps||0)),0),0);
+    const vol = s.exercises.reduce((a,x)=>a+x.sets.reduce((b,y)=>b+(y.kg||0)*(noVol(x.unit)?0:(y.reps||0)),0),0);
     const date = new Date(s.date).toLocaleDateString("it-IT",{weekday:"short",day:"numeric",month:"short"});
     return `<div class="hcard" style="--pc:var(${PLATES[(w?.color??0)%4]})"><header><h3>${esc(s.workoutName)}</h3><time>${esc(date)}</time></header>
       <div class="stats"><span>${s.exercises.length} esercizi</span><span>${nSets} serie</span><span>${Math.round(vol).toLocaleString("it-IT")} kg volume</span>${s.minutes?`<span>${s.minutes} min</span>`:""}</div>
@@ -1353,7 +1580,7 @@ function renderBody(){
   const cols = METRICS.filter(m=>body.entries.some(e=>e[m.k]!=null));
   const total = sessions.length, wk = weekGym(), planned = plan.workouts.filter(w=>w.day>=0).length;
   const mins = sessions.slice(0,10);
-  const vol30 = sessions.filter(s=>s.date>Date.now()-30*864e5).reduce((a,s)=>a+s.exercises.reduce((b,x)=>b+x.sets.reduce((c,y)=>c+(y.kg||0)*(x.unit==="s"?0:(y.reps||0)),0),0),0);
+  const vol30 = sessions.filter(s=>s.date>Date.now()-30*864e5).reduce((a,s)=>a+s.exercises.reduce((b,x)=>b+x.sets.reduce((c,y)=>c+(y.kg||0)*(noVol(x.unit)?0:(y.reps||0)),0),0),0);
   const L = (k)=>{ const x=latest(k); return x?num1(x.v):"–"; };
   $("#body").innerHTML = `
     <a class="back" href="#home">‹ Home</a>
@@ -1521,7 +1748,7 @@ function renderCal(){
   }
   const ev = dayEvents(calSel);
   const items = [];
-  ev.ses.forEach(s=>{ const nS=s.exercises.reduce((a,x)=>a+x.sets.length,0), vol=s.exercises.reduce((a,x)=>a+x.sets.reduce((b,y)=>b+(y.kg||0)*(x.unit==="s"?0:(y.reps||0)),0),0);
+  ev.ses.forEach(s=>{ const nS=s.exercises.reduce((a,x)=>a+x.sets.length,0), vol=s.exercises.reduce((a,x)=>a+x.sets.reduce((b,y)=>b+(y.kg||0)*(noVol(x.unit)?0:(y.reps||0)),0),0);
     items.push(`<div class="day-item"><span class="ic">🏋️</span><div class="tx"><b>${esc(s.workoutName)} · completato</b><small>${s.exercises.length} esercizi · ${nS} serie · ${r0(vol)} kg volume</small></div></div>`); });
   if(ev.planned) items.push(`<div class="day-item"><span class="ic">🗓️</span><div class="tx"><b>${esc(ev.planned.name)} · in programma</b><small>${ev.planned.exercises.length} esercizi${ev.planned.subtitle?" · "+esc(ev.planned.subtitle):""}</small></div><button class="btn" data-gow="${ev.planned.id}">Apri</button></div>`);
   ev.meas.forEach(e=>items.push(`<div class="day-item"><span class="ic">📏</span><div class="tx"><b>Misurazione</b><small>${METRICS.filter(mm=>e[mm.k]!=null).map(mm=>`${mm.l} ${num1(e[mm.k])} ${mm.u}`).join(" · ")}</small></div><a class="btn" href="#body" style="text-decoration:none">My Body</a></div>`));
