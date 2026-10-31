@@ -641,6 +641,27 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .setctl button:disabled{opacity:.35}
 .setctl span{min-width:76px;text-align:center;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
 .setctl b{font-family:var(--mono);font-size:1.05rem;color:var(--fg);letter-spacing:0}
+.srow .in[readonly]{cursor:pointer;caret-color:transparent}
+.srow .in[readonly]:active{transform:scale(.97)}
+/* selettore kg / ripetizioni */
+#picker .panel{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#picker h2 .pk-of{font-family:var(--body);font-weight:500;font-size:.9rem;color:var(--muted);text-transform:none}
+.pk-sec{border:1.5px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px;background:var(--surface)}
+.pk-sec.on{border-color:var(--accent)}
+.pk-l{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--muted);margin-bottom:8px;text-align:center}
+.pk-row{display:grid;grid-template-columns:64px 1fr 64px;gap:8px;align-items:center}
+.pk-row button{height:60px;border-radius:14px;border:1.5px solid var(--line);background:var(--sunk);color:var(--fg);font-size:1.8rem;font-weight:700;line-height:1;transition:transform .1s}
+.pk-row button:active{transform:scale(.92)}
+.pk-val{display:block;width:100%;min-width:0;height:60px;border:0;background:transparent;text-align:center;font:700 2.3rem/60px var(--mono);font-variant-numeric:tabular-nums;color:var(--fg);padding:0}
+input.pk-val{border-radius:12px}
+input.pk-val:focus{outline:none;background:var(--bg)}
+.pk-chips{display:flex;gap:6px;margin-top:10px;justify-content:center;flex-wrap:wrap}
+.pk-chips.grid{display:grid;grid-template-columns:repeat(6,1fr)}
+.pk-chips button{min-height:42px;padding:0 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);font:600 .95rem var(--mono);transition:transform .1s}
+.pk-chips button.tgt{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.pk-chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pk-chips button:active{transform:scale(.94)}
+.pk-btns{display:grid;grid-template-columns:1fr 1.6fr;gap:8px;margin-top:6px}
 /* riga serie selezionata e pannello -/+ */
 .srow .sn{border:0;padding:0;cursor:pointer}
 .srow.act:not(.done){background:color-mix(in srgb,var(--accent) 9%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 55%,transparent)}
@@ -760,7 +781,7 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 2.1</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 2.2</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -1646,36 +1667,66 @@ function renderSheetCards(){
       ${ms.length?`<span class="sc-tags">${ms.slice(0,5).map(k=>`<span class="tag">${MUSCLES[k]}</span>`).join("")}${ms.length>5?`<span class="tag">+${ms.length-5}</span>`:""}</span>`:""}
     </button>`; }).join("")}</div>`;
 }
-/* pannello serie: -/+ grandi per kg e ripetizioni della serie selezionata */
-const padRow = {};
-function padIdx(w,e){ const d=draftFor(w,e); let k=padRow[e.id]; if(k==null||k>=d.length){ k=d.findIndex(s=>!s.done); if(k<0) k=d.length-1; } return k; }
+/* selettore kg / ripetizioni: si apre toccando i campi della serie */
 function padVals(w,e,k){ const d=draftFor(w,e), s=d[k], last=lastFor(e);
   const pk = e.weights?.[k] ?? e.weights?.[e.weights.length-1] ?? last?.x.sets[k]?.kg ?? last?.x.sets.at(-1)?.kg ?? null, pr = last?.x.sets[k]?.reps ?? null;
   return {s, kg: s.kg ?? pk, reps: s.reps ?? pr ?? e.repMin, kgReal: s.kg!=null, repsReal: s.reps!=null}; }
-function padHTML(w,e){
-  const k=padIdx(w,e), v=padVals(w,e,k), u=unitShort(e.unit);
-  return `<div class="spad" data-pad="${e.id}"><p class="spad-t">Serie <b>${k+1}</b> di ${e.sets}${v.s.done?' · <span class="ok">fatta</span>':""}<small>tocca il numero di una serie per sceglierla</small></p>
-    <div class="spad-g">
-      ${e.unit!=="min"?`<div class="spad-c"><span>Kg</span><div class="spad-s"><button type="button" data-padf="kg" data-d="-1" data-ex="${e.id}" aria-label="Meno 2,5 kg">−</button><output class="${v.kgReal?"":"ph"}">${v.kg!=null?fmtKg(v.kg):"–"}</output><button type="button" data-padf="kg" data-d="1" data-ex="${e.id}" aria-label="Più 2,5 kg">+</button></div></div>`:""}
-      <div class="spad-c"><span>${u}</span><div class="spad-s"><button type="button" data-padf="reps" data-d="-1" data-ex="${e.id}" aria-label="Meno uno">−</button><output class="${v.repsReal?"":"ph"}">${v.reps}</output><button type="button" data-padf="reps" data-d="1" data-ex="${e.id}" aria-label="Più uno">+</button></div></div>
-    </div></div>`;
+let pk = null;
+const REP_CHIPS = {reps:[4,5,6,7,8,9,10,11,12,13,14,15], s:[10,15,20,30,40,45,60,75,90,120], min:[5,10,15,20,25,30,40,45,60]};
+function closePicker(){ $("#picker")?.remove(); pk=null; }
+function openPicker(eid,k,f){
+  const w=W(); const e=w&&w.exercises.find(x=>x.id===eid); if(!e) return;
+  const v=padVals(w,e,k); pk={eid,k,f,kg:v.kg,reps:v.reps}; drawPicker(true);
 }
-function padRefresh(w,e){ const card=document.querySelector(`[data-card="${e.id}"]`); if(!card) return; const k=padIdx(w,e);
-  card.querySelectorAll(".srow[data-row]").forEach(r=>r.classList.toggle("act", Number(r.dataset.row)===k));
-  const old=card.querySelector(".spad"); if(old) old.outerHTML=padHTML(w,e); }
+function drawPicker(first){
+  const w=W(), e=w&&w.exercises.find(x=>x.id===pk.eid); if(!e){ closePicker(); return; }
+  const d=draftFor(w,e), s=d[pk.k], u=e.unit, step=u==="s"?5:1, mk=unitMark(u);
+  const base = pk.kg ?? 0, kgChips=[base-5,base-2.5,base,base+2.5,base+5].filter(x=>x>=0);
+  const repChips = REP_CHIPS[u]||REP_CHIPS.reps;
+  let el=$("#picker");
+  if(!el){ el=document.createElement("div"); el.className="sheet"; el.id="picker"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.appendChild(document.createElement("div")).className="panel"; document.body.appendChild(el); }
+  el.setAttribute("aria-label",`Serie ${pk.k+1}: kg e ${unitShort(u).toLowerCase()}`);
+  el.querySelector(".panel").innerHTML=`<div class="grab"></div>
+    <div class="sh-top"><h2>Serie ${pk.k+1} <small class="pk-of">di ${e.sets}</small></h2><button class="btn" data-pkx aria-label="Chiudi">✕</button></div>
+    <p class="set-note" style="margin:-4px 0 12px">${esc(e.name)} · obiettivo ${repLabel(e)}</p>
+    ${u!=="min"?`<div class="pk-sec ${pk.f==="kg"?"on":""}"><span class="pk-l">Kg</span>
+      <div class="pk-row"><button type="button" data-pkd="kg" data-d="-1" aria-label="Meno 2,5 kg">−</button><input class="pk-val" id="pk-kg" inputmode="decimal" value="${pk.kg!=null?fmtKg(pk.kg):""}" placeholder="–" aria-label="Kg"><button type="button" data-pkd="kg" data-d="1" aria-label="Più 2,5 kg">+</button></div>
+      <div class="pk-chips">${kgChips.map(x=>`<button type="button" data-pkv="kg" data-v="${x}" aria-pressed="${pk.kg===x}">${fmtKg(x)}</button>`).join("")}</div></div>`:""}
+    <div class="pk-sec ${pk.f==="reps"?"on":""}"><span class="pk-l">${unitWord(u)}</span>
+      <div class="pk-row"><button type="button" data-pkd="reps" data-d="-1" aria-label="Meno ${step}">−</button><output class="pk-val">${pk.reps??"–"}${mk}</output><button type="button" data-pkd="reps" data-d="1" aria-label="Più ${step}">+</button></div>
+      <div class="pk-chips grid">${repChips.map(x=>`<button type="button" data-pkv="reps" data-v="${x}" aria-pressed="${pk.reps===x}" class="${x>=e.repMin&&x<=e.repMax?"tgt":""}">${x}${mk}</button>`).join("")}</div></div>
+    <div class="pk-btns"><button class="btn big" data-pksave>Salva</button><button class="btn primary big pk-done" data-pkdone>${s.done?"Salva":"✓ Salva e segna fatta"}</button></div>`;
+  if(first){ const f=el.querySelector(".pk-sec.on"); f?.scrollIntoView({block:"nearest"}); el.querySelector("[data-pkx]").focus(); }
+}
+function pickerCommit(markDone){
+  const w=W(), e=w&&w.exercises.find(x=>x.id===pk.eid); if(!e) return closePicker();
+  const k=pk.k, s=draftFor(w,e)[k]; s.kg=pk.kg; s.reps=pk.reps; saveDrafts();
+  const card=document.querySelector(`[data-card="${e.id}"]`);
+  if(card){ const ik=card.querySelector(`[data-kg="${k}"]`), ir=card.querySelector(`[data-reps="${k}"]`); if(ik) ik.value=fmtKg(s.kg); if(ir) ir.value=s.reps??""; }
+  closePicker();
+  if(markDone && !s.done) card?.querySelector(`[data-tick="${k}"]`)?.click();
+}
 document.addEventListener("click", ev=>{
-  const b=ev.target.closest("button"); if(!b) return; const w=W(); if(!w || view!=="workout" || editing) return;
-  if(b.dataset.act!=null){ const e=w.exercises.find(x=>x.id===b.dataset.ex); if(!e) return; padRow[e.id]=Number(b.dataset.act); padRefresh(w,e); return; }
-  if(b.dataset.padf){ const e=w.exercises.find(x=>x.id===b.dataset.ex); if(!e) return; const k=padIdx(w,e), v=padVals(w,e,k), dd=Number(b.dataset.d), card=b.closest(".card");
-    if(b.dataset.padf==="kg"){ v.s.kg=Math.max(0,Math.round(((v.kg??0)+dd*2.5)*4)/4); const inp=card.querySelector(`[data-kg="${k}"]`); if(inp) inp.value=fmtKg(v.s.kg); }
-    else { const step=e.unit==="s"?5:1; v.s.reps=Math.max(0,(Number(v.reps)||0)+dd*step); const inp=card.querySelector(`[data-reps="${k}"]`); if(inp) inp.value=v.s.reps; }
-    saveDrafts(); padRefresh(w,e); return; }
-  if(b.dataset.tick!=null){ const e=w.exercises.find(x=>x.id===b.dataset.ex); if(!e) return; setTimeout(()=>{ const d=draftFor(w,e); const nx=d.findIndex(s=>!s.done); padRow[e.id]= nx<0 ? Number(b.dataset.tick) : nx; padRefresh(w,e); },0); }
+  const t=ev.target;
+  const inp=t.closest?.(".srow .in");
+  if(inp && view==="workout" && !editing){ ev.preventDefault(); openPicker(inp.dataset.ex, Number(inp.dataset.kg ?? inp.dataset.reps), inp.dataset.kg!=null?"kg":"reps"); return; }
+  const sn=t.closest?.(".srow .sn[data-act]");
+  if(sn && view==="workout" && !editing){ openPicker(sn.dataset.ex, Number(sn.dataset.act), "kg"); return; }
+  const el=$("#picker"); if(!el || !el.contains(t) || !pk) return;
+  if(t===el || t.closest("[data-pkx]")){ closePicker(); return; }
+  const b=t.closest("button"); if(!b) return;
+  const w=W(), e=w&&w.exercises.find(x=>x.id===pk.eid); if(!e) return;
+  if(b.dataset.pkd){ const dd=Number(b.dataset.d);
+    if(b.dataset.pkd==="kg") pk.kg=Math.max(0,Math.round(((pk.kg??0)+dd*2.5)*4)/4);
+    else pk.reps=Math.max(0,(Number(pk.reps)||0)+dd*(e.unit==="s"?5:1));
+    pk.f=b.dataset.pkd; drawPicker(); return; }
+  if(b.dataset.pkv){ pk[b.dataset.pkv]=Number(b.dataset.v); pk.f=b.dataset.pkv; drawPicker(); return; }
+  if(b.hasAttribute("data-pksave")){ pickerCommit(false); return; }
+  if(b.hasAttribute("data-pkdone")){ pickerCommit(true); return; }
 });
-document.addEventListener("focusin", ev=>{ const t=ev.target; if(!t.dataset || (t.dataset.kg==null && t.dataset.reps==null)) return; const w=W(); if(!w) return;
-  const e=w.exercises.find(x=>x.id===t.dataset.ex); if(!e) return; const k=Number(t.dataset.kg ?? t.dataset.reps); if(padRow[e.id]!==k){ padRow[e.id]=k; padRefresh(w,e); } });
-document.addEventListener("input", ev=>{ const t=ev.target; if(!t.dataset || (t.dataset.kg==null && t.dataset.reps==null)) return; const w=W(); if(!w) return;
-  const e=w.exercises.find(x=>x.id===t.dataset.ex); if(!e) return; const card=t.closest(".card"), o=card?.querySelectorAll(".spad output"); if(!o) return; setTimeout(()=>padRefresh(w,e),0); });
+document.addEventListener("input", ev=>{ if(ev.target.id!=="pk-kg" || !pk) return; const n=parseNum(ev.target.value); pk.kg = n==null||n<0 ? null : Math.min(500,n); pk.f="kg";
+  $("#picker").querySelectorAll('[data-pkv="kg"]').forEach(x=>x.setAttribute("aria-pressed", Number(x.dataset.v)===pk.kg)); });
+document.addEventListener("keydown", ev=>{ if(!$("#picker")) return; if(ev.key==="Escape") closePicker(); if(ev.key==="Enter" && ev.target.id==="pk-kg") pickerCommit(false); });
 
 function renderCard(w,e,i){
   const d = draftFor(w,e);
@@ -1686,9 +1737,9 @@ function renderCard(w,e,i){
   d.forEach((s,k)=>{
     const prevKg = e.weights?.[k] ?? e.weights?.[e.weights.length-1] ?? "";
     const prevReps = last?.x.sets[k]?.reps;
-    rows += `<div class="srow ${s.done?"done":""} ${k===padIdx(w,e)?"act":""}" data-row="${k}"><button type="button" class="sn" data-act="${k}" data-ex="${e.id}" aria-label="Seleziona serie ${k+1}">${k+1}</button>
-      <input class="in" inputmode="decimal" id="kg-${e.id}-${k}" data-kg="${k}" data-ex="${e.id}" value="${fmtKg(s.kg)}" placeholder="${fmtKg(prevKg)||'kg'}" aria-label="Kg serie ${k+1}">
-      <input class="in" inputmode="numeric" id="rp-${e.id}-${k}" data-reps="${k}" data-ex="${e.id}" value="${s.reps??""}" placeholder="${prevReps??repLabel(e)}" aria-label="${unit} serie ${k+1}">
+    rows += `<div class="srow ${s.done?"done":""}" data-row="${k}"><button type="button" class="sn" data-act="${k}" data-ex="${e.id}" aria-label="Seleziona serie ${k+1}">${k+1}</button>
+      <input class="in" readonly inputmode="none" id="kg-${e.id}-${k}" data-kg="${k}" data-ex="${e.id}" value="${fmtKg(s.kg)}" placeholder="${fmtKg(prevKg)||'kg'}" aria-label="Kg serie ${k+1}">
+      <input class="in" readonly inputmode="none" id="rp-${e.id}-${k}" data-reps="${k}" data-ex="${e.id}" value="${s.reps??""}" placeholder="${prevReps??repLabel(e)}" aria-label="${unit} serie ${k+1}">
       <button class="tick" data-tick="${k}" data-ex="${e.id}" aria-pressed="${!!s.done}" aria-label="Serie ${k+1} completata"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>`;
   });
   const lid = libOf(e), L = LIBX[lid], nn = String(i+1).padStart(2,"0");
@@ -1702,7 +1753,6 @@ function renderCard(w,e,i){
     </div>
     ${last?`<div class="last"><span>Ultima volta</span><b>${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</b></div>`:""}
     <div class="sets" role="group" aria-label="Serie di ${esc(e.name)}">${rows}</div>
-    ${padHTML(w,e)}
     <div class="setctl"><button type="button" data-setd="-1" data-ex="${e.id}" ${e.sets<=1?"disabled":""} aria-label="Togli una serie">−</button><span><b>${e.sets}</b> ${e.sets===1?"serie":"serie"}</span><button type="button" data-setd="1" data-ex="${e.id}" ${e.sets>=10?"disabled":""} aria-label="Aggiungi una serie">+</button></div>
     <div class="rest-line"><div class="rl-l"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><output>${fmtT(e.rest)}</output><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div></div>
     <button class="btn btn-timer" data-start="${e.id}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Avvia timer</button></div>
@@ -2458,7 +2508,7 @@ $("#set-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDe
 const TABS = ["home","cal","food","set"];
 let lastSec = null;
 function route(){
-  closeWMenu(); closeInfo();
+  closeWMenu(); closeInfo(); closePicker();
   const h = location.hash.slice(1);
   const sec = ["gym","body","cal","food","set"].includes(h) ? h : "home";
   ["home","gym","body","cal","food","set"].forEach(id=>$("#"+id).hidden = id!==sec);
