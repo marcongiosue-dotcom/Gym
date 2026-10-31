@@ -662,6 +662,15 @@ input.pk-val:focus{outline:none;background:var(--bg)}
 .pk-chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .pk-chips button:active{transform:scale(.94)}
 .pk-btns{display:grid;grid-template-columns:1fr 1.6fr;gap:8px;margin-top:6px}
+.rest-val{min-width:4.4em;height:40px;border:0;background:transparent;color:var(--fg);font:700 1rem var(--mono);font-variant-numeric:tabular-nums;text-decoration:underline dotted color-mix(in srgb,var(--fg) 40%,transparent);text-underline-offset:4px;cursor:pointer}
+.rest-val:active{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+#rpick .panel{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#rpick .pk-row button{font-size:1.1rem}
+.rp-type{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-top:12px}
+.rp-type label{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--muted)}
+.rp-type .tin{width:84px;height:52px;text-align:center;font:700 1.5rem var(--mono);letter-spacing:0;color:var(--fg)}
+.rp-type>span{font:700 1.6rem/52px var(--mono);color:var(--muted)}
+.pk-chips.grid5{display:grid;grid-template-columns:repeat(5,1fr)}
 /* riga serie selezionata e pannello -/+ */
 .srow .sn{border:0;padding:0;cursor:pointer}
 .srow.act:not(.done){background:color-mix(in srgb,var(--accent) 9%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 55%,transparent)}
@@ -781,7 +790,7 @@ input.pk-val:focus{outline:none;background:var(--bg)}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 2.2</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 2.3</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -1728,6 +1737,49 @@ document.addEventListener("input", ev=>{ if(ev.target.id!=="pk-kg" || !pk) retur
   $("#picker").querySelectorAll('[data-pkv="kg"]').forEach(x=>x.setAttribute("aria-pressed", Number(x.dataset.v)===pk.kg)); });
 document.addEventListener("keydown", ev=>{ if(!$("#picker")) return; if(ev.key==="Escape") closePicker(); if(ev.key==="Enter" && ev.target.id==="pk-kg") pickerCommit(false); });
 
+/* selettore del recupero: minuti e secondi */
+let rp = null;
+const REST_CHIPS = [30,45,60,75,90,120,150,180,240,300];
+function closeRestPick(){ $("#rpick")?.remove(); rp=null; }
+function openRestPick(eid){ const w=W(), e=w&&w.exercises.find(x=>x.id===eid); if(!e) return; rp={eid, v:e.rest}; drawRestPick(); $("#rpick [data-rpx]").focus(); }
+function drawRestPick(keepInputs){
+  const w=W(), e=w&&w.exercises.find(x=>x.id===rp.eid); if(!e) return closeRestPick();
+  let el=$("#rpick");
+  if(!el){ el=document.createElement("div"); el.className="sheet"; el.id="rpick"; el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); el.setAttribute("aria-label","Recupero"); el.appendChild(document.createElement("div")).className="panel"; document.body.appendChild(el); }
+  const m=Math.floor(rp.v/60), sec=rp.v%60;
+  if(keepInputs){ el.querySelector(".pk-big").textContent=fmtT(rp.v); el.querySelectorAll("[data-rpv]").forEach(x=>x.setAttribute("aria-pressed",Number(x.dataset.rpv)===rp.v)); return; }
+  el.querySelector(".panel").innerHTML=`<div class="grab"></div>
+    <div class="sh-top"><h2>Recupero</h2><button class="btn" data-rpx aria-label="Chiudi">✕</button></div>
+    <p class="set-note" style="margin:-4px 0 12px">${esc(e.name)} · pausa tra una serie e l'altra</p>
+    <div class="pk-sec on">
+      <div class="pk-row"><button type="button" data-rpd="-15" aria-label="Meno 15 secondi">−15</button><output class="pk-val pk-big">${fmtT(rp.v)}</output><button type="button" data-rpd="15" aria-label="Più 15 secondi">+15</button></div>
+      <div class="rp-type"><label>Minuti<input class="tin" id="rp-m" inputmode="numeric" maxlength="2" value="${m}"></label><span>:</span><label>Secondi<input class="tin" id="rp-s" inputmode="numeric" maxlength="2" value="${String(sec).padStart(2,"0")}"></label></div>
+      <div class="pk-chips grid5">${REST_CHIPS.map(x=>`<button type="button" data-rpv="${x}" aria-pressed="${rp.v===x}">${x<60?x+" s":fmtT(x)}</button>`).join("")}</div>
+    </div>
+    <div class="pk-btns"><button class="btn big" data-rpsave>Salva</button><button class="btn primary big" data-rpstart>▶ Salva e avvia timer</button></div>`;
+}
+function syncRestInputs(){ const m=$("#rp-m"), s=$("#rp-s"); if(m) m.value=Math.floor(rp.v/60); if(s) s.value=String(rp.v%60).padStart(2,"0"); }
+function commitRest(start){
+  const w=W(), e=w&&w.exercises.find(x=>x.id===rp.eid); if(!e) return closeRestPick();
+  e.rest=Math.max(0,Math.min(1800,rp.v)); savePlan(); closeRestPick(); render();
+  if(start){ startTimer(e.rest,e.name,"Recupero"); openFull(); } else toast("Recupero "+fmtT(e.rest));
+}
+document.addEventListener("click", ev=>{
+  const t=ev.target, op=t.closest?.("[data-restpick]");
+  if(op){ openRestPick(op.dataset.restpick); return; }
+  const el=$("#rpick"); if(!el || !el.contains(t) || !rp) return;
+  if(t===el || t.closest("[data-rpx]")){ closeRestPick(); return; }
+  const b=t.closest("button"); if(!b) return;
+  if(b.dataset.rpd){ rp.v=Math.max(0,Math.min(1800,rp.v+Number(b.dataset.rpd))); syncRestInputs(); drawRestPick(true); return; }
+  if(b.dataset.rpv){ rp.v=Number(b.dataset.rpv); syncRestInputs(); drawRestPick(true); return; }
+  if(b.hasAttribute("data-rpsave")){ commitRest(false); return; }
+  if(b.hasAttribute("data-rpstart")){ commitRest(true); return; }
+});
+document.addEventListener("input", ev=>{ if(!rp || (ev.target.id!=="rp-m" && ev.target.id!=="rp-s")) return;
+  const m=Math.max(0,Math.min(30,parseInt($("#rp-m").value,10)||0)), s=Math.max(0,Math.min(59,parseInt($("#rp-s").value,10)||0)); rp.v=m*60+s; drawRestPick(true); });
+document.addEventListener("focusin", ev=>{ if(ev.target.id==="rp-m"||ev.target.id==="rp-s") ev.target.select(); });
+document.addEventListener("keydown", ev=>{ if(!$("#rpick")) return; if(ev.key==="Escape") closeRestPick(); if(ev.key==="Enter" && (ev.target.id==="rp-m"||ev.target.id==="rp-s")) commitRest(false); });
+
 function renderCard(w,e,i){
   const d = draftFor(w,e);
   const last = lastFor(e);
@@ -1754,7 +1806,7 @@ function renderCard(w,e,i){
     ${last?`<div class="last"><span>Ultima volta</span><b>${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</b></div>`:""}
     <div class="sets" role="group" aria-label="Serie di ${esc(e.name)}">${rows}</div>
     <div class="setctl"><button type="button" data-setd="-1" data-ex="${e.id}" ${e.sets<=1?"disabled":""} aria-label="Togli una serie">−</button><span><b>${e.sets}</b> ${e.sets===1?"serie":"serie"}</span><button type="button" data-setd="1" data-ex="${e.id}" ${e.sets>=10?"disabled":""} aria-label="Aggiungi una serie">+</button></div>
-    <div class="rest-line"><div class="rl-l"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><output>${fmtT(e.rest)}</output><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div></div>
+    <div class="rest-line"><div class="rl-l"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><button type="button" class="rest-val" data-restpick="${e.id}" aria-label="Recupero ${fmtT(e.rest)}: tocca per scegliere">${fmtT(e.rest)}</button><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div></div>
     <button class="btn btn-timer" data-start="${e.id}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Avvia timer</button></div>
   </article>`;
 }
@@ -1914,7 +1966,7 @@ document.addEventListener("click", ev=>{
   if(b.hasAttribute("data-addex")){ const e=ex("Nuovo esercizio","",3,8,12,90); w.exercises.push(e); savePlan(); render(); document.getElementById("n-"+e.id)?.select(); return; }
   if(b.dataset.mv){ const i=w.exercises.findIndex(e=>e.id===b.dataset.ex), j=i+Number(b.dataset.mv); [w.exercises[i],w.exercises[j]]=[w.exercises[j],w.exercises[i]]; savePlan(); render(); return; }
   if(b.dataset.delex){ armButton(b,()=>{ w.exercises=w.exercises.filter(e=>e.id!==b.dataset.delex); savePlan(); render(); }); return; }
-  if(b.dataset.rest){ const e=w.exercises.find(e=>e.id===b.dataset.ex); e.rest=Math.max(0,e.rest+Number(b.dataset.rest)); savePlan(); b.parentElement.querySelector("output").textContent=fmtT(e.rest); b.closest(".card").querySelector(".meta .tag:nth-child(2)").textContent="rec "+fmtT(e.rest); return; }
+  if(b.dataset.rest){ const e=w.exercises.find(e=>e.id===b.dataset.ex); e.rest=Math.max(0,e.rest+Number(b.dataset.rest)); savePlan(); b.parentElement.querySelector(".rest-val").textContent=fmtT(e.rest); b.closest(".card").querySelector(".meta .tag:nth-child(2)").textContent="rec "+fmtT(e.rest); return; }
   if(b.dataset.setd){ const e=w.exercises.find(e=>e.id===b.dataset.ex); if(!e) return; const n=Math.min(10,Math.max(1,e.sets+Number(b.dataset.setd))); if(n===e.sets) return;
     e.sets=n; if(e.weights?.length){ const wt=e.weights; e.weights=Array.from({length:n},(_,k)=>wt[k]??wt[wt.length-1]); }
     draftFor(w,e); saveDrafts(); savePlan(); render(); toast(Number(b.dataset.setd)>0?"Serie aggiunta":"Serie tolta"); return; }
@@ -2508,7 +2560,7 @@ $("#set-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDe
 const TABS = ["home","cal","food","set"];
 let lastSec = null;
 function route(){
-  closeWMenu(); closeInfo(); closePicker();
+  closeWMenu(); closeInfo(); closePicker(); closeRestPick();
   const h = location.hash.slice(1);
   const sec = ["gym","body","cal","food","set"].includes(h) ? h : "home";
   ["home","gym","body","cal","food","set"].forEach(id=>$("#"+id).hidden = id!==sec);
