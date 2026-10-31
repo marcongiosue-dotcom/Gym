@@ -719,6 +719,21 @@ input.pk-val:focus{outline:none;background:var(--bg)}
 .v-enter{animation:viewIn .24s var(--ease)}
 @keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){.v-enter,.srow.just,.srow.just .tick{animation:none}.btn,.chip,.timer,.srow,.tick{transition:none}}
+/* My Body: profilo compilabile e riquadri toccabili */
+button.stat{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+button.stat:active{transform:scale(.98)}
+.stat em.add{color:var(--accent);font-family:var(--body);font-weight:600}
+.prof-cta{display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;padding:14px 16px;border:0;border-radius:var(--r);background:var(--accent);color:var(--accent-ink);font:inherit;text-align:left;cursor:pointer}
+.prof-cta b{display:block;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.3rem;line-height:1.05}
+.prof-cta small{opacity:.85;font-size:.85rem}
+.prof-cta .arr{margin-left:auto;font-size:1.5rem}
+.prof-sum{display:flex;flex-wrap:wrap;gap:6px}
+.prof-sum .tag{font-size:.8rem}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 6px;font:inherit;font-size:.88rem;font-weight:600;color:var(--fg);cursor:pointer;text-transform:none;letter-spacing:0}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.kcal-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.kcal-row b{font-family:var(--mono);font-size:1.1rem}
 </style>
 
 </head>
@@ -2111,7 +2126,19 @@ const saveHome = ()=>LS.set("mypt.home", homePrefs);
 /* body data: {height, entries:[{id,date:"YYYY-MM-DD",weight,fat,waist,chest,hips,arm,thigh}]} newest first */
 let body = Object.assign({height:null, entries:[]}, LS.get("mypt.body")||{});
 const saveBody = ()=>LS.set("mypt.body", body);
-let bodyForm = false, bodyMore = false;
+let bodyForm = false, bodyMore = false, profForm = false, profDraft = null;
+const BACT = [{k:"sed",l:"Sedentario",f:1.2},{k:"light",l:"Leggero",f:1.375},{k:"mod",l:"Moderato",f:1.55},{k:"high",l:"Intenso",f:1.725}];
+const BGOALS = [{k:"cut",l:"Dimagrire",d:-400},{k:"keep",l:"Mantenere",d:0},{k:"bulk",l:"Massa",d:300}];
+const prof = ()=> body.profile ??= {};
+function ageOf(){ const y=prof().birth; if(!y) return null; return new Date().getFullYear()-y; }
+function energy(){
+  const P=prof(), w=latest("weight"), a=ageOf();
+  if(!P.sex||!w||!body.height||!a) return null;
+  const bmr = 10*w.v + 6.25*body.height - 5*a + (P.sex==="M"?5:-161);
+  const act = BACT.find(x=>x.k===P.activity)||BACT[1];
+  const tdee = bmr*act.f, goal = BGOALS.find(x=>x.k===P.goal)||BGOALS[1];
+  return {bmr, tdee, target: Math.round((tdee+goal.d)/10)*10, goal};
+}
 const METRICS = [
   {k:"weight", l:"Peso", u:"kg", good:-1},
   {k:"fat", l:"Grasso", u:"%", good:-1},
@@ -2178,6 +2205,36 @@ function renderHome(){
     <div class="sports">${list.length?list.map(tile).join(""):`<div class="empty" style="grid-column:1/-1">${homePrefs.filter==="Preferiti"?"Nessun preferito: tocca la ☆ su uno sport per aggiungerlo.":"Nessuno sport con questo filtro."}</div>`}</div>`;
 }
 
+function tapStat(k,l,u){
+  const x=latest(k), m=METRICS.find(m=>m.k===k);
+  return `<button class="stat" type="button" data-bopen="${k}" aria-label="${l}: tocca per inserire"><span>${l}</span><b>${x?num1(x.v):"–"}<small style="font-size:.7rem"> ${u}</small></b>${x?delta(m):`<em class="add">+ inserisci</em>`}</button>`;
+}
+function renderProfile(){
+  const P=prof(), done = P.sex && P.birth && body.height;
+  if(profForm){
+    const D=profDraft, yr=new Date().getFullYear();
+    const seg=(key,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button type="button" data-pset="${key}" data-pval="${o.k}" aria-pressed="${D[key]===o.k}">${o.l}</button>`).join("")}</div>`;
+    return `<div class="card" style="margin-top:16px"><h3 style="margin:0 0 10px;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.3rem">Il tuo profilo</h3>
+      <div class="edit-grid" style="margin-top:0">
+        <label class="full">Sesso${seg("sex",[{k:"M",l:"Uomo"},{k:"F",l:"Donna"}])}</label>
+        <label>Anno di nascita<input class="tin" id="p-birth" inputmode="numeric" maxlength="4" value="${D.birth??""}" placeholder="es. 1995"></label>
+        <label>Altezza (cm)<input class="tin" id="p-height" inputmode="decimal" value="${D.height??""}" placeholder="es. 178"></label>
+        <label>Peso attuale (kg)<input class="tin" id="p-weight" inputmode="decimal" placeholder="${latest("weight")?num1(latest("weight").v):"es. 75"}"></label>
+        <label>Grasso (%)<input class="tin" id="p-fat" inputmode="decimal" placeholder="${latest("fat")?num1(latest("fat").v):"facoltativo"}"></label>
+        <label class="full">Quanto ti muovi durante la settimana?${seg("activity",BACT)}</label>
+        <label class="full">Obiettivo${seg("goal",BGOALS)}</label>
+      </div>
+      <div class="edit-actions"><button class="btn" type="button" data-pform>Annulla</button><span class="sp"></span><button class="btn primary" type="button" data-psave>Salva profilo</button></div>
+      <p class="set-note">Servono per calcolare BMI e calorie giornaliere. Restano solo sul tuo telefono.</p></div>`;
+  }
+  if(!done) return `<button class="prof-cta" type="button" data-pform><span><b>Compila il tuo profilo</b><small>Sesso, età, altezza, peso e obiettivo: 1 minuto</small></span><span class="arr" aria-hidden="true">›</span></button>`;
+  const E=energy(), act=BACT.find(x=>x.k===P.activity), g=BGOALS.find(x=>x.k===P.goal);
+  return `<div class="sec-title"><h2>Profilo</h2><button class="btn" type="button" data-pform>Modifica</button></div>
+    <div class="card"><div class="prof-sum"><span class="tag">${P.sex==="M"?"Uomo":"Donna"}</span><span class="tag">${ageOf()} anni</span><span class="tag">${num1(body.height)} cm</span>${act?`<span class="tag">${act.l}</span>`:""}${g?`<span class="tag">${g.l}</span>`:""}</div>
+    ${E?`<div class="kcal-row"><div><span class="kicker" style="margin:0;display:block">Calorie al giorno</span><b>${r0(E.target)} kcal</b><small style="display:block;color:var(--muted);font-size:.78rem">Metabolismo basale ${r0(E.bmr)} · consumo stimato ${r0(E.tdee)}</small></div>
+      ${food.targets.kcal===E.target?`<span class="set-note" style="margin:0">✓ Obiettivo Cibo</span>`:`<button class="btn" type="button" data-usekcal="${E.target}">Usa in Cibo</button>`}</div>`
+      :`<p class="set-note">Inserisci il peso per calcolare le calorie giornaliere.</p>`}</div>`;
+}
 function renderBody(){
   const b = bmi();
   const bmiLbl = b==null?"":b<18.5?"sottopeso":b<25?"normopeso":b<30?"sovrappeso":"obesità";
@@ -2192,19 +2249,21 @@ function renderBody(){
     <p class="kicker">Riepilogo</p><h1>My Body</h1>
     <p style="margin:6px 0 0;color:var(--muted);font-size:.9rem">${body.entries.length?`Ultima misurazione: ${new Date(body.entries[0].date).toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric"})}`:"Nessuna misurazione ancora: aggiungi la prima qui sotto."}</p>
 
+    ${renderProfile()}
+
     <div class="sec-title"><h2>Composizione</h2></div>
     <div class="stat-row">
-      <div class="stat"><span>Peso</span><b>${L("weight")}<small style="font-size:.7rem"> kg</small></b>${delta(METRICS[0])}</div>
-      <div class="stat"><span>BMI</span><b>${b?num1(b):"–"}</b><em>${b?bmiLbl:(body.height?"":"serve l'altezza")}</em></div>
-      <div class="stat"><span>Grasso</span><b>${L("fat")}<small style="font-size:.7rem"> %</small></b>${delta(METRICS[1])}</div>
+      ${tapStat("weight","Peso","kg")}
+      <button class="stat" type="button" data-bopen="${body.height?"weight":"height"}"><span>BMI</span><b>${b?num1(b):"–"}</b><em class="${b?"":"add"}">${b?bmiLbl:(body.height?"+ inserisci il peso":"+ inserisci l'altezza")}</em></button>
+      ${tapStat("fat","Grasso","%")}
       <div class="stat"><span>Massa magra</span><b>${(latest("weight")&&latest("fat"))?num1(latest("weight").v*(1-latest("fat").v/100)):"–"}<small style="font-size:.7rem"> kg</small></b></div>
-      <div class="stat"><span>Altezza</span><b>${body.height?num1(body.height):"–"}<small style="font-size:.7rem"> cm</small></b></div>
+      <button class="stat" type="button" data-bopen="height"><span>Altezza</span><b>${body.height?num1(body.height):"–"}<small style="font-size:.7rem"> cm</small></b>${body.height?"":`<em class="add">+ inserisci</em>`}</button>
       <div class="stat"><span>Misurazioni</span><b>${body.entries.length}</b></div>
     </div>
 
     <details class="more" ${bodyMore?"open":""}><summary><span class="when-closed">Vedi altro ▾</span><span class="when-open">Vedi meno ▴</span></summary>
       <div class="sec-title"><h2>Circonferenze</h2></div>
-      <div class="stat-row">${METRICS.slice(2).map(m=>`<div class="stat"><span>${m.l}</span><b>${L(m.k)}<small style="font-size:.7rem"> cm</small></b>${delta(m)}</div>`).join("")}</div>
+      <div class="stat-row">${METRICS.slice(2).map(m=>tapStat(m.k,m.l,"cm")).join("")}</div>
       <div class="sec-title"><h2>Storico misure</h2></div>
       ${body.entries.length?`<div class="card tscroll"><table class="btable"><thead><tr><th>Data</th>${cols.map(m=>`<th>${m.l}</th>`).join("")}<th></th></tr></thead><tbody>
         ${body.entries.map(e=>`<tr><td>${new Date(e.date).toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"2-digit"})}</td>${cols.map(m=>`<td>${e[m.k]!=null?num1(e[m.k]):"–"}</td>`).join("")}<td><button class="x" data-bdel="${e.id}" aria-label="Elimina misurazione">✕</button></td></tr>`).join("")}
@@ -2242,6 +2301,19 @@ document.addEventListener("click", ev=>{
     if(!any){ saveBody(); renderBody(); toast(h?"Altezza salvata":"Inserisci almeno un valore"); return; }
     body.entries.push(e); body.entries.sort((a,b)=>b.date.localeCompare(a.date)); saveBody(); bodyForm=false; renderBody(); scrollTo(0,0); toast("Misurazione salvata"); return;
   }
+  if(b.hasAttribute("data-pform")){ profForm=!profForm; if(profForm){ const P=prof(); profDraft={sex:P.sex,birth:P.birth,height:body.height,activity:P.activity||"light",goal:P.goal||"keep"}; } renderBody(); if(profForm) $("#body .card")?.scrollIntoView({block:"start",behavior:"smooth"}); return; }
+  if(b.dataset.pset){ ["birth","height"].forEach(k=>{ const el=$("#p-"+k); if(el) profDraft[k]=el.value; }); profDraft[b.dataset.pset]=b.dataset.pval;
+    b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); return; }
+  if(b.hasAttribute("data-psave")){
+    const D=profDraft, yr=new Date().getFullYear(), by=parseNum($("#p-birth").value), h=parseNum($("#p-height").value), w=parseNum($("#p-weight").value), f=parseNum($("#p-fat").value);
+    if(!D.sex){ toast("Scegli Uomo o Donna"); return; }
+    if(!by||by<yr-100||by>yr-10){ toast("Scrivi l'anno di nascita, es. 1995"); $("#p-birth").focus(); return; }
+    if(!h||h<100||h>250){ toast("Scrivi l'altezza in cm, es. 178"); $("#p-height").focus(); return; }
+    Object.assign(prof(),{sex:D.sex,birth:Math.round(by),activity:D.activity,goal:D.goal}); body.height=h;
+    if((w&&w>20&&w<400)||(f&&f>2&&f<70)){ const t=TODAY(); let e=body.entries.find(e=>e.date===t); if(!e){ e={id:uid(),date:t}; body.entries.push(e); body.entries.sort((a,b)=>b.date.localeCompare(a.date)); } if(w&&w>20&&w<400) e.weight=w; if(f&&f>2&&f<70) e.fat=f; }
+    saveBody(); profForm=false; renderBody(); scrollTo(0,0); toast("Profilo salvato"); return; }
+  if(b.dataset.usekcal){ food.targets.kcal=Number(b.dataset.usekcal); saveFood(); renderBody(); toast("Obiettivo calorie aggiornato in Cibo"); return; }
+  if(b.dataset.bopen){ const k=b.dataset.bopen; bodyMore=!!$("#body details.more")?.open; bodyForm=true; renderBody(); const el=$("#b-"+k); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.focus({preventScroll:true}); } return; }
   if(b.dataset.bdel){ armButton(b,()=>{ bodyMore=true; body.entries=body.entries.filter(e=>e.id!==b.dataset.bdel); saveBody(); renderBody(); }); return; }
 });
 document.addEventListener("change", ev=>{
