@@ -615,6 +615,12 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .cfg-range{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
 .goal-card{margin-bottom:4px}
 .card>.cfg{padding:14px 0 2px}
+.setctl{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:-2px}
+.setctl button{width:44px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--sunk);color:var(--fg);font-size:1.35rem;font-weight:700;line-height:1;transition:transform .1s,background-color .15s}
+.setctl button:active:not(:disabled){transform:scale(.92)}
+.setctl button:disabled{opacity:.35}
+.setctl span{min-width:76px;text-align:center;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.setctl b{font-family:var(--mono);font-size:1.05rem;color:var(--fg);letter-spacing:0}
 .tabbar a{min-height:48px;justify-content:center}
 /* transizioni */
 .v-enter{animation:viewIn .24s var(--ease)}
@@ -691,7 +697,7 @@ body.timing .undo{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <button class="btn primary" type="button" data-shareapp style="width:100%">Invia l'app a un amico</button>
     <p class="set-note">Link per scaricarla: <span style="user-select:all;color:var(--fg);overflow-wrap:anywhere">marcongiosue-dotcom.github.io/Gym/scarica.html</span></p></div>
   <p class="set-note" style="margin-top:22px;text-align:center">Foto degli esercizi: free-exercise-db (pubblico dominio). Alcune foto mostrano la variante più simile.</p>
-  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.8</p>
+  <p class="set-note" style="margin-top:6px;text-align:center">MyPT · versione 1.9</p>
 </div>
 <div class="timer" id="timer" role="timer" aria-live="off">
   <div class="bar" id="tbar"></div>
@@ -1105,7 +1111,7 @@ function showInfo(id){
     <div class="info-grid">
       <div><span>Muscolo principale</span><b>${MUSCLES[l.m]}</b></div>
       <div><span>Attrezzo</span><b>${EQUIP[l.eq]||"–"}</b></div>
-      <div><span>Serie consigliate</span><b>${l.sets} × ${repLabel(l)}</b></div>
+      <div><span>Serie consigliate</span><b>3 × ${repLabel(l)}</b></div>
       <div><span>Recupero</span><b>${l.rest?fmtT(l.rest):"–"}</b></div>
     </div>
     ${l.sec.length?`<p class="lbl2">Coinvolge anche</p><div class="meta" style="margin-top:0">${l.sec.map(k=>`<span class="tag">${MUSCLES[k]}</span>`).join("")}</div>`:""}
@@ -1183,15 +1189,15 @@ let bld = null;
 const REP_PRESETS = {reps:[["Forza",4,6],["Massa",8,12],["Tono",12,15],["Resistenza",15,20]], s:[["20 s",20,20],["30 s",30,30],["45 s",45,45],["1 min",60,60]], min:[["5 min",5,5],["10 min",10,10],["20 min",20,20],["30 min",30,30]]};
 const REST_PRESETS = [30,45,60,90,120,180];
 const GOALS = [["base","Consigliato","Serie e ripetizioni consigliate per ogni esercizio"],
-  ["forza","Forza","Poche ripetizioni e carichi alti: 3–4 serie da 4–8, recupero lungo"],
-  ["massa","Massa","Ipertrofia: 3–4 serie da 8–12, recupero 1:15–2:00"],
+  ["forza","Forza","Poche ripetizioni e carichi alti: 3 serie da 4–8, recupero lungo"],
+  ["massa","Massa","Ipertrofia: 3 serie da 8–12, recupero 1:15–2:00"],
   ["tono","Tonificazione","3 serie da 12–15, recupero breve"],
-  ["resistenza","Resistenza","2–3 serie da 15–20, recupero 45 s"]];
-const GOALV = {forza:{m:[4,4,6,180],i:[3,6,8,120]}, massa:{m:[4,8,10,120],i:[3,10,12,75]}, tono:{m:[3,12,15,75],i:[3,12,15,60]}, resistenza:{m:[3,15,20,45],i:[2,15,20,45]}};
+  ["resistenza","Resistenza","3 serie da 15–20, recupero 45 s"]];
+const GOALV = {forza:{m:[3,4,6,180],i:[3,6,8,120]}, massa:{m:[3,8,10,120],i:[3,10,12,75]}, tono:{m:[3,12,15,75],i:[3,12,15,60]}, resistenza:{m:[3,15,20,45],i:[3,15,20,45]}};
 const unitWord = u=> u==="s"?"Secondi":u==="min"?"Minuti":"Ripetizioni";
 const fmtRest = r=> r? (r<60? r+" s" : fmtT(r)) : "Nessuno";
 function cfgDefault(id){ const l=LIBX[id], last=lastByLib(id); const kgs=last?last.sets.map(s=>s.kg).filter(v=>v!=null):[];
-  return {sets:l.sets, a:l.repMin, b:l.repMax, rest:l.rest, unit:l.unit, kg:kgs.length?kgs[0]:null, lastKg:kgs.length?kgs[0]:null}; }
+  return {sets:3, a:l.repMin, b:l.repMax, rest:l.rest, unit:l.unit, kg:kgs.length?kgs[0]:null, lastKg:kgs.length?kgs[0]:null}; }
 function cfgGet(sc){ const i=sc.indexOf(":"), t=sc.slice(0,i), id=sc.slice(i+1);
   if(t==="b") return {t, o:bld?.cfg?.[id]};
   const w=W(); return {t, o:w&&w.exercises.find(x=>x.id===id)}; }
@@ -1321,11 +1327,11 @@ function renderLibList(byM){
   if(!keys.length) return `<div class="empty">Nessun esercizio con questi filtri.</div>`;
   return keys.map(k=>`<h3 class="lgrp">${MUSCLES[k]} <span>${byM[k].length}</span></h3><div class="llist">${byM[k].map(l=>{
     const on = bld.picked.includes(l.id), sec = l.sec.map(s=>MUSCLES[s]).join(", ");
-    return `<div class="lrow-w"><button class="lthumb" data-info="${l.id}" aria-label="Foto e istruzioni: ${esc(l.name)}">${thumb(l)}</button><button class="lrow" data-pick="${l.id}" aria-pressed="${on}"><span class="nm">${esc(l.name)}<small>${EQUIP[l.eq]} · ${l.sets}×${repLabel(l)}${sec?" · anche "+sec:""}</small></span><span class="add" aria-hidden="true">${on?"✓":"+"}</span></button></div>`; }).join("")}</div>`).join("");
+    return `<div class="lrow-w"><button class="lthumb" data-info="${l.id}" aria-label="Foto e istruzioni: ${esc(l.name)}">${thumb(l)}</button><button class="lrow" data-pick="${l.id}" aria-pressed="${on}"><span class="nm">${esc(l.name)}<small>${EQUIP[l.eq]} · 3×${repLabel(l)}${sec?" · anche "+sec:""}</small></span><span class="add" aria-hidden="true">${on?"✓":"+"}</span></button></div>`; }).join("")}</div>`).join("");
 }
 function lastByLib(lib){ for(const s of sessions){ const x=s.exercises?.find(x=>libOf(x)===lib); if(x && x.sets?.length) return x; } return null; }
 function exFromLib(id){
-  const l = LIBX[id], e = ex(l.name, libTarget(l), l.sets, l.repMin, l.repMax, l.rest, l.unit); e.lib = id;
+  const l = LIBX[id], e = ex(l.name, libTarget(l), 3, l.repMin, l.repMax, l.rest, l.unit); e.lib = id;
   const last = lastByLib(id); if(last){ const kgs=last.sets.map(s=>s.kg).filter(v=>v!=null); if(kgs.length) e.weights=Array.from({length:e.sets},(_,k)=>last.sets[k]?.kg ?? kgs[kgs.length-1]); }
   return e;
 }
@@ -1594,6 +1600,7 @@ function renderCard(w,e,i){
     </div>
     ${last?`<div class="last"><span>Ultima volta</span><b>${last.x.sets.map(s=>`${fmtKg(s.kg)||"–"}×${s.reps??"–"}`).join("  ")}</b></div>`:""}
     <div class="sets" role="group" aria-label="Serie di ${esc(e.name)}">${rows}</div>
+    <div class="setctl"><button type="button" data-setd="-1" data-ex="${e.id}" ${e.sets<=1?"disabled":""} aria-label="Togli una serie">−</button><span><b>${e.sets}</b> ${e.sets===1?"serie":"serie"}</span><button type="button" data-setd="1" data-ex="${e.id}" ${e.sets>=10?"disabled":""} aria-label="Aggiungi una serie">+</button></div>
     <div class="rest-line"><div class="rl-l"><span>Recupero</span><div class="stepper"><button data-rest="-15" data-ex="${e.id}" aria-label="Meno 15 secondi">−</button><output>${fmtT(e.rest)}</output><button data-rest="15" data-ex="${e.id}" aria-label="Più 15 secondi">+</button></div></div>
     <button class="btn btn-timer" data-start="${e.id}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Avvia timer</button></div>
   </article>`;
@@ -1755,6 +1762,9 @@ document.addEventListener("click", ev=>{
   if(b.dataset.mv){ const i=w.exercises.findIndex(e=>e.id===b.dataset.ex), j=i+Number(b.dataset.mv); [w.exercises[i],w.exercises[j]]=[w.exercises[j],w.exercises[i]]; savePlan(); render(); return; }
   if(b.dataset.delex){ armButton(b,()=>{ w.exercises=w.exercises.filter(e=>e.id!==b.dataset.delex); savePlan(); render(); }); return; }
   if(b.dataset.rest){ const e=w.exercises.find(e=>e.id===b.dataset.ex); e.rest=Math.max(0,e.rest+Number(b.dataset.rest)); savePlan(); b.parentElement.querySelector("output").textContent=fmtT(e.rest); b.closest(".card").querySelector(".meta .tag:nth-child(2)").textContent="rec "+fmtT(e.rest); return; }
+  if(b.dataset.setd){ const e=w.exercises.find(e=>e.id===b.dataset.ex); if(!e) return; const n=Math.min(10,Math.max(1,e.sets+Number(b.dataset.setd))); if(n===e.sets) return;
+    e.sets=n; if(e.weights?.length){ const wt=e.weights; e.weights=Array.from({length:n},(_,k)=>wt[k]??wt[wt.length-1]); }
+    draftFor(w,e); saveDrafts(); savePlan(); render(); toast(Number(b.dataset.setd)>0?"Serie aggiunta":"Serie tolta"); return; }
   if(b.dataset.start){ const e=w.exercises.find(e=>e.id===b.dataset.start); startTimer(e.rest,e.name,"Recupero"); return; }
   if(b.dataset.tick!=null){
     const e=w.exercises.find(e=>e.id===b.dataset.ex), k=Number(b.dataset.tick), d=draftFor(w,e), s=d[k];
