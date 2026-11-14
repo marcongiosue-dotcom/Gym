@@ -1,4 +1,4 @@
-const CACHE = "mypt-v22";
+const CACHE = "mypt-v23";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -10,6 +10,9 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  // Le altre versioni (2.3, gioia) hanno il loro service worker: non toccarle
+  const rel = url.pathname.slice(new URL(self.registration.scope).pathname.length);
+  if (url.origin === location.origin && /^(2\.3|gioia)(\/|$)/.test(rel)) return;
   // Pagina: rete prima (per ricevere aggiornamenti), cache se offline
   if (req.mode === "navigate") {
     const isApp = /\/(index\.html)?$/.test(url.pathname);

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#15191b">
-<script>try{var t=JSON.parse(localStorage.getItem("mypt.theme"));if(t)document.documentElement.dataset.theme=t;if(t==="custom"){var v=JSON.parse(localStorage.getItem("mypt.customVars"))||{};for(var k in v)document.documentElement.style.setProperty(k,v[k])}}catch(e){}</script>
+<script>try{var t=JSON.parse(localStorage.getItem("gioia.mypt.theme"));if(t)document.documentElement.dataset.theme=t;if(t==="custom"){var v=JSON.parse(localStorage.getItem("gioia.mypt.customVars"))||{};for(var k in v)document.documentElement.style.setProperty(k,v[k])}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1485,8 +1485,8 @@ let plan = null, sessions = [], current = null, editing = false, view = "list", 
 let drafts = {}; // workoutId -> exId -> [{kg,reps,done}]
 let store = {mode:"local"}; // {mode:"db", planRef, sessCol}
 const LS = {
-  get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  get(k){try{return JSON.parse(localStorage.getItem("gioia."+k))}catch(e){return null}},
+  set(k,v){try{localStorage.setItem("gioia."+k,JSON.stringify(v))}catch(e){}}
 };
 plan = LS.get("gym.plan") || defaultPlan();
 sessions = LS.get("gym.sessions") || [];
@@ -2607,7 +2607,7 @@ document.addEventListener("click", ev=>{
     user.name=n.charAt(0).toUpperCase()+n.slice(1); LS.set("mypt.user",user); $("#set-name").value=user.name; refresh(); toast("Nome salvato"); return; }
   if(b.hasAttribute("data-settgt")){ const T=food.targets; [["kcal","#s-kcal"],["p","#s-p"],["c","#s-c"],["f","#s-f"],["water","#s-water"]].forEach(([k,id])=>{ const v=parseNum($(id).value); if(v!=null&&v>=0) T[k]=Math.round(v); }); saveFood(); refresh(); toast("Obiettivi salvati"); return; }
   if(b.hasAttribute("data-setsports")){ closeSettings(); homeEdit=true; homePrefs.sort="custom"; homePrefs.filter="Tutti"; saveHome(); if(location.hash&&location.hash!=="#home") location.hash="#home"; else renderHome(); return; }
-  if(b.hasAttribute("data-wipe")){ armButton(b,()=>{ try{ Object.keys(localStorage).filter(k=>/^(gym|mypt)\./.test(k)).forEach(k=>localStorage.removeItem(k)); }catch(e){} location.hash=""; location.reload(); }); return; }
+  if(b.hasAttribute("data-wipe")){ armButton(b,()=>{ try{ Object.keys(localStorage).filter(k=>/^gioia\./.test(k)).forEach(k=>localStorage.removeItem(k)); }catch(e){} location.hash=""; location.reload(); }); return; }
 });
 $("#set-name").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("[data-setname]").click(); } });
 
